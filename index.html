@@ -291,6 +291,70 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
   to{opacity:1;transform:translateY(0)}
 }
 
+
+/* KOMPAKT AKILLI ASİSTAN */
+.ai-chip{
+  margin:0 16px 10px;
+  background:var(--surf);
+  border:.5px solid var(--brd2);
+  border-radius:15px;
+  padding:11px 13px;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  box-shadow:0 2px 12px rgba(0,0,0,.05);
+}
+.ai-chip-ico{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  flex-shrink:0;
+}
+.ai-chip-body{flex:1;min-width:0}
+.ai-chip-title{
+  font-size:11px;
+  font-weight:800;
+  color:var(--txt);
+  margin-bottom:3px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.ai-chip-tag{
+  font-size:9px;
+  color:var(--blue);
+  background:var(--blue-bg);
+  padding:2px 6px;
+  border-radius:999px;
+  white-space:nowrap;
+}
+.ai-chip-text{
+  font-size:11.5px;
+  line-height:1.45;
+  color:var(--txt2);
+}
+.ai-chip-actions{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+}
+.ai-mini-btn{
+  padding:6px 8px;
+  border-radius:999px;
+  background:var(--bg2);
+  color:var(--txt2);
+  font-size:10.5px;
+  font-weight:700;
+}
+.ai-mini-btn:active{transform:scale(.96)}
+
 </style>
 </head>
 <body>
@@ -349,33 +413,22 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
       <div class="tahmin-txt" id="tahminTxt"></div>
     </div>
 
+    <div class="ai-chip" id="aiInsight" style="display:none">
+      <div class="ai-chip-ico">🤖</div>
+      <div class="ai-chip-body">
+        <div class="ai-chip-title">
+          <span>Akıllı Öneri</span>
+          <span class="ai-chip-tag" id="aiInsightTag">Canlı</span>
+        </div>
+        <div class="ai-chip-text" id="aiInsightText"></div>
+        <div class="ai-chip-actions">
+          <button class="ai-mini-btn" onclick="aiOneriYenile()">Başka öneri</button>
+          <button class="ai-mini-btn" onclick="tabSec(3)">Grafiğe bak</button>
+        </div>
+      </div>
+    </div>
+
     
-<div class="ai-panel" style="margin:0 16px 12px;background:linear-gradient(135deg,#111827,#1f2937);border-radius:18px;padding:16px;color:white;box-shadow:0 8px 24px rgba(0,0,0,.18)">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div style="font-size:15px;font-weight:700">🤖 Akıllı Finans Asistanı</div>
-    <div style="font-size:11px;padding:4px 8px;background:rgba(255,255,255,.12);border-radius:999px">AI Destekli</div>
-  </div>
-
-  <div style="font-size:12px;line-height:1.7;color:rgba(255,255,255,.82)">
-    • Gereksiz harcamaları analiz eder<br>
-    • Otomatik yatırım önerileri sunar<br>
-    • Aylık bütçe risklerini tahmin eder<br>
-    • Harcama alışkanlıklarını yorumlar
-  </div>
-
-  <div style="display:flex;gap:8px;margin-top:14px">
-    <div style="flex:1;background:rgba(255,255,255,.08);padding:10px;border-radius:12px;text-align:center">
-      <div style="font-size:10px;opacity:.7">Tasarruf Skoru</div>
-      <div style="font-size:18px;font-weight:700;color:#4ade80">92</div>
-    </div>
-
-    <div style="flex:1;background:rgba(255,255,255,.08);padding:10px;border-radius:12px;text-align:center">
-      <div style="font-size:10px;opacity:.7">Risk Durumu</div>
-      <div style="font-size:18px;font-weight:700;color:#facc15">Düşük</div>
-    </div>
-  </div>
-</div>
-
 
     <div class="oneri-wrap" id="oneriWrap">
       <div class="oneri-ttl">🎯 Akıllı Bütçe Önerisi</div>
@@ -602,6 +655,7 @@ function render(){
   } else sub.textContent='';
 
   tahminGoster(h);
+  aiInsightGoster(h);
   oneriGoster(h);
 
   // Progress — FIX 11: progress oran hesabı doğru
@@ -629,6 +683,64 @@ function tahminGoster(h){
   else if(h.oran>=70){ico.textContent='📊';txt.innerHTML='Harcamalar gelirinizin <strong>%'+h.oran+"'ü</strong>. Dikkatli olunabilir.";}
   else if(h.kalan>0){const gun=h.topGider>0?Math.round((h.kalan/h.topGider)*30):0;ico.textContent='✨';txt.innerHTML='<strong>'+fTL(h.kalan)+' kalan</strong> ile bu hızda ~'+gun+' gün daha.';}
   else if(h.kalan<0){ico.textContent='🔴';txt.innerHTML='<strong>Giderler geliri aştı!</strong> '+fTL(Math.abs(h.kalan))+' açık var.';}
+}
+
+
+let aiOneriIndex=0;
+
+function aiOnerileriUret(h){
+  const v=ayVerisi(aktifAy);
+  const giderSayisi=v.giderler.length;
+  const gelirSayisi=v.gelirler.length;
+  const odenmeyen=v.giderler.filter(k=>!k.odendi).reduce((s,k)=>s+k.tutar,0);
+  const yatirim=h.yatirim||0;
+  const liste=[];
+
+  if(!h.topGelir && !h.topGider){
+    liste.push({tag:'Başlangıç',txt:'Önce maaşını ekle. Sonra uygulama sana gider limiti, yatırım hedefi ve kalan para tahmini çıkaracak.'});
+  }
+  if(h.topGelir>0 && giderSayisi===0){
+    liste.push({tag:'Plan',txt:'Henüz gider yok. Sabit ödemelerini eklediğinde aylık risk ve kalan gün hesabı daha doğru çalışır.'});
+  }
+  if(h.oran>=90){
+    liste.push({tag:'Risk yüksek',txt:'Harcama oranı kritik seviyede. Yeni gider eklemeden önce zorunlu olmayan ödemeleri ertelemek mantıklı olur.'});
+  } else if(h.oran>=70){
+    liste.push({tag:'Dikkat',txt:'Bütçenin çoğu kullanılmış. Kalan günlerde küçük harcamaları kategoriye ayırarak takip et.'});
+  } else if(h.topGelir>0){
+    liste.push({tag:'İyi gidiyor',txt:'Harcama oranın kontrollü. Bu ay ekstra kalan tutarın bir kısmını yatırım ya da acil durum bütçesine ayırabilirsin.'});
+  }
+  if(odenmeyen>0){
+    liste.push({tag:'Ödeme',txt:'Ödenmemiş gider toplamı '+fTL(odenmeyen)+'. Bunları işaretlersen harcama oranı daha net görünür.'});
+  }
+  if(h.topGelir>0 && yatirim<h.topGelir*.15){
+    liste.push({tag:'Yatırım',txt:'Yatırım oranı düşük görünüyor. İmkan varsa gelirin %15–30 arası için ayrı bir hedef oluştur.'});
+  }
+  if(gelirSayisi>0 && giderSayisi>0 && h.kalan>0){
+    const gun=h.topGider>0?Math.max(1,Math.round((h.kalan/h.topGider)*30)):30;
+    liste.push({tag:'Tahmin',txt:'Mevcut tempoyla kalan tutar yaklaşık '+gun+' gün idare eder. Büyük alımları bu bilgiye göre planla.'});
+  }
+  if(h.kalan<0){
+    liste.push({tag:'Açık',txt:'Bu ay '+fTL(Math.abs(h.kalan))+' açık var. En yüksek gider kategorisini grafikten kontrol et.'});
+  }
+
+  return liste.length?liste:[{tag:'Hazır',txt:'Veriler güncellendikçe burada sabit metin yerine duruma göre değişen öneriler görünecek.'}];
+}
+
+function aiInsightGoster(h){
+  const box=document.getElementById('aiInsight');
+  const txt=document.getElementById('aiInsightText');
+  const tag=document.getElementById('aiInsightTag');
+  if(!box||!txt||!tag)return;
+  const oneriler=aiOnerileriUret(h);
+  const secili=oneriler[aiOneriIndex%oneriler.length];
+  tag.textContent=secili.tag;
+  txt.textContent=secili.txt;
+  box.style.display='flex';
+}
+
+function aiOneriYenile(){
+  aiOneriIndex++;
+  aiInsightGoster(hesapla(aktifAy));
 }
 
 function oneriGoster(h){
