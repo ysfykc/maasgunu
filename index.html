@@ -275,6 +275,22 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
   border: .5px solid var(--brd2);
 }
 .tip-popup.on { display: flex !important; }
+
+.ai-panel{
+  animation:fadeAi .45s ease;
+  backdrop-filter:blur(12px);
+}
+.hcard,.prg-sec,.tabs,.mini-chart,.oneri-wrap{
+  transition:all .25s ease;
+}
+.hcard:active,.prg-sec:active,.mini-chart:active{
+  transform:scale(.98);
+}
+@keyframes fadeAi{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
 </style>
 </head>
 <body>
@@ -333,6 +349,34 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
       <div class="tahmin-txt" id="tahminTxt"></div>
     </div>
 
+    
+<div class="ai-panel" style="margin:0 16px 12px;background:linear-gradient(135deg,#111827,#1f2937);border-radius:18px;padding:16px;color:white;box-shadow:0 8px 24px rgba(0,0,0,.18)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:15px;font-weight:700">🤖 Akıllı Finans Asistanı</div>
+    <div style="font-size:11px;padding:4px 8px;background:rgba(255,255,255,.12);border-radius:999px">AI Destekli</div>
+  </div>
+
+  <div style="font-size:12px;line-height:1.7;color:rgba(255,255,255,.82)">
+    • Gereksiz harcamaları analiz eder<br>
+    • Otomatik yatırım önerileri sunar<br>
+    • Aylık bütçe risklerini tahmin eder<br>
+    • Harcama alışkanlıklarını yorumlar
+  </div>
+
+  <div style="display:flex;gap:8px;margin-top:14px">
+    <div style="flex:1;background:rgba(255,255,255,.08);padding:10px;border-radius:12px;text-align:center">
+      <div style="font-size:10px;opacity:.7">Tasarruf Skoru</div>
+      <div style="font-size:18px;font-weight:700;color:#4ade80">92</div>
+    </div>
+
+    <div style="flex:1;background:rgba(255,255,255,.08);padding:10px;border-radius:12px;text-align:center">
+      <div style="font-size:10px;opacity:.7">Risk Durumu</div>
+      <div style="font-size:18px;font-weight:700;color:#facc15">Düşük</div>
+    </div>
+  </div>
+</div>
+
+
     <div class="oneri-wrap" id="oneriWrap">
       <div class="oneri-ttl">🎯 Akıllı Bütçe Önerisi</div>
       <div class="oneri-grid" id="oneriGrid"></div>
@@ -346,7 +390,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 
     <div class="tabs">
       <button class="tbtn on" onclick="tabSec(0)">📋 Tümü</button>
-      <button class="tbtn" onclick="tabSec(1)">💚 Gelir</button>
+      <button class="tbtn" onclick="tabSec(1)">🟢 Gelir</button>
       <button class="tbtn" onclick="tabSec(2)">🔴 Gider</button>
       <button class="tbtn" onclick="tabSec(3)">📊 Grafik</button>
     </div>
@@ -373,12 +417,12 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 </div>
 
 
-<div class="quick-add-wrap" style="position:fixed;bottom:150px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:9997">
+<div class="quick-add-wrap" style="position:fixed;bottom:110px;right:20px;display:flex;flex-direction:column;gap:12px;z-index:9997">
   <button onclick="modalAc('gelir')" title="Gelir Ekle"
-    style="width:46px;height:46px;border-radius:50%;border:none;background:#1a7a42;color:white;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.18)">₺</button>
+    style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#16a34a,#22c55e);color:white;font-size:22px;box-shadow:0 10px 24px rgba(34,197,94,.35)">₺</button>
 
   <button onclick="modalAc('gider')" title="Gider Ekle"
-    style="width:46px;height:46px;border-radius:50%;border:none;background:#c03535;color:white;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.18)">₺</button>
+    style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;font-size:22px;box-shadow:0 10px 24px rgba(239,68,68,.35)">₺</button>
 </div>
 
 <!-- NAV -->
@@ -613,8 +657,8 @@ function icerikRender(){
 
   if(gG){
     const top=v.gelirler.reduce((s,k)=>s+k.tutar,0);
-    html+=`<div class="sec" id="sec-gelir"><div class="sec-hdr"><span class="sec-ttl">💚 Gelirler</span><span class="sec-total g">${fTL(top)}</span></div>`;
-    html+=v.gelirler.length?v.gelirler.map((k,i)=>kalemHtml(k,'gelir',i)).join(''):'<div class="empty-sec"><div class="empty-ico">💚</div>Henüz gelir eklenmedi</div>';
+    html+=`<div class="sec" id="sec-gelir"><div class="sec-hdr"><span class="sec-ttl">🟢 Gelirler</span><span class="sec-total g">${fTL(top)}</span></div>`;
+    html+=v.gelirler.length?v.gelirler.map((k,i)=>kalemHtml(k,'gelir',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🟢</div>Henüz gelir eklenmedi</div>';
     html+='</div>';
   }
   if(gD){
@@ -746,7 +790,7 @@ function modalAc(tip){
   document.getElementById('tekrarToggle').classList.remove('on');
   document.getElementById('yatirimToggle').classList.remove('on');
   ['eAd','eTutar','eKat','eNot'].forEach(id=>document.getElementById(id).value='');
-  const ttl={gelir:'💚 Gelir Ekle',gider:'🔴 Gider Ekle',yatirim:'📈 Yatırım Ekle'};
+  const ttl={gelir:'🟢 Gelir Ekle',gider:'🔴 Gider Ekle',yatirim:'📈 Yatırım Ekle'};
   const cls={gelir:'sbtn g',gider:'sbtn r',yatirim:'sbtn p'};
   document.getElementById('mTtl').textContent=ttl[tip]||'Ekle';
   document.getElementById('mBtn').className=cls[tip]||'sbtn g';
