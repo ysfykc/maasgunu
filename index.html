@@ -7,7 +7,23 @@
 <meta name="theme-color" content="#f7f5f0">
 <title>Maaş Günü</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+function menuAc() {
+  const p = document.getElementById('tipPopup');
+  if (p) p.classList.toggle('on');
+}
+function formAc(tip) {
+  aktifTip = tip;
+  const mttl = document.getElementById('modalTtl');
+  if (mttl) mttl.textContent = tip === 'gelir' ? 'Gelir Ekle' : 'Gider Ekle';
+  const tp = document.getElementById('tipPopup');
+  if (tp) tp.classList.remove('on');
+  const mo = document.getElementById('modalOv');
+  if (mo) mo.classList.add('on');
+  const ia = document.getElementById('inpAd');
+  if (ia) ia.focus();
+}
+</script>
 <style>
 :root {
   --bg:#f7f5f0; --bg2:#edeae3; --bg3:#e3e0d8;
@@ -236,6 +252,42 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 
 /* SCROLL ANCHOR — FIX 7 */
 .scroll-anchor{height:1px;display:block}
+
+.fab {
+  position: fixed;
+  bottom: 85px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: var(--txt);
+  color: var(--bg);
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999; /* En üstte olduğundan emin olalım */
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.fab:active { transform: scale(0.9); }
+.tip-popup {
+  position: fixed;
+  bottom: 150px;
+  right: 20px;
+  background: var(--surf);
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: var(--sh2);
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 9998;
+  border: .5px solid var(--brd2);
+}
+.tip-popup.on { display: flex !important; }
 </style>
 </head>
 <body>
@@ -886,7 +938,7 @@ async function init(){
   const u=await fbBaslat();
 
   if(!u){
-    document.getElementById('login').style.setProperty('display', 'flex', 'important');
+    document.getElementById('login').style.display='flex';
     window._fb.onAuthStateChanged(auth,async kullanici=>{
       if(kullanici){
         user=kullanici;
@@ -906,7 +958,7 @@ async function init(){
         setInterval(fbKaydet,60000);
       }else{
         user=null;veri={aylar:{},guncelleme:null};
-        document.getElementById('login').style.setProperty('display', 'flex', 'important');
+        document.getElementById('login').style.display='flex';
         document.getElementById('logoUser').style.display='none';
       }
     });
@@ -929,6 +981,22 @@ async function init(){
 }
 
 document.addEventListener('DOMContentLoaded',init);
+
+function menuAc() {
+  const p = document.getElementById('tipPopup');
+  if (p) p.classList.toggle('on');
+}
+function formAc(tip) {
+  aktifTip = tip;
+  const mttl = document.getElementById('modalTtl');
+  if (mttl) mttl.textContent = tip === 'gelir' ? 'Gelir Ekle' : 'Gider Ekle';
+  const tp = document.getElementById('tipPopup');
+  if (tp) tp.classList.remove('on');
+  const mo = document.getElementById('modalOv');
+  if (mo) mo.classList.add('on');
+  const ia = document.getElementById('inpAd');
+  if (ia) ia.focus();
+}
 </script>
 </body>
 </html>
