@@ -298,10 +298,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
   <div class="logo">
     <div class="logo-ico">💰</div>
     Maaş Günü
-    <div class="logo-user" id="logoUser" style="display:none">
-      <span>—</span>
-      <span id="logoUserName"></span>
-    </div>
+
   </div>
   <div class="tbr">
     <span id="sync">🔄</span>
@@ -366,7 +363,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 </main>
 
 <!-- FAB -->
-<button class="fab" id="fabBtn" onclick="fabTikla()">＋</button>
+<button class="fab" id="fabBtn" onclick="fabTikla()" style="display:none">＋</button>
 
 <!-- TİP POPUP -->
 <div class="tip-popup" id="tipPopup">
@@ -381,7 +378,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
     style="width:46px;height:46px;border-radius:50%;border:none;background:#1a7a42;color:white;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.18)">₺</button>
 
   <button onclick="modalAc('gider')" title="Gider Ekle"
-    style="width:46px;height:46px;border-radius:50%;border:none;background:#c03535;color:white;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.18)">−</button>
+    style="width:46px;height:46px;border-radius:50%;border:none;background:#c03535;color:white;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.18)">₺</button>
 </div>
 
 <!-- NAV -->
@@ -871,7 +868,7 @@ function navSec(i){
   document.getElementById('pageAy').className='page'+(i===0?' on':'');
   document.getElementById('pageGecmis').className='page'+(i===1?' on':'');
   // FIX 17: FAB geçmiş sayfasında gizli
-  document.getElementById('fabBtn').style.display=i===0?'flex':'none';
+  document.getElementById('fabBtn').style.display='none';
   tipPopupKapat();
   window.scrollTo({top:0,behavior:'smooth'});
   if(i===1)gecmisRender();
@@ -945,13 +942,7 @@ async function init(){
         document.getElementById('login').style.display='none';
         const av=document.getElementById('avatar');
         if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';}
-        // FIX 19: Logo'da kullanıcı adı göster
-        const nameEl=document.getElementById('logoUser');
-        const nameSpan=document.getElementById('logoUserName');
-        if(nameEl&&nameSpan){
-          nameSpan.textContent=kullanici.displayName?.split(' ')[0]||kullanici.email?.split('@')[0]||'ysfykc';
-          nameEl.style.display='flex';
-        }
+        // Kullanıcı adı üst bardan kaldırıldı.
         lsYukle();render();
         await fbYukle();render();
         setSynk('ok');
@@ -959,7 +950,7 @@ async function init(){
       }else{
         user=null;veri={aylar:{},guncelleme:null};
         document.getElementById('login').style.display='flex';
-        document.getElementById('logoUser').style.display='none';
+        // Kullanıcı adı üst bardan kaldırıldı.
       }
     });
     return;
@@ -968,12 +959,7 @@ async function init(){
   document.getElementById('login').style.display='none';
   const av=document.getElementById('avatar');
   if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
-  const nameEl=document.getElementById('logoUser');
-  const nameSpan=document.getElementById('logoUserName');
-  if(nameEl&&nameSpan){
-    nameSpan.textContent=u.displayName?.split(' ')[0]||u.email?.split('@')[0]||'ysfykc';
-    nameEl.style.display='flex';
-  }
+  // Kullanıcı adı üst bardan kaldırıldı.
   lsYukle();render();
   await fbYukle();render();
   setSynk('ok');
