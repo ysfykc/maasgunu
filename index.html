@@ -441,6 +441,10 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
       <div class="prg-bot"><span id="prgOde">₺0 ödendi</span><span id="prgKal">₺0 kaldı</span></div>
     </div>
 
+<div style="margin:0 16px 10px;font-size:11px;color:var(--txt3);line-height:1.5">
+✓ İşaretlenen gelir ve giderler üst kutulara otomatik dahil edilir.
+</div>
+
     <div class="tabs">
       <button class="tbtn on" onclick="tabSec(0)">📋 Tümü</button>
       <button class="tbtn" onclick="tabSec(1)">🟢 Gelir</button>
@@ -628,12 +632,25 @@ function ayYazi(k){const[y,m]=k.split('-');return AYLAR[parseInt(m)-1]+' '+y;}
 
 function hesapla(ay){
   const v=ayVerisi(ay);
-  const topGelir=v.gelirler.reduce((s,k)=>s+k.tutar,0);
-  const topGider=v.giderler.reduce((s,k)=>s+k.tutar,0);
-  const odendi=v.giderler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0);
+
+  // Sadece işaretlenen gelir/giderler üst kutulara dahil edilir
+  const aktifGelirler=v.gelirler.filter(k=>k.odendi);
+  const aktifGiderler=v.giderler.filter(k=>k.odendi);
+
+  const topGelir=aktifGelirler.reduce((s,k)=>s+k.tutar,0);
+  const topGider=aktifGiderler.reduce((s,k)=>s+k.tutar,0);
+
+  const odendi=topGider;
   const kalan=topGelir-topGider;
-  const oran=topGelir>0?Math.min(100,Math.round(topGider/topGelir*100)):0;
-  const yatirim=v.giderler.filter(k=>k.yatirim).reduce((s,k)=>s+k.tutar,0);
+
+  const oran=topGelir>0
+    ?Math.min(100,Math.round(topGider/topGelir*100))
+    :0;
+
+  const yatirim=aktifGiderler
+    .filter(k=>k.yatirim)
+    .reduce((s,k)=>s+k.tutar,0);
+
   return{topGelir,topGider,odendi,kalan,oran,yatirim};
 }
 
