@@ -562,7 +562,18 @@ main{padding-bottom:calc(var(--nav) + 120px)}
 .deleted-head{padding:14px 15px}
 .deleted-body{padding:10px 14px 14px}
 .deleted-row{padding:10px 0}
-.quick-add-wrap{bottom:96px!important;right:18px!important;gap:11px!important}
+.quick-add-wrap{
+  position:fixed!important;
+  right:50%!important;
+  transform:translateX(50%)!important;
+  bottom:84px!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:14px!important;
+  z-index:9999!important;
+}
 .quick-add-wrap button{
   width:54px!important;
   height:54px!important;
@@ -1545,5 +1556,27 @@ document.addEventListener('DOMContentLoaded',init);
 .hcard.gider .hcard-lbl,
 .hcard.gider .hcard-val{
   color:#d63d3d!important;
+}
+</style>
+
+<style>
+.quick-add-wrap button{
+  width:60px!important;
+  height:60px!important;
+  border-radius:22px!important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.12),
+    inset 0 1px 0 rgba(255,255,255,.35)!important;
+}
+.quick-add-wrap button:first-child{
+  background:linear-gradient(145deg,rgba(42,173,98,.92),rgba(42,173,98,.74))!important;
+}
+.quick-add-wrap button:last-child{
+  background:linear-gradient(145deg,rgba(224,80,80,.92),rgba(224,80,80,.74))!important;
+}
+.quick-add-wrap button:active{
+  transform:scale(.92)!important;
 }
 </style>
