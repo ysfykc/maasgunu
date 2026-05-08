@@ -1442,7 +1442,7 @@ function navSec(i){
   document.getElementById('pageGecmis').className='page'+(i===1?' on':'');
   // FIX 17: FAB geçmiş sayfasında gizli
   document.getElementById('fabBtn').style.display='none';
-  const qaw=document.querySelector('.quick-add-wrap'); if(qaw)qaw.style.display=i===0?'flex':'none';
+  const qaw=document.querySelector('.quick-add-wrap'); if(qaw)qaw.style.display=(i===0 && document.body.classList.contains('app-ready'))?'flex':'none';
   tipPopupKapat();
   window.scrollTo({top:0,behavior:'smooth'});
   if(i===1)gecmisRender();
@@ -1509,11 +1509,11 @@ async function init(){
   const u=await fbBaslat();
 
   if(!u){
-    document.getElementById('login').style.display='flex';
+    document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
     window._fb.onAuthStateChanged(auth,async kullanici=>{
       if(kullanici){
         user=kullanici;
-        document.getElementById('login').style.display='none';
+        document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
         const av=document.getElementById('avatar');
         if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';}
         // Kullanıcı adı üst bardan kaldırıldı.
@@ -1523,14 +1523,14 @@ async function init(){
         setInterval(fbKaydet,60000);
       }else{
         user=null;veri={aylar:{},guncelleme:null};
-        document.getElementById('login').style.display='flex';
+        document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
         // Kullanıcı adı üst bardan kaldırıldı.
       }
     });
     return;
   }
 
-  document.getElementById('login').style.display='none';
+  document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
   const av=document.getElementById('avatar');
   if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
   // Kullanıcı adı üst bardan kaldırıldı.
@@ -1544,6 +1544,110 @@ document.addEventListener('DOMContentLoaded',init);
 
 
 </script>
+
+<style>
+/* SON DÜZELTME: LOGIN BUTONLARI VE KART RENKLERİ */
+body:not(.app-ready) .quick-add-wrap,
+body.login-open .quick-add-wrap{
+  display:none!important;
+}
+
+body.app-ready:not(.login-open) .quick-add-wrap{
+  display:flex!important;
+}
+
+/* Silme/işaretleme için kullanılan arkadaki koyu yarım şeritleri gizle */
+.kalem-bg{
+  display:none!important;
+}
+
+/* Gelir kartları tamamen şeffaf yeşil */
+#sec-gelir .kalem{
+  background:rgba(42,173,98,.105)!important;
+  border:1px solid rgba(42,173,98,.16)!important;
+  box-shadow:0 10px 24px rgba(42,173,98,.055)!important;
+}
+
+/* Gider kartları tamamen şeffaf kırmızı */
+#sec-gider .kalem{
+  background:rgba(224,80,80,.105)!important;
+  border:1px solid rgba(224,80,80,.16)!important;
+  box-shadow:0 10px 24px rgba(224,80,80,.055)!important;
+}
+
+/* Dark mode tonları */
+[data-theme=dark] #sec-gelir .kalem{
+  background:rgba(42,173,98,.16)!important;
+  border-color:rgba(42,173,98,.22)!important;
+}
+
+[data-theme=dark] #sec-gider .kalem{
+  background:rgba(224,80,80,.16)!important;
+  border-color:rgba(224,80,80,.22)!important;
+}
+
+/* Üstteki Gelir/Gider özet kartları da tek renkte kalsın */
+.hcard.gelir{
+  background:rgba(42,173,98,.12)!important;
+  border:1px solid rgba(42,173,98,.16)!important;
+}
+
+.hcard.gider{
+  background:rgba(224,80,80,.12)!important;
+  border:1px solid rgba(224,80,80,.16)!important;
+}
+
+[data-theme=dark] .hcard.gelir{
+  background:rgba(42,173,98,.16)!important;
+}
+
+[data-theme=dark] .hcard.gider{
+  background:rgba(224,80,80,.16)!important;
+}
+
+/* Hızlı ekle butonları login sonrası altta düzgün dursun */
+.quick-add-wrap{
+  position:fixed!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:86px!important;
+  transform:translateX(-50%)!important;
+  flex-direction:row!important;
+  gap:14px!important;
+  z-index:9999!important;
+}
+
+.quick-add-wrap button{
+  width:58px!important;
+  height:58px!important;
+  border-radius:22px!important;
+}
+</style>
+
+
+<script>
+function uiLoginDurumuAyarla(acik){
+  document.body.classList.toggle('login-open', !!acik);
+  document.body.classList.toggle('app-ready', !acik);
+  const q=document.querySelector('.quick-add-wrap');
+  if(q) q.style.display = acik ? 'none' : 'flex';
+}
+document.addEventListener('DOMContentLoaded', function(){
+  const login=document.getElementById('login');
+  if(login){
+    const obs=new MutationObserver(function(){
+      const acik = getComputedStyle(login).display !== 'none';
+      uiLoginDurumuAyarla(acik);
+    });
+    obs.observe(login,{attributes:true,attributeFilter:['style','class']});
+    setTimeout(function(){
+      const acik = getComputedStyle(login).display !== 'none';
+      uiLoginDurumuAyarla(acik);
+    },250);
+  }
+});
+</script>
+
 </body>
 </html>
 
