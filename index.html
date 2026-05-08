@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#f7f5f0">
 <title>Maaş Günü</title>
+<!-- Firebase Authentication: Email/Password WebView uyumlu giriş -->
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -643,11 +644,30 @@ main{padding-bottom:calc(var(--nav) + 120px)}
   <div class="box">
     <div class="ico">💰</div>
     <h1>Maaş Günü</h1>
-    <p>Aylık gelir ve giderlerini akıllıca yönet.<br>Her cihazında senkronize çalışır.</p>
-    <button id="loginBtn" onclick="girisYap()">
-      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Google ile Giriş Yap
-    </button>
+    <p>Aylık gelir ve giderlerini güvenli şekilde senkronize et.<br>E-posta hesabınla giriş yap.</p>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab on" id="authLoginTab" onclick="authModeSec('login')">Giriş Yap</button>
+        <button class="auth-tab" id="authRegisterTab" onclick="authModeSec('register')">Hesap Oluştur</button>
+      </div>
+
+      <div class="auth-field">
+        <label>E-posta</label>
+        <input type="email" id="authEmail" placeholder="ornek@mail.com" autocomplete="email">
+      </div>
+
+      <div class="auth-field">
+        <label>Şifre</label>
+        <input type="password" id="authPass" placeholder="En az 6 karakter" autocomplete="current-password">
+      </div>
+
+      <button id="loginBtn" onclick="emailAuthIslem()">Giriş Yap</button>
+
+      <button class="forgot-btn" onclick="sifreSifirla()">Şifremi unuttum</button>
+      <div class="auth-note" id="authNote">Verilerin e-posta hesabına bağlı şekilde Firebase üzerinde senkronize edilir.</div>
+    </div>
+
     <div class="sig">Tasarım & Fikir<br><strong>Yusuf AYKAÇ</strong></div>
   </div>
 </div>
@@ -820,10 +840,10 @@ let db,auth,user=null;
 async function fbBaslat(){
   const{initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
   const{getFirestore,doc,setDoc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const{getAuth,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  const{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
   const app=initializeApp(CFG);
   db=getFirestore(app);auth=getAuth(app);
-  window._fb={doc,setDoc,getDoc,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut};
+  window._fb={doc,setDoc,getDoc,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut};
   return new Promise(res=>onAuthStateChanged(auth,u=>{user=u;res(u);}));
 }
 
@@ -854,11 +874,72 @@ async function fbYukle(){
   }catch(e){console.warn(e);setSynk('off');}
 }
 
+let authMode='login';
+
+function authModeSec(mode){
+  authMode=mode;
+  const l=document.getElementById('authLoginTab');
+  const r=document.getElementById('authRegisterTab');
+  const b=document.getElementById('loginBtn');
+  const n=document.getElementById('authNote');
+
+  if(l)l.classList.toggle('on',mode==='login');
+  if(r)r.classList.toggle('on',mode==='register');
+
+  if(b)b.textContent=mode==='login'?'Giriş Yap':'Hesap Oluştur';
+  if(n)n.textContent=mode==='login'
+    ?'Verilerin e-posta hesabına bağlı şekilde Firebase üzerinde senkronize edilir.'
+    :'Yeni hesap açarsan verilerin bu e-posta hesabına bağlanır.';
+}
+
+async function emailAuthIslem(){
+  const email=(document.getElementById('authEmail')?.value||'').trim();
+  const pass=(document.getElementById('authPass')?.value||'').trim();
+  const btn=document.getElementById('loginBtn');
+
+  if(!email){toast('⚠️ E-posta gir');return;}
+  if(!pass || pass.length<6){toast('⚠️ Şifre en az 6 karakter olmalı');return;}
+
+  if(btn)btn.textContent='⏳ Bekle…';
+
+  try{
+    const{createUserWithEmailAndPassword,signInWithEmailAndPassword}=window._fb;
+    if(authMode==='register'){
+      await createUserWithEmailAndPassword(auth,email,pass);
+      toast('✅ Hesap oluşturuldu');
+    }else{
+      await signInWithEmailAndPassword(auth,email,pass);
+      toast('✅ Giriş yapıldı');
+    }
+  }catch(e){
+    console.warn(e);
+    let m='Giriş başarısız';
+    if(e.code==='auth/email-already-in-use')m='Bu e-posta zaten kayıtlı';
+    else if(e.code==='auth/invalid-email')m='E-posta geçersiz';
+    else if(e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found')m='E-posta veya şifre hatalı';
+    else if(e.code==='auth/weak-password')m='Şifre zayıf';
+    toast('⚠️ '+m);
+  }finally{
+    if(btn)btn.textContent=authMode==='login'?'Giriş Yap':'Hesap Oluştur';
+  }
+}
+
+async function sifreSifirla(){
+  const email=(document.getElementById('authEmail')?.value||'').trim();
+  if(!email){toast('⚠️ Önce e-posta yaz');return;}
+  try{
+    const{sendPasswordResetEmail}=window._fb;
+    await sendPasswordResetEmail(auth,email);
+    toast('📩 Şifre sıfırlama maili gönderildi');
+  }catch(e){
+    console.warn(e);
+    toast('⚠️ Mail gönderilemedi');
+  }
+}
+
+// Eski Google giriş çağrısı kalırsa e-posta girişine yönlendir.
 async function girisYap(){
-  const{signInWithPopup,GoogleAuthProvider}=window._fb;
-  document.getElementById('loginBtn').textContent='⏳ Bekle…';
-  try{await signInWithPopup(auth,new GoogleAuthProvider());}
-  catch(e){console.warn(e);document.getElementById('loginBtn').textContent='Tekrar Dene';}
+  await emailAuthIslem();
 }
 
 async function cikisYap(){
@@ -1442,7 +1523,7 @@ function navSec(i){
   document.getElementById('pageGecmis').className='page'+(i===1?' on':'');
   // FIX 17: FAB geçmiş sayfasında gizli
   document.getElementById('fabBtn').style.display='none';
-  const qaw=document.querySelector('.quick-add-wrap'); if(qaw)qaw.style.display=(i===0 && document.body.classList.contains('app-ready'))?'flex':'none';
+  const qaw=document.querySelector('.quick-add-wrap'); if(qaw)qaw.style.display=i===0?'flex':'none';
   tipPopupKapat();
   window.scrollTo({top:0,behavior:'smooth'});
   if(i===1)gecmisRender();
@@ -1509,11 +1590,11 @@ async function init(){
   const u=await fbBaslat();
 
   if(!u){
-    document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
+    document.getElementById('login').style.display='flex';
     window._fb.onAuthStateChanged(auth,async kullanici=>{
       if(kullanici){
         user=kullanici;
-        document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
+        document.getElementById('login').style.display='none';
         const av=document.getElementById('avatar');
         if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';}
         // Kullanıcı adı üst bardan kaldırıldı.
@@ -1523,14 +1604,14 @@ async function init(){
         setInterval(fbKaydet,60000);
       }else{
         user=null;veri={aylar:{},guncelleme:null};
-        document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
+        document.getElementById('login').style.display='flex';
         // Kullanıcı adı üst bardan kaldırıldı.
       }
     });
     return;
   }
 
-  document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
+  document.getElementById('login').style.display='none';
   const av=document.getElementById('avatar');
   if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
   // Kullanıcı adı üst bardan kaldırıldı.
@@ -1546,107 +1627,74 @@ document.addEventListener('DOMContentLoaded',init);
 </script>
 
 <style>
-/* SON DÜZELTME: LOGIN BUTONLARI VE KART RENKLERİ */
-body:not(.app-ready) .quick-add-wrap,
-body.login-open .quick-add-wrap{
-  display:none!important;
+/* E-POSTA / ŞİFRE GİRİŞ PANELİ */
+.auth-card{
+  width:100%;
+  background:var(--surf);
+  border:.5px solid var(--brd2);
+  border-radius:20px;
+  padding:14px;
+  box-shadow:var(--sh2);
+  text-align:left;
 }
-
-body.app-ready:not(.login-open) .quick-add-wrap{
-  display:flex!important;
+.auth-tabs{
+  display:flex;
+  background:var(--bg2);
+  border-radius:14px;
+  padding:4px;
+  gap:4px;
+  margin-bottom:14px;
 }
-
-/* Silme/işaretleme için kullanılan arkadaki koyu yarım şeritleri gizle */
-.kalem-bg{
-  display:none!important;
+.auth-tab{
+  flex:1;
+  padding:10px 8px;
+  border-radius:11px;
+  font-size:12px;
+  font-weight:800;
+  color:var(--txt2);
 }
-
-/* Gelir kartları tamamen şeffaf yeşil */
-#sec-gelir .kalem{
-  background:rgba(42,173,98,.105)!important;
-  border:1px solid rgba(42,173,98,.16)!important;
-  box-shadow:0 10px 24px rgba(42,173,98,.055)!important;
+.auth-tab.on{
+  background:var(--txt);
+  color:var(--bg);
+  box-shadow:0 6px 16px rgba(0,0,0,.12);
 }
-
-/* Gider kartları tamamen şeffaf kırmızı */
-#sec-gider .kalem{
-  background:rgba(224,80,80,.105)!important;
-  border:1px solid rgba(224,80,80,.16)!important;
-  box-shadow:0 10px 24px rgba(224,80,80,.055)!important;
+.auth-field{margin-bottom:10px}
+.auth-field label{
+  display:block;
+  font-size:11px;
+  color:var(--txt2);
+  font-weight:700;
+  margin-bottom:5px;
 }
-
-/* Dark mode tonları */
-[data-theme=dark] #sec-gelir .kalem{
-  background:rgba(42,173,98,.16)!important;
-  border-color:rgba(42,173,98,.22)!important;
+.auth-field input{
+  width:100%;
+  border:none;
+  outline:none;
+  background:var(--bg2);
+  color:var(--txt);
+  padding:13px 14px;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:600;
 }
-
-[data-theme=dark] #sec-gider .kalem{
-  background:rgba(224,80,80,.16)!important;
-  border-color:rgba(224,80,80,.22)!important;
+.auth-field input:focus{box-shadow:0 0 0 3px rgba(42,173,98,.14)}
+.forgot-btn{
+  width:100%;
+  margin-top:9px;
+  padding:8px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--txt2);
 }
-
-/* Üstteki Gelir/Gider özet kartları da tek renkte kalsın */
-.hcard.gelir{
-  background:rgba(42,173,98,.12)!important;
-  border:1px solid rgba(42,173,98,.16)!important;
+.auth-note{
+  font-size:10.5px;
+  color:var(--txt3);
+  line-height:1.45;
+  text-align:center;
+  margin-top:8px;
 }
-
-.hcard.gider{
-  background:rgba(224,80,80,.12)!important;
-  border:1px solid rgba(224,80,80,.16)!important;
-}
-
-[data-theme=dark] .hcard.gelir{
-  background:rgba(42,173,98,.16)!important;
-}
-
-[data-theme=dark] .hcard.gider{
-  background:rgba(224,80,80,.16)!important;
-}
-
-/* Hızlı ekle butonları login sonrası altta düzgün dursun */
-.quick-add-wrap{
-  position:fixed!important;
-  left:50%!important;
-  right:auto!important;
-  bottom:86px!important;
-  transform:translateX(-50%)!important;
-  flex-direction:row!important;
-  gap:14px!important;
-  z-index:9999!important;
-}
-
-.quick-add-wrap button{
-  width:58px!important;
-  height:58px!important;
-  border-radius:22px!important;
-}
+#loginBtn{margin-top:4px}
 </style>
-
-
-<script>
-function uiLoginDurumuAyarla(acik){
-  document.body.classList.toggle('login-open', !!acik);
-  document.body.classList.toggle('app-ready', !acik);
-  const q=document.querySelector('.quick-add-wrap');
-  if(q) q.style.display = acik ? 'none' : 'flex';
-}
-document.addEventListener('DOMContentLoaded', function(){
-  const login=document.getElementById('login');
-  if(login){
-    const obs=new MutationObserver(function(){
-      const acik = getComputedStyle(login).display !== 'none';
-      uiLoginDurumuAyarla(acik);
-    });
-    obs.observe(login,{attributes:true,attributeFilter:['style','class']});
-    setTimeout(function(){
-      const acik = getComputedStyle(login).display !== 'none';
-      uiLoginDurumuAyarla(acik);
-    },250);
-  }
-});
-</script>
 
 </body>
 </html>
