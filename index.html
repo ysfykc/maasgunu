@@ -355,6 +355,99 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 }
 .ai-mini-btn:active{transform:scale(.96)}
 
+
+/* KULLANIM İYİLEŞTİRMELERİ */
+.kalem{cursor:pointer}
+.kalem:active{transform:scale(.99)}
+.edit-hint{
+  font-size:10px;
+  color:var(--txt3);
+  margin-top:3px;
+}
+.deleted-sec{
+  margin:8px 16px 12px;
+  background:var(--surf);
+  border:.5px dashed var(--brd2);
+  border-radius:14px;
+  overflow:hidden;
+}
+.deleted-head{
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+}
+.deleted-title{
+  font-size:11px;
+  font-weight:800;
+  color:var(--txt3);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.deleted-count{
+  font-size:10px;
+  color:var(--txt3);
+  background:var(--bg2);
+  padding:3px 7px;
+  border-radius:999px;
+}
+.deleted-body{
+  display:none;
+  border-top:.5px solid var(--brd);
+  padding:8px 12px 12px;
+}
+.deleted-body.on{display:block}
+.deleted-group-title{
+  font-size:10.5px;
+  font-weight:800;
+  margin:8px 0 6px;
+}
+.deleted-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 0;
+  border-bottom:.5px solid var(--brd);
+}
+.deleted-row:last-child{border-bottom:none}
+.deleted-name{
+  font-size:12px;
+  color:var(--txt2);
+  min-width:0;
+}
+.deleted-meta{
+  font-size:10px;
+  color:var(--txt3);
+  margin-top:2px;
+}
+.deleted-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+.deleted-amount{
+  font-size:12px;
+  font-weight:800;
+}
+.deleted-btn{
+  font-size:10px;
+  font-weight:800;
+  padding:5px 7px;
+  border-radius:999px;
+  background:var(--bg2);
+  color:var(--txt2);
+}
+.deleted-btn:active{transform:scale(.95)}
+.quick-add-wrap button{
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.quick-add-wrap button:active{
+  transform:scale(.92);
+}
+
 </style>
 </head>
 <body>
@@ -453,6 +546,11 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
     </div>
 
     <!-- FIX 9: Scroll anchor'lar — tab tıklanınca buraya scroll edilir -->
+    
+<div style="margin:0 16px 10px;padding:10px 12px;background:var(--surf);border:.5px solid var(--brd2);border-radius:12px;font-size:11px;color:var(--txt2);line-height:1.5">
+Kartlara dokunarak düzenleyebilir, sağa kaydırarak işaretleyebilir, sola kaydırarak silinenlere taşıyabilirsin.
+</div>
+
     <span class="scroll-anchor" id="anchor-gelir"></span>
     <div id="icerik"></div>
   </div>
@@ -606,7 +704,9 @@ let chartInst=null;
 function bugunAy(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 
 function ayVerisi(ay){
-  if(!veri.aylar[ay])veri.aylar[ay]={gelirler:[],giderler:[]};
+  if(!veri.aylar[ay])veri.aylar[ay]={gelirler:[],giderler:[],silinenGelirler:[],silinenGiderler:[]};
+  if(!veri.aylar[ay].silinenGelirler)veri.aylar[ay].silinenGelirler=[];
+  if(!veri.aylar[ay].silinenGiderler)veri.aylar[ay].silinenGiderler=[];
   if(!veri.aylar[ay]._tekrarUygulandi){tekrarlayanlariUygula(ay);veri.aylar[ay]._tekrarUygulandi=true;}
   return veri.aylar[ay];
 }
@@ -692,8 +792,8 @@ function tahminGoster(h){
   const ico=document.getElementById('tahminIco');
   const txt=document.getElementById('tahminTxt');
   if(!h.topGelir&&!h.topGider){
-    band.style.display='flex';ico.textContent='🌱';
-    txt.innerHTML='<strong>Yeni bir ay, temiz sayfa!</strong><br>Gelir ve giderlerini ekleyerek başla.';return;
+    band.style.display='none';
+    return;
   }
   band.style.display='flex';
   if(h.oran>=90){ico.textContent='⚠️';txt.innerHTML='<strong>Dikkat!</strong> Gelirinizin %'+h.oran+"'ünü harcadınız.";}
@@ -797,9 +897,70 @@ function icerikRender(){
     html+='</div>';
   }
 
+  html+=silinenlerRender();
   el.innerHTML=html;
   swipelariBagla();
   draglariBagla();
+}
+
+
+function silinenlerRender(){
+  const v=ayVerisi(aktifAy);
+  const sg=v.silinenGelirler||[];
+  const sd=v.silinenGiderler||[];
+  const toplam=sg.length+sd.length;
+  if(!toplam)return '';
+
+  const satir=(k,tip,idx)=>{
+    const renk=tip==='gelir'?'var(--green)':'var(--red)';
+    const tarih=k.silindiTarih?new Date(k.silindiTarih).toLocaleDateString('tr-TR'):'';
+    return `<div class="deleted-row">
+      <div class="deleted-name">
+        <div>${escHtml(k.ad||'İsimsiz')}</div>
+        <div class="deleted-meta">${k.kategori?escHtml(k.kategori)+' • ':''}${tarih}</div>
+      </div>
+      <div class="deleted-actions">
+        <span class="deleted-amount" style="color:${renk}">${fTL(k.tutar||0)}</span>
+        <button class="deleted-btn" onclick="silineniGeriAl('${tip}',${idx})">Geri al</button>
+        <button class="deleted-btn" onclick="silineniKaliciSil('${tip}',${idx})">Sil</button>
+      </div>
+    </div>`;
+  };
+
+  return `<div class="deleted-sec">
+    <div class="deleted-head" onclick="document.getElementById('deletedBody').classList.toggle('on')">
+      <span class="deleted-title">🗑 Silinenler</span>
+      <span class="deleted-count">${toplam} kayıt</span>
+    </div>
+    <div class="deleted-body" id="deletedBody">
+      ${sg.length?`<div class="deleted-group-title" style="color:var(--green)">Gelirden silinenler</div>${sg.map((k,i)=>satir(k,'gelir',i)).join('')}`:''}
+      ${sd.length?`<div class="deleted-group-title" style="color:var(--red)">Giderden silinenler</div>${sd.map((k,i)=>satir(k,'gider',i)).join('')}`:''}
+    </div>
+  </div>`;
+}
+
+async function silineniGeriAl(tip,idx){
+  const v=ayVerisi(aktifAy);
+  const kaynak=tip==='gelir'?v.silinenGelirler:v.silinenGiderler;
+  const hedef=tip==='gelir'?v.gelirler:v.giderler;
+  if(!kaynak||!kaynak[idx])return;
+  const [k]=kaynak.splice(idx,1);
+  delete k.silindiTarih;
+  k.id=uid();
+  hedef.push(k);
+  render();
+  await fbKaydet();
+  toast('↩️ Geri alındı');
+}
+
+async function silineniKaliciSil(tip,idx){
+  const v=ayVerisi(aktifAy);
+  const kaynak=tip==='gelir'?v.silinenGelirler:v.silinenGiderler;
+  if(!kaynak||!kaynak[idx])return;
+  kaynak.splice(idx,1);
+  render();
+  await fbKaydet();
+  toast('Kalıcı silindi');
 }
 
 function kalemHtml(k,tip,idx){
@@ -809,9 +970,9 @@ function kalemHtml(k,tip,idx){
   if(k.yatirim)badges.push('<span class="badge yatirim">Yatırım</span>');
   return`<div class="kalem-wrap" id="kw-${k.id}" data-id="${k.id}" data-tip="${tip}" data-idx="${idx}">
     <div class="kalem-bg"><div class="kalem-bg-l"><span>✓</span></div><div class="kalem-bg-r"><span>🗑</span></div></div>
-    <div class="kalem" id="k-${k.id}">
-      <div class="kalem-handle"><span></span><span></span><span></span></div>
-      <div class="kalem-check ${k.odendi?'on':''}" onclick="toggleOdendi('${tip}','${k.id}')"></div>
+    <div class="kalem" id="k-${k.id}" onclick="kalemDuzenleAc('${tip}','${k.id}')">
+      <div class="kalem-handle" onclick="event.stopPropagation()"><span></span><span></span><span></span></div>
+      <div class="kalem-check ${k.odendi?'on':''}" onclick="event.stopPropagation();toggleOdendi('${tip}','${k.id}')"></div>
       <div class="kalem-info">
         <div class="kalem-ad ${k.odendi?'done':''}">${escHtml(k.ad)}</div>
         <div class="kalem-meta">
@@ -819,6 +980,7 @@ function kalemHtml(k,tip,idx){
           ${k.not?`<span class="kalem-not">${escHtml(k.not)}</span>`:''}
           ${badges.join('')}
         </div>
+        <div class="edit-hint">Düzenlemek için karta dokun</div>
       </div>
       <div class="kalem-tutar ${renk}">${fTL(k.tutar)}</div>
     </div>
@@ -954,9 +1116,22 @@ async function kalemKaydet(){
 
 async function kalemSil(tip,id){
   const v=ayVerisi(aktifAy);
-  if(tip==='gelir')v.gelirler=v.gelirler.filter(k=>k.id!==id);
-  else v.giderler=v.giderler.filter(k=>k.id!==id);
-  render();await fbKaydet();toast('🗑 Silindi');
+  if(!v.silinenGelirler)v.silinenGelirler=[];
+  if(!v.silinenGiderler)v.silinenGiderler=[];
+
+  if(tip==='gelir'){
+    const k=v.gelirler.find(x=>x.id===id);
+    if(k)v.silinenGelirler.push({...k,silindiTarih:new Date().toISOString()});
+    v.gelirler=v.gelirler.filter(k=>k.id!==id);
+  } else {
+    const k=v.giderler.find(x=>x.id===id);
+    if(k)v.silinenGiderler.push({...k,silindiTarih:new Date().toISOString()});
+    v.giderler=v.giderler.filter(k=>k.id!==id);
+  }
+
+  render();
+  await fbKaydet();
+  toast('🗑 Silinenlere taşındı');
 }
 
 // FIX 15: toggleOdendi — anlık güncelleme, render() çağrılıyor
@@ -967,6 +1142,28 @@ async function toggleOdendi(tip,id){
   if(k)k.odendi=!k.odendi;
   render(); // Anlık güncelleme
   await fbKaydet();
+}
+
+
+function kalemDuzenleAc(tip,id){
+  const v=ayVerisi(aktifAy);
+  const liste=tip==='gelir'?v.gelirler:v.giderler;
+  const k=liste.find(x=>x.id===id);
+  if(!k)return;
+
+  duzenlenenId=id;
+  duzenlenenTip=tip;
+
+  document.getElementById('dAd').value=k.ad||'';
+  document.getElementById('dTutar').value=k.tutar||0;
+  document.getElementById('dKat').value=k.kategori||'';
+  document.getElementById('dNot').value=k.not||'';
+
+  dTekrarAcik=!!k.tekrar;
+  document.getElementById('dTekrar').className='toggle'+(dTekrarAcik?' on':'');
+
+  document.getElementById('dBtn').className=tip==='gelir'?'sbtn g':'sbtn r';
+  document.getElementById('mDuzenle').classList.add('on');
 }
 
 // Uzun basınca düzenleme
