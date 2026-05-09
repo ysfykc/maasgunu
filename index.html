@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<html data-theme="light" lang="tr">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-  <meta content="yes" name="apple-mobile-web-app-capable"/>
-  <meta content="#f7f5f0" name="theme-color"/>
-  <title>
-   Maaş Günü
-  </title>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=DM+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-  </script>
-  <script>
-  </script>
-  <style>
-   :root {
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f7f5f0">
+<title>Maaş Günü</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+
+</script>
+<style>
+:root {
   --bg:#f7f5f0; --bg2:#edeae3; --bg3:#e3e0d8;
   --surf:#fff; --brd:rgba(0,0,0,.07); --brd2:rgba(0,0,0,.13);
   --txt:#1a1814; --txt2:#706d66; --txt3:#a8a49c;
@@ -635,425 +633,187 @@ main{padding-bottom:calc(var(--nav) + 120px)}
   background:var(--green2);
   box-shadow:0 0 0 4px var(--green-bg);
 }
-  </style>
-  <style>
-   @media (max-width: 768px) {
-    .topbar, .ay-bar, .nav {
-      font-size: 12px;
-    }
-    .hero {
-      grid-template-columns: 1fr;
-    }
-    .hcard {
-      padding: 10px;
-      font-size: 14px;
-    }
-    .fab {
-      font-size: 28px;
-    }
-  }
-  </style>
- </head>
- <body>
-  <div id="syncStatus">
-   <p>
-    Veri senkronizasyonu:
-    <span id="sync">
-     🔄
-    </span>
-   </p>
-  </div>
-  <div class="mini-chart">
-   <div class="mini-chart-ttl">
-    Gider Kategorileri
-   </div>
-   <canvas height="200" id="catChart">
-   </canvas>
-  </div>
-  <!-- LOGIN -->
-  <div id="login">
-   <div class="box">
-    <div class="ico">
-     💰
-    </div>
-    <h1>
-     Maaş Günü
-    </h1>
-    <p>
-     Aylık gelir ve giderlerini akıllıca yönet.
-     <br/>
-     Her cihazında senkronize çalışır.
-    </p>
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="box">
+    <div class="ico">💰</div>
+    <h1>Maaş Günü</h1>
+    <p>Aylık gelir ve giderlerini akıllıca yönet.<br>Her cihazında senkronize çalışır.</p>
     <button id="loginBtn" onclick="girisYap()">
-     <svg height="20" viewbox="0 0 24 24" width="20">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4">
-      </path>
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853">
-      </path>
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05">
-      </path>
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335">
-      </path>
-     </svg>
-     Google ile Giriş Yap
+      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google ile Giriş Yap
     </button>
-    <div class="sig">
-     Tasarım &amp; Fikir
-     <br/>
-     <strong>
-      Yusuf AYKAÇ
-     </strong>
-    </div>
-   </div>
+    <div class="sig">Tasarım & Fikir<br><strong>Yusuf AYKAÇ</strong></div>
   </div>
-  <!-- TOPBAR -->
-  <header class="topbar">
-   <div class="logo">
-    <div class="logo-ico">
-     💰
-    </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-ico">💰</div>
     Maaş Günü
-   </div>
-   <div class="tbr">
-    <span id="sync">
-     🔄
-    </span>
-    <button class="ibtn" id="themeBtn" onclick="temaDegis()">
-     🌙
-    </button>
-    <img id="avatar" onclick="cikisYap()" title="Çıkış yap"/>
-   </div>
-  </header>
-  <!-- AY BAR -->
-  <div class="ay-bar">
-   <button class="ay-nav" onclick="ayDegis(-1)">
-    ‹
-   </button>
-   <span class="ay-lbl month-pill" id="ayLbl">
-    —
-   </span>
-   <button class="ay-nav" onclick="ayDegis(1)">
-    ›
-   </button>
+
   </div>
-  <!-- MAIN -->
-  <main>
-   <!-- BU AY -->
-   <div class="page on" id="pageAy">
+  <div class="tbr">
+    <span id="sync">🔄</span>
+    <button class="ibtn" id="themeBtn" onclick="temaDegis()">🌙</button>
+    <img id="avatar" onclick="cikisYap()" title="Çıkış yap">
+  </div>
+</header>
+
+<!-- AY BAR -->
+<div class="ay-bar">
+  <button class="ay-nav" onclick="ayDegis(-1)">‹</button>
+  <span class="ay-lbl month-pill" id="ayLbl">—</span>
+  <button class="ay-nav" onclick="ayDegis(1)">›</button>
+</div>
+
+<!-- MAIN -->
+<main>
+  <!-- BU AY -->
+  <div class="page on" id="pageAy">
     <div class="hero">
-     <div class="hcard gelir">
-      <div class="hcard-lbl">
-       Gelir
+      <div class="hcard gelir"><div class="hcard-lbl">Gelir</div><div class="hcard-val" id="hGelir">₺0</div></div>
+      <div class="hcard gider"><div class="hcard-lbl">Gider</div><div class="hcard-val" id="hGider">₺0</div></div>
+      <div class="hcard kalan-pos" id="hKalanCard">
+        <div class="hcard-lbl">Kalan</div>
+        <div class="hcard-val" id="hKalan">₺0</div>
+        <div class="hcard-sub" id="hKalanSub"></div>
       </div>
-      <div class="hcard-val" id="hGelir">
-       ₺0
-      </div>
-     </div>
-     <div class="hcard gider">
-      <div class="hcard-lbl">
-       Gider
-      </div>
-      <div class="hcard-val" id="hGider">
-       ₺0
-      </div>
-     </div>
-     <div class="hcard kalan-pos" id="hKalanCard">
-      <div class="hcard-lbl">
-       Kalan
-      </div>
-      <div class="hcard-val" id="hKalan">
-       ₺0
-      </div>
-      <div class="hcard-sub" id="hKalanSub">
-      </div>
-     </div>
     </div>
-    <div class="helper-card" id="quickStatus">
-     Bu ay için hızlı durum hazırlanıyor.
-    </div>
+    <div class="helper-card" id="quickStatus">Bu ay için hızlı durum hazırlanıyor.</div>
+
     <div class="tahmin-band" id="tahminBand" style="display:none">
-     <div class="tahmin-ico" id="tahminIco">
-      💡
-     </div>
-     <div class="tahmin-txt" id="tahminTxt">
-     </div>
+      <div class="tahmin-ico" id="tahminIco">💡</div>
+      <div class="tahmin-txt" id="tahminTxt"></div>
     </div>
+
     <div class="ai-chip" id="aiInsight" style="display:none">
-     <div class="ai-chip-ico">
-      🤖
-     </div>
-     <div class="ai-chip-body">
-      <div class="ai-chip-title">
-       <span>
-        Akıllı Öneri
-       </span>
-       <span class="ai-chip-tag" id="aiInsightTag">
-        Canlı
-       </span>
+      <div class="ai-chip-ico">🤖</div>
+      <div class="ai-chip-body">
+        <div class="ai-chip-title">
+          <span>Akıllı Öneri</span>
+          <span class="ai-chip-tag" id="aiInsightTag">Canlı</span>
+        </div>
+        <div class="ai-chip-text" id="aiInsightText"></div>
+        <div class="ai-chip-actions">
+          <button class="ai-mini-btn" onclick="aiOneriYenile()">Başka öneri</button>
+          <button class="ai-mini-btn" onclick="tabSec(3)">Grafiğe bak</button>
+        </div>
       </div>
-      <div class="ai-chip-text" id="aiInsightText">
-      </div>
-      <div class="ai-chip-actions">
-       <button class="ai-mini-btn" onclick="aiOneriYenile()">
-        Başka öneri
-       </button>
-       <button class="ai-mini-btn" onclick="tabSec(3)">
-        Grafiğe bak
-       </button>
-      </div>
-     </div>
     </div>
+
+    
+
     <div class="oneri-wrap" id="oneriWrap">
-     <div class="oneri-ttl">
-      🎯 Akıllı Bütçe Önerisi
-     </div>
-     <div class="oneri-grid" id="oneriGrid">
-     </div>
+      <div class="oneri-ttl">🎯 Akıllı Bütçe Önerisi</div>
+      <div class="oneri-grid" id="oneriGrid"></div>
     </div>
+
     <div class="prg-sec">
-     <div class="prg-top">
-      <span class="prg-lbl">
-       Harcama Oranı
-      </span>
-      <span class="prg-pct" id="prgPct">
-       %0
-      </span>
-     </div>
-     <div class="prg-bar-wrap">
-      <div class="prg-bar ok" id="prgBar" style="width:0%">
-      </div>
-     </div>
-     <div class="prg-bot">
-      <span id="prgOde">
-       ₺0 ödendi
-      </span>
-      <span id="prgKal">
-       ₺0 kaldı
-      </span>
-     </div>
+      <div class="prg-top"><span class="prg-lbl">Harcama Oranı</span><span class="prg-pct" id="prgPct">%0</span></div>
+      <div class="prg-bar-wrap"><div class="prg-bar ok" id="prgBar" style="width:0%"></div></div>
+      <div class="prg-bot"><span id="prgOde">₺0 ödendi</span><span id="prgKal">₺0 kaldı</span></div>
     </div>
-    <div class="helper-card">
-     ✓ Üst kutular yalnızca işaretlenen gelir ve giderlere göre hesaplanır.
-    </div>
+
+<div class="helper-card">✓ Üst kutular yalnızca işaretlenen gelir ve giderlere göre hesaplanır.</div>
+
     <div class="tabs">
-     <button class="tbtn on" onclick="tabSec(0)">
-      📋 Tümü
-     </button>
-     <button class="tbtn" onclick="tabSec(1)">
-      🟢 Gelir
-     </button>
-     <button class="tbtn" onclick="tabSec(2)">
-      🔴 Gider
-     </button>
-     <button class="tbtn" onclick="tabSec(3)">
-      📊 Grafik
-     </button>
+      <button class="tbtn on" onclick="tabSec(0)">📋 Tümü</button>
+      <button class="tbtn" onclick="tabSec(1)">🟢 Gelir</button>
+      <button class="tbtn" onclick="tabSec(2)">🔴 Gider</button>
+      <button class="tbtn" onclick="tabSec(3)">📊 Grafik</button>
     </div>
+
     <!-- FIX 9: Scroll anchor'lar — tab tıklanınca buraya scroll edilir -->
-    <div class="helper-card">
-     Kartlara dokun: düzenle · Sağa kaydır: işaretle · Sola kaydır: silinenlere taşı.
-    </div>
-    <span class="scroll-anchor" id="anchor-gelir">
-    </span>
-    <div id="icerik">
-    </div>
-   </div>
-   <!-- GEÇMİŞ -->
-   <div class="page" id="pageGecmis">
-    <div id="gecmisIcerik" style="padding-top:8px">
-    </div>
-   </div>
-  </main>
-  <!-- FAB -->
-  <button class="fab" id="fabBtn" onclick="fabTikla()" style="display:none">
-   ＋
-  </button>
-  <!-- TİP POPUP -->
-  <div class="tip-popup" id="tipPopup">
-   <div class="tip-item" onclick="modalAc('gelir')">
-    <span class="ti">
-     💚
-    </span>
-    <span style="color:var(--green);font-weight:600">
-     Gelir Ekle
-    </span>
-   </div>
-   <div class="tip-item" onclick="modalAc('gider')">
-    <span class="ti">
-     🔴
-    </span>
-    <span style="color:var(--red);font-weight:600">
-     Gider Ekle
-    </span>
-   </div>
-   <div class="tip-item" onclick="modalAc('yatirim')">
-    <span class="ti">
-     📈
-    </span>
-    <span style="color:var(--purple);font-weight:600">
-     Yatırım Ekle
-    </span>
-   </div>
+    
+<div class="helper-card">Kartlara dokun: düzenle · Sağa kaydır: işaretle · Sola kaydır: silinenlere taşı.</div>
+
+    <span class="scroll-anchor" id="anchor-gelir"></span>
+    <div id="icerik"></div>
   </div>
-  <div class="quick-add-wrap" style="position:fixed;bottom:110px;right:20px;display:flex;flex-direction:column;gap:12px;z-index:9997">
-   <button onclick="modalAc('gelir')" style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#16a34a,#22c55e);color:white;font-size:22px;box-shadow:0 10px 24px rgba(34,197,94,.35)" title="Gelir Ekle">
-    ₺
-   </button>
-   <button onclick="modalAc('gider')" style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;font-size:22px;box-shadow:0 10px 24px rgba(239,68,68,.35)" title="Gider Ekle">
-    ₺
-   </button>
+
+  <!-- GEÇMİŞ -->
+  <div class="page" id="pageGecmis">
+    <div id="gecmisIcerik" style="padding-top:8px"></div>
   </div>
-  <!-- NAV -->
-  <nav class="nav">
-   <button class="nitem on" id="nav0" onclick="navSec(0)">
-    <span class="nico">
-     📋
-    </span>
-    Bu Ay
-   </button>
-   <button class="nitem" id="nav1" onclick="navSec(1)">
-    <span class="nico">
-     📅
-    </span>
-    Geçmiş
-   </button>
-  </nav>
-  <!-- MODAL: EKLE -->
-  <div class="ov" id="mEkle" onclick="if(event.target===this){this.classList.remove('on');tipPopupKapat()}">
-   <div class="modal">
-    <div class="mhandle">
-    </div>
-    <div class="mttl" id="mTtl">
-     Gelir Ekle
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Açıklama
-     </label>
-     <input class="inp" id="eAd" placeholder="örn. Maaş, Kira, Netflix…" type="text"/>
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Tutar
-     </label>
-     <div class="ipfx">
-      <span class="pfx">
-       ₺
-      </span>
-      <input class="inp" id="eTutar" min="0" placeholder="0" step="any" type="number"/>
-     </div>
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Kategori
-      <span style="color:var(--txt3);font-weight:400">
-       (isteğe bağlı)
-      </span>
-     </label>
-     <input class="inp" id="eKat" placeholder="örn. Fatura, Market…" type="text"/>
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Not
-      <span style="color:var(--txt3);font-weight:400">
-       (isteğe bağlı)
-      </span>
-     </label>
-     <input class="inp" id="eNot" placeholder="örn. Ocak maaşı" type="text"/>
-    </div>
+</main>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="fabTikla()" style="display:none">＋</button>
+
+<!-- TİP POPUP -->
+<div class="tip-popup" id="tipPopup">
+  <div class="tip-item" onclick="modalAc('gelir')"><span class="ti">💚</span><span style="color:var(--green);font-weight:600">Gelir Ekle</span></div>
+  <div class="tip-item" onclick="modalAc('gider')"><span class="ti">🔴</span><span style="color:var(--red);font-weight:600">Gider Ekle</span></div>
+  <div class="tip-item" onclick="modalAc('yatirim')"><span class="ti">📈</span><span style="color:var(--purple);font-weight:600">Yatırım Ekle</span></div>
+</div>
+
+
+<div class="quick-add-wrap" style="position:fixed;bottom:110px;right:20px;display:flex;flex-direction:column;gap:12px;z-index:9997">
+  <button onclick="modalAc('gelir')" title="Gelir Ekle"
+    style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#16a34a,#22c55e);color:white;font-size:22px;box-shadow:0 10px 24px rgba(34,197,94,.35)">₺</button>
+
+  <button onclick="modalAc('gider')" title="Gider Ekle"
+    style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;font-size:22px;box-shadow:0 10px 24px rgba(239,68,68,.35)">₺</button>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nitem on" id="nav0" onclick="navSec(0)"><span class="nico">📋</span>Bu Ay</button>
+  <button class="nitem" id="nav1" onclick="navSec(1)"><span class="nico">📅</span>Geçmiş</button>
+</nav>
+
+<!-- MODAL: EKLE -->
+<div class="ov" id="mEkle" onclick="if(event.target===this){this.classList.remove('on');tipPopupKapat()}">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mttl" id="mTtl">Gelir Ekle</div>
+    <div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" type="text" id="eAd" placeholder="örn. Maaş, Kira, Netflix…"></div>
+    <div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" type="number" id="eTutar" placeholder="0" min="0" step="any"></div></div>
+    <div class="igrp"><label class="ilbl">Kategori <span style="color:var(--txt3);font-weight:400">(isteğe bağlı)</span></label><input class="inp" type="text" id="eKat" placeholder="örn. Fatura, Market…"></div>
+    <div class="igrp"><label class="ilbl">Not <span style="color:var(--txt3);font-weight:400">(isteğe bağlı)</span></label><input class="inp" type="text" id="eNot" placeholder="örn. Ocak maaşı"></div>
     <div class="toggle-row" id="tekrarRow">
-     <div>
-      <div class="toggle-lbl">
-       🔄 Tekrarlayan
-      </div>
-      <div class="toggle-sub">
-       Her ay otomatik eklensin
-      </div>
-     </div>
-     <div class="toggle" id="tekrarToggle" onclick="toggleTikla('tekrar')">
-     </div>
+      <div><div class="toggle-lbl">🔄 Tekrarlayan</div><div class="toggle-sub">Her ay otomatik eklensin</div></div>
+      <div class="toggle" id="tekrarToggle" onclick="toggleTikla('tekrar')"></div>
     </div>
     <div class="toggle-row" id="yatirimRow" style="display:none">
-     <div>
-      <div class="toggle-lbl">
-       📈 Yatırım
-      </div>
-      <div class="toggle-sub">
-       Yatırım hedefine sayılsın
-      </div>
-     </div>
-     <div class="toggle" id="yatirimToggle" onclick="toggleTikla('yatirim')">
-     </div>
+      <div><div class="toggle-lbl">📈 Yatırım</div><div class="toggle-sub">Yatırım hedefine sayılsın</div></div>
+      <div class="toggle" id="yatirimToggle" onclick="toggleTikla('yatirim')"></div>
     </div>
-    <button class="sbtn g" id="mBtn" onclick="kalemKaydet()">
-     ✓ Ekle
-    </button>
-    <button class="cancel-btn" onclick="document.getElementById('mEkle').classList.remove('on')">
-     İptal
-    </button>
-   </div>
+    <button class="sbtn g" id="mBtn" onclick="kalemKaydet()">✓ Ekle</button>
+    <button class="cancel-btn" onclick="document.getElementById('mEkle').classList.remove('on')">İptal</button>
   </div>
-  <!-- MODAL: DÜZENLE -->
-  <div class="ov" id="mDuzenle" onclick="if(event.target===this)this.classList.remove('on')">
-   <div class="modal">
-    <div class="mhandle">
-    </div>
-    <div class="mttl">
-     Düzenle
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Açıklama
-     </label>
-     <input class="inp" id="dAd" type="text"/>
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Tutar
-     </label>
-     <div class="ipfx">
-      <span class="pfx">
-       ₺
-      </span>
-      <input class="inp" id="dTutar" min="0" step="any" type="number"/>
-     </div>
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Kategori
-     </label>
-     <input class="inp" id="dKat" type="text"/>
-    </div>
-    <div class="igrp">
-     <label class="ilbl">
-      Not
-     </label>
-     <input class="inp" id="dNot" type="text"/>
-    </div>
+</div>
+
+<!-- MODAL: DÜZENLE -->
+<div class="ov" id="mDuzenle" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mttl">Düzenle</div>
+    <div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" type="text" id="dAd"></div>
+    <div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" type="number" id="dTutar" min="0" step="any"></div></div>
+    <div class="igrp"><label class="ilbl">Kategori</label><input class="inp" type="text" id="dKat"></div>
+    <div class="igrp"><label class="ilbl">Not</label><input class="inp" type="text" id="dNot"></div>
     <div class="toggle-row">
-     <div>
-      <div class="toggle-lbl">
-       🔄 Tekrarlayan
-      </div>
-     </div>
-     <div class="toggle" id="dTekrar" onclick="toggleTikla('dTekrar')">
-     </div>
+      <div><div class="toggle-lbl">🔄 Tekrarlayan</div></div>
+      <div class="toggle" id="dTekrar" onclick="toggleTikla('dTekrar')"></div>
     </div>
-    <button class="sbtn g" id="dBtn" onclick="duzenleKaydet()">
-     ✓ Kaydet
-    </button>
-    <button class="cancel-btn" onclick="document.getElementById('mDuzenle').classList.remove('on')">
-     İptal
-    </button>
-   </div>
+    <button class="sbtn g" id="dBtn" onclick="duzenleKaydet()">✓ Kaydet</button>
+    <button class="cancel-btn" onclick="document.getElementById('mDuzenle').classList.remove('on')">İptal</button>
   </div>
-  <div class="toast" id="toast">
-  </div>
-  <div class="sig-bar">
-   Yusuf AYKAÇ
-  </div>
-  <script>
-   /* ══ FIREBASE ══ */
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="sig-bar">Yusuf AYKAÇ</div>
+
+<script>
+/* ══ FIREBASE ══ */
 const CFG={apiKey:'AIzaSyADpIRNLQEIer_gplTgwKi_EKkfcyrYoqY',authDomain:'maasgunu-bd353.firebaseapp.com',projectId:'maasgunu-bd353',storageBucket:'maasgunu-bd353.firebasestorage.app',messagingSenderId:'485904329467',appId:'1:485904329467:web:579d932ae8f25958901e5e'};
 let db,auth,user=null;
 
@@ -1781,9 +1541,12 @@ async function init(){
 }
 
 document.addEventListener('DOMContentLoaded',init);
-  </script>
-  <style>
-   /* SON DÜZELTME: LOGIN BUTONLARI VE KART RENKLERİ */
+
+
+</script>
+
+<style>
+/* SON DÜZELTME: LOGIN BUTONLARI VE KART RENKLERİ */
 body:not(.app-ready) .quick-add-wrap,
 body.login-open .quick-add-wrap{
   display:none!important;
@@ -1859,9 +1622,11 @@ body.app-ready:not(.login-open) .quick-add-wrap{
   height:58px!important;
   border-radius:22px!important;
 }
-  </style>
-  <script>
-   function uiLoginDurumuAyarla(acik){
+</style>
+
+
+<script>
+function uiLoginDurumuAyarla(acik){
   document.body.classList.toggle('login-open', !!acik);
   document.body.classList.toggle('app-ready', !acik);
   const q=document.querySelector('.quick-add-wrap');
@@ -1881,47 +1646,14 @@ document.addEventListener('DOMContentLoaded', function(){
     },250);
   }
 });
-  </script>
-  <button class="fab" id="fabBtn" onclick="fabTikla()" style="display:block;">
-   ＋
-  </button>
-  <div class="tip-popup" id="tipPopup">
-   <div class="tip-item" onclick="modalAc('gelir')">
-    <span class="ti">
-     💚
-    </span>
-    <span style="color:var(--green);font-weight:600">
-     Gelir Ekle
-    </span>
-   </div>
-   <div class="tip-item" onclick="modalAc('gider')">
-    <span class="ti">
-     🔴
-    </span>
-    <span style="color:var(--red);font-weight:600">
-     Gider Ekle
-    </span>
-   </div>
-   <div class="tip-item" onclick="modalAc('yatirim')">
-    <span class="ti">
-     📈
-    </span>
-    <span style="color:var(--purple);font-weight:600">
-     Yatırım Ekle
-    </span>
-   </div>
-  </div>
-  <script>
-   function showNotification(message) {
-    alert(message);
-  }
-  // Example: Show a notification when a new income or expense is added
-  showNotification("Yeni gelir eklendi!");
-  </script>
- </body>
+</script>
+
+</body>
 </html>
+
+
 <style>
- .hcard.gelir .hcard-lbl,
+.hcard.gelir .hcard-lbl,
 .hcard.gelir .hcard-val{
   color:#149251!important;
 }
@@ -1930,8 +1662,9 @@ document.addEventListener('DOMContentLoaded', function(){
   color:#d63d3d!important;
 }
 </style>
+
 <style>
- .quick-add-wrap button{
+.quick-add-wrap button{
   width:60px!important;
   height:60px!important;
   border-radius:22px!important;
