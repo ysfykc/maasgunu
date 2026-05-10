@@ -129,11 +129,13 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 .empty-sec{text-align:center;padding:24px 16px;color:var(--txt3);font-size:12.5px;line-height:1.6}
 .empty-ico{font-size:32px;opacity:.4;margin-bottom:8px}
 
-/* KALEM */
+/* KALEM (Swipe İşlemleri) */
 .kalem-wrap{position:relative;margin-bottom:7px;border-radius:13px;overflow:hidden}
-.kalem-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:0;background:var(--bg2)}
-.kalem-bg-l{color:var(--green);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px}
-.kalem-bg-r{color:var(--red);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px}
+.kalem-bg{position:absolute;inset:0;z-index:0;background:var(--bg2);opacity:0;transition:opacity .25s ease}
+.kalem-bg-l, .kalem-bg-r{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;opacity:0}
+.kalem-bg-l{left:24px;color:var(--green)}
+.kalem-bg-r{right:24px;color:var(--red)}
+
 .kalem{position:relative;z-index:1;background:var(--surf);border:.5px solid var(--brd2);border-radius:13px;display:flex;align-items:center;padding:12px 13px;gap:10px;touch-action:pan-y;user-select:none;will-change:transform;-webkit-backface-visibility:hidden}
 .kalem.dragging{box-shadow:var(--sh2);opacity:.9}
 .kalem-handle{width:18px;display:flex;flex-direction:column;gap:3px;align-items:center;cursor:grab;flex-shrink:0;opacity:.25;padding:4px 0}
@@ -1170,6 +1172,7 @@ function swipelariBagla(){
     el.addEventListener('touchstart',e=>{
       sx=e.touches[0].clientX;sy=e.touches[0].clientY;swiping=true;moved=false;cx=0;
     },{passive:true});
+    
     el.addEventListener('touchmove',e=>{
       if(!swiping)return;
       const dx=e.touches[0].clientX-sx;
@@ -1179,12 +1182,31 @@ function swipelariBagla(){
       cx=Math.max(-110,Math.min(110,dx));
       el.style.transform=`translateX(${cx}px)`;
       el.style.transition='none';
+
+      // Arka plan yazılarının sadece kaydırırken şeffaflıkla belirmesi
+      const bg = el.previousElementSibling;
+      if(bg && bg.classList.contains('kalem-bg')){
+         bg.style.opacity = 1;
+         bg.style.transition = 'none';
+         const bgl = bg.querySelector('.kalem-bg-l');
+         const bgr = bg.querySelector('.kalem-bg-r');
+         if(cx > 0) {
+             bgl.style.opacity = Math.min(1, Math.abs(cx) / 30);
+             bgr.style.opacity = 0;
+         } else {
+             bgl.style.opacity = 0;
+             bgr.style.opacity = Math.min(1, Math.abs(cx) / 30);
+         }
+      }
     },{passive:true});
+    
     el.addEventListener('touchend',()=>{
       if(!moved){el.style.transform='';return;}
       const id=el.id.replace('k-','');
       const wrap=el.closest('.kalem-wrap');
       const tip=wrap?.dataset.tip;
+      const bg = el.previousElementSibling;
+      
       if(cx>70){
         el.style.transform='translateX(120%)';el.style.transition='.3s ease';
         setTimeout(()=>{toggleOdendi(tip,id);},300);
@@ -1193,6 +1215,11 @@ function swipelariBagla(){
         setTimeout(()=>kalemSil(tip,id),300);
       } else {
         el.style.transform='';el.style.transition='.25s ease';
+        // Kaydırma bitince arka planı tekrar tamamen gizle
+        if(bg && bg.classList.contains('kalem-bg')) {
+          bg.style.opacity = 0;
+          bg.style.transition = 'opacity .25s ease';
+        }
       }
       swiping=false;
     });
