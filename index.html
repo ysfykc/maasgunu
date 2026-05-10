@@ -131,8 +131,10 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 
 /* KALEM */
 .kalem-wrap{position:relative;margin-bottom:7px;border-radius:13px;overflow:hidden}
-.kalem-bg{display:none!important;}
-.kalem{position:relative;background:var(--surf);border:.5px solid var(--brd2);border-radius:13px;display:flex;align-items:center;padding:12px 13px;gap:10px;touch-action:pan-y;user-select:none;will-change:transform;-webkit-backface-visibility:hidden}
+.kalem-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:0;background:var(--bg2)}
+.kalem-bg-l{color:var(--green);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px}
+.kalem-bg-r{color:var(--red);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px}
+.kalem{position:relative;z-index:1;background:var(--surf);border:.5px solid var(--brd2);border-radius:13px;display:flex;align-items:center;padding:12px 13px;gap:10px;touch-action:pan-y;user-select:none;will-change:transform;-webkit-backface-visibility:hidden}
 .kalem.dragging{box-shadow:var(--sh2);opacity:.9}
 .kalem-handle{width:18px;display:flex;flex-direction:column;gap:3px;align-items:center;cursor:grab;flex-shrink:0;opacity:.25;padding:4px 0}
 .kalem-handle span{width:12px;height:2px;background:var(--txt);border-radius:var(--rp);display:block}
@@ -1128,7 +1130,7 @@ function kalemHtml(k,tip,idx){
   if(k.tekrar)badges.push('<span class="badge tekrar">Tekrar</span>');
   if(k.yatirim)badges.push('<span class="badge yatirim">Yatırım</span>');
   return`<div class="kalem-wrap" id="kw-${k.id}" data-id="${k.id}" data-tip="${tip}" data-idx="${idx}">
-    <div class="kalem-bg"><div class="kalem-bg-l"><span>✓</span></div><div class="kalem-bg-r"><span>🗑</span></div></div>
+    <div class="kalem-bg"><div class="kalem-bg-l"><span>✓ İşaretle</span></div><div class="kalem-bg-r"><span>Sil 🗑</span></div></div>
     <div class="kalem" id="k-${k.id}" onclick="kalemDuzenleAc('${tip}','${k.id}')">
       <div class="kalem-handle" onclick="event.stopPropagation()"><span></span><span></span><span></span></div>
       <div class="kalem-check ${k.odendi?'on':''}" onclick="event.stopPropagation();toggleOdendi('${tip}','${k.id}')"></div>
