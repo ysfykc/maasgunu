@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html data-theme="light" lang="tr">
 <head>
 <meta charset="utf-8"/>
@@ -9,8 +8,6 @@
 <title>Maaş Günü</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=DM+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-</script>
 <style>
 :root {
   --bg:#f7f5f0; --bg2:#edeae3; --bg3:#e3e0d8;
@@ -37,7 +34,6 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{font-size:15px}
-/* FIX 1: body overflow-x hidden ama overflow-y auto — scroll çalışsın */
 body{font-family:var(--fd);background:var(--bg);color:var(--txt);min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto}
 button{cursor:pointer;border:none;background:none;font-family:var(--fd)}
 input,select{font-family:var(--fd);font-size:inherit}
@@ -58,7 +54,6 @@ input[type=number]{-moz-appearance:textfield}
 .topbar{position:fixed;top:0;left:0;right:0;height:var(--top);background:var(--surf);border-bottom:.5px solid var(--brd2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200}
 .logo{font-family:var(--fs);font-size:20px;display:flex;align-items:center;gap:8px}
 .logo-ico{width:28px;height:28px;background:linear-gradient(135deg,var(--green),var(--green2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
-/* FIX 2: logo sağında kullanıcı adı + tire */
 .logo-user{font-size:11px;color:var(--txt3);font-family:var(--fd);font-weight:500;display:flex;align-items:center;gap:4px}
 .tbr{display:flex;align-items:center;gap:8px}
 .ibtn{width:34px;height:34px;border-radius:8px;background:var(--bg2);border:.5px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt2)}
@@ -71,7 +66,7 @@ input[type=number]{-moz-appearance:textfield}
 .ay-nav:active{background:var(--bg3)}
 .ay-lbl{font-size:15px;font-weight:600;color:var(--txt)}
 
-/* MAIN — FIX 3: padding-bottom yeterince büyük, FAB'ın altında içerik kalmıyor */
+/* MAIN */
 main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 
 /* HERO */
@@ -136,12 +131,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 
 /* KALEM */
 .kalem-wrap{position:relative;margin-bottom:7px;border-radius:13px;overflow:hidden}
-.kalem-bg{position:absolute;inset:0;display:flex;align-items:center;border-radius:13px}
-.kalem-bg-l{flex:1;background:var(--green);display:flex;align-items:center;padding-left:16px}
-.kalem-bg-l span{font-size:18px}
-.kalem-bg-r{flex:1;background:var(--red);display:flex;align-items:center;justify-content:flex-end;padding-right:16px}
-.kalem-bg-r span{font-size:18px}
-/* FIX 4: kalem position relative — overflow hidden wrap'e bağlı, z-index doğru */
+.kalem-bg{display:none!important;}
 .kalem{position:relative;background:var(--surf);border:.5px solid var(--brd2);border-radius:13px;display:flex;align-items:center;padding:12px 13px;gap:10px;touch-action:pan-y;user-select:none;will-change:transform;-webkit-backface-visibility:hidden}
 .kalem.dragging{box-shadow:var(--sh2);opacity:.9}
 .kalem-handle{width:18px;display:flex;flex-direction:column;gap:3px;align-items:center;cursor:grab;flex-shrink:0;opacity:.25;padding:4px 0}
@@ -164,18 +154,6 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 /* GRAFİK */
 .mini-chart{margin:0 16px 10px;background:var(--surf);border:.5px solid var(--brd2);border-radius:14px;padding:14px}
 .mini-chart-ttl{font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:12px}
-
-/* FIX 5: FAB her zaman görünür, z-index yüksek, hiç bir şeyin altında kalmasın */
-.fab{position:fixed;bottom:calc(var(--nav)+14px);right:18px;width:52px;height:52px;border-radius:50%;background:var(--txt);color:var(--bg);font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.22);z-index:180;transition:.15s}
-.fab:active{transform:scale(.92)}
-
-/* TİP POPUP — FIX 6: popup FAB'ın tam üstünde, z-index tutarlı */
-.tip-popup{position:fixed;bottom:calc(var(--nav)+76px);right:16px;background:var(--surf);border:.5px solid var(--brd2);border-radius:16px;padding:6px;box-shadow:var(--sh2);z-index:179;display:none;flex-direction:column;gap:3px;min-width:155px}
-.tip-popup.on{display:flex;animation:popUp .2s cubic-bezier(.34,1.56,.64,1)}
-@keyframes popUp{from{opacity:0;transform:scale(.85) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.tip-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--txt);transition:.15s;cursor:pointer}
-.tip-item:active{background:var(--bg2)}
-.tip-item .ti{font-size:18px}
 
 /* NAV */
 .nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:var(--surf);border-top:.5px solid var(--brd2);display:flex;align-items:center;justify-content:space-around;padding:0 8px 8px;z-index:200}
@@ -237,44 +215,8 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
 .page.on{display:block;animation:fadeUp .25s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* SCROLL ANCHOR — FIX 7 */
+/* SCROLL ANCHOR */
 .scroll-anchor{height:1px;display:block}
-
-.fab {
-  position: fixed;
-  bottom: 85px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 28px;
-  background: var(--txt);
-  color: var(--bg);
-  font-size: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  z-index: 9999; /* En üstte olduğundan emin olalım */
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.fab:active { transform: scale(0.9); }
-.tip-popup {
-  position: fixed;
-  bottom: 150px;
-  right: 20px;
-  background: var(--surf);
-  border-radius: 16px;
-  padding: 8px;
-  box-shadow: var(--sh2);
-  display: none;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 9998;
-  border: .5px solid var(--brd2);
-}
-.tip-popup.on { display: flex !important; }
 
 .ai-panel{
   animation:fadeAi .45s ease;
@@ -290,7 +232,6 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
   from{opacity:0;transform:translateY(10px)}
   to{opacity:1;transform:translateY(0)}
 }
-
 
 /* KOMPAKT AKILLI ASİSTAN */
 .ai-chip{
@@ -354,7 +295,6 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
   font-weight:700;
 }
 .ai-mini-btn:active{transform:scale(.96)}
-
 
 /* KULLANIM İYİLEŞTİRMELERİ */
 .kalem{cursor:pointer}
@@ -441,13 +381,6 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 80px)}
   color:var(--txt2);
 }
 .deleted-btn:active{transform:scale(.95)}
-.quick-add-wrap button{
-  transition:transform .15s ease, box-shadow .15s ease;
-}
-.quick-add-wrap button:active{
-  transform:scale(.92);
-}
-
 
 /* ═══════════════════════════════════════
    iOS PREMIUM ARAYÜZ GÜNCELLEMESİ
@@ -562,32 +495,6 @@ main{padding-bottom:calc(var(--nav) + 120px)}
 .deleted-head{padding:14px 15px}
 .deleted-body{padding:10px 14px 14px}
 .deleted-row{padding:10px 0}
-.quick-add-wrap{
-  position:fixed!important;
-  right:50%!important;
-  transform:translateX(50%)!important;
-  bottom:84px!important;
-  display:flex!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:14px!important;
-  z-index:9999!important;
-}
-.quick-add-wrap button{
-  width:54px!important;
-  height:54px!important;
-  border-radius:50%!important;
-  font-size:23px!important;
-  border:1px solid rgba(255,255,255,.32)!important;
-}
-.fab{display:none!important}
-.tip-popup{
-  border-radius:20px!important;
-  background:var(--ios-surface-strong)!important;
-  backdrop-filter:var(--ios-blur);
-  -webkit-backdrop-filter:var(--ios-blur);
-}
 .nav{height:72px;padding-bottom:12px}
 .nitem{border-radius:18px;padding:9px 4px}
 .nitem.on{background:var(--bg2);color:var(--green)}
@@ -634,10 +541,130 @@ main{padding-bottom:calc(var(--nav) + 120px)}
   box-shadow:0 0 0 4px var(--green-bg);
 }
 
+/* YENİ HAREKETLİ FAB (SPEED DIAL) STİLLERİ */
+.fab-container {
+  position: fixed;
+  bottom: 86px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.fab-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.9);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fab-container.open .fab-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.main-fab {
+  width: 58px;
+  height: 58px;
+  border-radius: 29px;
+  background: var(--txt);
+  color: var(--bg);
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+  border: none;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+[data-theme=dark] .main-fab {
+  background: #f0ece4;
+  color: #100f0d;
+}
+.fab-container.open .main-fab {
+  transform: rotate(45deg);
+}
+.action-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 20px;
+  border: none;
+  color: white;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: transform 0.15s ease;
+  cursor: pointer;
+}
+.action-btn:active {
+  transform: scale(0.92);
+}
+.action-btn.gelir-btn {
+  background: linear-gradient(145deg, rgba(42,173,98,0.92), rgba(42,173,98,0.74));
+}
+.action-btn.gider-btn {
+  background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74));
+}
+
+body:not(.app-ready) .fab-container,
+body.login-open .fab-container {
+  display: none !important;
+}
+body.app-ready:not(.login-open) .fab-container {
+  display: flex !important;
+}
+
+#sec-gelir .kalem{
+  background:rgba(42,173,98,.105)!important;
+  border:1px solid rgba(42,173,98,.16)!important;
+  box-shadow:0 10px 24px rgba(42,173,98,.055)!important;
+}
+#sec-gider .kalem{
+  background:rgba(224,80,80,.105)!important;
+  border:1px solid rgba(224,80,80,.16)!important;
+  box-shadow:0 10px 24px rgba(224,80,80,.055)!important;
+}
+[data-theme=dark] #sec-gelir .kalem{
+  background:rgba(42,173,98,.16)!important;
+  border-color:rgba(42,173,98,.22)!important;
+}
+[data-theme=dark] #sec-gider .kalem{
+  background:rgba(224,80,80,.16)!important;
+  border-color:rgba(224,80,80,.22)!important;
+}
+.hcard.gelir{
+  background:rgba(42,173,98,.12)!important;
+  border:1px solid rgba(42,173,98,.16)!important;
+}
+.hcard.gider{
+  background:rgba(224,80,80,.12)!important;
+  border:1px solid rgba(224,80,80,.16)!important;
+}
+[data-theme=dark] .hcard.gelir{
+  background:rgba(42,173,98,.16)!important;
+}
+[data-theme=dark] .hcard.gider{
+  background:rgba(224,80,80,.16)!important;
+}
+.hcard.gelir .hcard-lbl,
+.hcard.gelir .hcard-val{
+  color:#149251!important;
+}
+.hcard.gider .hcard-lbl,
+.hcard.gider .hcard-val{
+  color:#d63d3d!important;
+}
 </style>
 </head>
 <body>
-<!-- LOGIN -->
 <div id="login">
 <div class="box">
 <div class="ico">💰</div>
@@ -650,12 +677,10 @@ main{padding-bottom:calc(var(--nav) + 120px)}
 <div class="sig">Tasarım &amp; Fikir<br/><strong>ysfykc</strong></div>
 </div>
 </div>
-<!-- TOPBAR -->
 <header class="topbar">
 <div class="logo">
 <div class="logo-ico">💰</div>
     Maaş Günü
-
   </div>
 <div class="tbr">
 <span id="sync">🔄</span>
@@ -663,15 +688,12 @@ main{padding-bottom:calc(var(--nav) + 120px)}
 <img id="avatar" onclick="cikisYap()" title="Çıkış yap"/>
 </div>
 </header>
-<!-- AY BAR -->
 <div class="ay-bar">
 <button class="ay-nav" onclick="ayDegis(-1)">‹</button>
 <span class="ay-lbl month-pill" id="ayLbl">—</span>
 <button class="ay-nav" onclick="ayDegis(1)">›</button>
 </div>
-<!-- MAIN -->
 <main>
-<!-- BU AY -->
 <div class="page on" id="pageAy">
 <div class="hero">
 <div class="hcard gelir"><div class="hcard-lbl">Gelir</div><div class="hcard-val" id="hGelir">₺0</div></div>
@@ -717,35 +739,28 @@ main{padding-bottom:calc(var(--nav) + 120px)}
 <button class="tbtn" onclick="tabSec(2)">🔴 Gider</button>
 <button class="tbtn" onclick="tabSec(3)">📊 Grafik</button>
 </div>
-<!-- FIX 9: Scroll anchor'lar — tab tıklanınca buraya scroll edilir -->
 <div class="helper-card">Kartlara dokun: düzenle · Sağa kaydır: işaretle · Sola kaydır: silinenlere taşı.</div>
 <span class="scroll-anchor" id="anchor-gelir"></span>
 <div id="icerik"></div>
 </div>
-<!-- GEÇMİŞ -->
 <div class="page" id="pageGecmis">
 <div id="gecmisIcerik" style="padding-top:8px"></div>
 </div>
 </main>
-<!-- FAB -->
-<button class="fab" id="fabBtn" onclick="fabTikla()" style="display:none">＋</button>
-<!-- TİP POPUP -->
-<div class="tip-popup" id="tipPopup">
-<div class="tip-item" onclick="modalAc('gelir')"><span class="ti">💚</span><span style="color:var(--green);font-weight:600">Gelir Ekle</span></div>
-<div class="tip-item" onclick="modalAc('gider')"><span class="ti">🔴</span><span style="color:var(--red);font-weight:600">Gider Ekle</span></div>
-<div class="tip-item" onclick="modalAc('yatirim')"><span class="ti">📈</span><span style="color:var(--purple);font-weight:600">Yatırım Ekle</span></div>
+
+<div class="fab-container" id="fabContainer">
+  <div class="fab-actions" id="fabActions">
+    <button class="action-btn gider-btn" onclick="modalAc('gider'); closeFab();" title="Gider Ekle">₺</button>
+    <button class="action-btn gelir-btn" onclick="modalAc('gelir'); closeFab();" title="Gelir Ekle">₺</button>
+  </div>
+  <button class="main-fab" id="mainFab" onclick="toggleFab()">＋</button>
 </div>
-<div class="quick-add-wrap" style="position:fixed;bottom:110px;right:20px;display:flex;flex-direction:column;gap:12px;z-index:9997">
-<button onclick="modalAc('gelir')" style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#16a34a,#22c55e);color:white;font-size:22px;box-shadow:0 10px 24px rgba(34,197,94,.35)" title="Gelir Ekle">₺</button>
-<button onclick="modalAc('gider')" style="width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;font-size:22px;box-shadow:0 10px 24px rgba(239,68,68,.35)" title="Gider Ekle">₺</button>
-</div>
-<!-- NAV -->
+
 <nav class="nav">
 <button class="nitem on" id="nav0" onclick="navSec(0)"><span class="nico">📋</span>Bu Ay</button>
 <button class="nitem" id="nav1" onclick="navSec(1)"><span class="nico">📅</span>Geçmiş</button>
 </nav>
-<!-- MODAL: EKLE -->
-<div class="ov" id="mEkle" onclick="if(event.target===this){this.classList.remove('on');tipPopupKapat()}">
+<div class="ov" id="mEkle" onclick="if(event.target===this){this.classList.remove('on'); closeFab();}">
 <div class="modal">
 <div class="mhandle"></div>
 <div class="mttl" id="mTtl">Gelir Ekle</div>
@@ -765,7 +780,6 @@ main{padding-bottom:calc(var(--nav) + 120px)}
 <button class="cancel-btn" onclick="document.getElementById('mEkle').classList.remove('on')">İptal</button>
 </div>
 </div>
-<!-- MODAL: DÜZENLE -->
 <div class="ov" id="mDuzenle" onclick="if(event.target===this)this.classList.remove('on')">
 <div class="modal">
 <div class="mhandle"></div>
@@ -887,25 +901,14 @@ function ayYazi(k){const[y,m]=k.split('-');return AYLAR[parseInt(m)-1]+' '+y;}
 
 function hesapla(ay){
   const v=ayVerisi(ay);
-
-  // Sadece işaretlenen gelir/giderler üst kutulara dahil edilir
   const aktifGelirler=v.gelirler.filter(k=>k.odendi);
   const aktifGiderler=v.giderler.filter(k=>k.odendi);
-
   const topGelir=aktifGelirler.reduce((s,k)=>s+k.tutar,0);
   const topGider=aktifGiderler.reduce((s,k)=>s+k.tutar,0);
-
   const odendi=topGider;
   const kalan=topGelir-topGider;
-
-  const oran=topGelir>0
-    ?Math.min(100,Math.round(topGider/topGelir*100))
-    :0;
-
-  const yatirim=aktifGiderler
-    .filter(k=>k.yatirim)
-    .reduce((s,k)=>s+k.tutar,0);
-
+  const oran=topGelir>0?Math.min(100,Math.round(topGider/topGelir*100)):0;
+  const yatirim=aktifGiderler.filter(k=>k.yatirim).reduce((s,k)=>s+k.tutar,0);
   return{topGelir,topGider,odendi,kalan,oran,yatirim};
 }
 
@@ -914,7 +917,6 @@ function render(){
   document.getElementById('ayLbl').textContent=ayYazi(aktifAy);
   const h=hesapla(aktifAy);
 
-  // Hero — FIX 10: kalan tutarı Math.abs olmadan göster, sign bilgi verir
   document.getElementById('hGelir').textContent=fTL(h.topGelir);
   document.getElementById('hGider').textContent=fTL(h.topGider);
   document.getElementById('hKalan').textContent=(h.kalan<0?'-':'')+fTL(Math.abs(h.kalan));
@@ -931,7 +933,6 @@ function render(){
   aiInsightGoster(h);
   oneriGoster(h);
 
-  // Progress — FIX 11: progress oran hesabı doğru
   const cls=h.oran<70?'ok':h.oran<90?'warn':'danger';
   document.getElementById('prgBar').className='prg-bar '+cls;
   document.getElementById('prgBar').style.width=h.oran+'%';
@@ -942,7 +943,6 @@ function render(){
 
   icerikRender();
 }
-
 
 function hizliDurumGoster(h){
   const el=document.getElementById('quickStatus');
@@ -975,9 +975,7 @@ function tahminGoster(h){
   else if(h.kalan<0){ico.textContent='🔴';txt.innerHTML='<strong>Giderler geliri aştı!</strong> '+fTL(Math.abs(h.kalan))+' açık var.';}
 }
 
-
 let aiOneriIndex=0;
-
 function aiOnerileriUret(h){
   const v=ayVerisi(aktifAy);
   const giderSayisi=v.giderler.length;
@@ -986,32 +984,19 @@ function aiOnerileriUret(h){
   const yatirim=h.yatirim||0;
   const liste=[];
 
-  if(!h.topGelir && !h.topGider){
-    liste.push({tag:'Hazır',txt:'Maaşını ve sabit giderlerini eklediğinde aylık denge, risk ve kalan para tahmini otomatik oluşur.'});
-  }
-  if(h.topGelir>0 && giderSayisi===0){
-    liste.push({tag:'Plan',txt:'Henüz gider yok. Sabit ödemelerini eklediğinde aylık risk ve kalan gün hesabı daha doğru çalışır.'});
-  }
-  if(h.oran>=90){
-    liste.push({tag:'Risk yüksek',txt:'Harcama oranı kritik seviyede. Yeni gider eklemeden önce zorunlu olmayan ödemeleri ertelemek mantıklı olur.'});
-  } else if(h.oran>=70){
-    liste.push({tag:'Dikkat',txt:'Bütçenin çoğu kullanılmış. Kalan günlerde küçük harcamaları kategoriye ayırarak takip et.'});
-  } else if(h.topGelir>0){
-    liste.push({tag:'İyi gidiyor',txt:'Harcama oranın kontrollü. Bu ay ekstra kalan tutarın bir kısmını yatırım ya da acil durum bütçesine ayırabilirsin.'});
-  }
-  if(odenmeyen>0){
-    liste.push({tag:'Ödeme',txt:'Ödenmemiş gider toplamı '+fTL(odenmeyen)+'. Bunları işaretlersen harcama oranı daha net görünür.'});
-  }
-  if(h.topGelir>0 && yatirim<h.topGelir*.15){
-    liste.push({tag:'Yatırım',txt:'Yatırım oranı düşük görünüyor. İmkan varsa gelirin %15–30 arası için ayrı bir hedef oluştur.'});
-  }
+  if(!h.topGelir && !h.topGider) liste.push({tag:'Hazır',txt:'Maaşını ve sabit giderlerini eklediğinde aylık denge, risk ve kalan para tahmini otomatik oluşur.'});
+  if(h.topGelir>0 && giderSayisi===0) liste.push({tag:'Plan',txt:'Henüz gider yok. Sabit ödemelerini eklediğinde aylık risk ve kalan gün hesabı daha doğru çalışır.'});
+  if(h.oran>=90) liste.push({tag:'Risk yüksek',txt:'Harcama oranı kritik seviyede. Yeni gider eklemeden önce zorunlu olmayan ödemeleri ertelemek mantıklı olur.'});
+  else if(h.oran>=70) liste.push({tag:'Dikkat',txt:'Bütçenin çoğu kullanılmış. Kalan günlerde küçük harcamaları kategoriye ayırarak takip et.'});
+  else if(h.topGelir>0) liste.push({tag:'İyi gidiyor',txt:'Harcama oranın kontrollü. Bu ay ekstra kalan tutarın bir kısmını yatırım ya da acil durum bütçesine ayırabilirsin.'});
+  
+  if(odenmeyen>0) liste.push({tag:'Ödeme',txt:'Ödenmemiş gider toplamı '+fTL(odenmeyen)+'. Bunları işaretlersen harcama oranı daha net görünür.'});
+  if(h.topGelir>0 && yatirim<h.topGelir*.15) liste.push({tag:'Yatırım',txt:'Yatırım oranı düşük görünüyor. İmkan varsa gelirin %15–30 arası için ayrı bir hedef oluştur.'});
   if(gelirSayisi>0 && giderSayisi>0 && h.kalan>0){
     const gun=h.topGider>0?Math.max(1,Math.round((h.kalan/h.topGider)*30)):30;
     liste.push({tag:'Tahmin',txt:'Mevcut tempoyla kalan tutar yaklaşık '+gun+' gün idare eder. Büyük alımları bu bilgiye göre planla.'});
   }
-  if(h.kalan<0){
-    liste.push({tag:'Açık',txt:'Bu ay '+fTL(Math.abs(h.kalan))+' açık var. En yüksek gider kategorisini grafikten kontrol et.'});
-  }
+  if(h.kalan<0) liste.push({tag:'Açık',txt:'Bu ay '+fTL(Math.abs(h.kalan))+' açık var. En yüksek gider kategorisini grafikten kontrol et.'});
 
   return liste.length?liste:[{tag:'Akıllı takip',txt:'Veriler değiştikçe öneriler de değişir; mevcut ayın durumuna göre yorum yapılır.'}];
 }
@@ -1077,7 +1062,6 @@ function icerikRender(){
   swipelariBagla();
   draglariBagla();
 }
-
 
 function silinenlerRender(){
   const v=ayVerisi(aktifAy);
@@ -1162,7 +1146,6 @@ function kalemHtml(k,tip,idx){
   </div>`;
 }
 
-// FIX 12: XSS koruması
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function grafikRender(v){
@@ -1179,7 +1162,6 @@ function grafikRender(v){
   });
 }
 
-/* ══ SWIPE — FIX 13: threshold artırıldı, yanlış tetiklenme azaltıldı ══ */
 function swipelariBagla(){
   document.querySelectorAll('.kalem').forEach(el=>{
     let sx=0,sy=0,cx=0,swiping=false,moved=false;
@@ -1215,7 +1197,6 @@ function swipelariBagla(){
   });
 }
 
-/* ══ DRAG & DROP ══ */
 function draglariBagla(){
   document.querySelectorAll('.kalem-wrap').forEach(wrap=>{
     const handle=wrap.querySelector('.kalem-handle');
@@ -1244,19 +1225,29 @@ function draglariBagla(){
   });
 }
 
-/* ══ KALEM İŞLEMLERİ ══ */
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 
-function fabTikla(){document.getElementById('tipPopup').classList.toggle('on');}
-function tipPopupKapat(){document.getElementById('tipPopup').classList.remove('on');}
+/* ══ YENİ FAB (SPEED DIAL) FONKSİYONLARI ══ */
+function toggleFab(){
+  document.getElementById('fabContainer').classList.toggle('open');
+}
+function closeFab(){
+  const f = document.getElementById('fabContainer');
+  if(f) f.classList.remove('open');
+}
+
+// FAB dışına tıklayınca menüyü kapat
+document.addEventListener('touchstart', e => {
+  if(!e.target.closest('#fabContainer')) closeFab();
+},{passive:true});
 
 function modalAc(tip){
-  tipPopupKapat();aktifTip=tip;
+  aktifTip=tip;
   tekrarAcik=false;yatirimAcik=false;
   document.getElementById('tekrarToggle').classList.remove('on');
   document.getElementById('yatirimToggle').classList.remove('on');
   ['eAd','eTutar','eKat','eNot'].forEach(id=>document.getElementById(id).value='');
-  const ttl={gelir:'🟢 Gelir Ekle',gider:'🔴 Gider Ekle',yatirim:'📈 Yatırım / Birikim Ekle'};
+  const ttl={gelir:'🟢 Gelir Ekle',gider:'🔴 Gider Ekle',yatirim:'📈 Yatırım Ekle'};
   const cls={gelir:'sbtn g',gider:'sbtn r',yatirim:'sbtn p'};
   document.getElementById('mTtl').textContent=ttl[tip]||'Ekle';
   document.getElementById('mBtn').className=cls[tip]||'sbtn g';
@@ -1279,7 +1270,6 @@ async function kalemKaydet(){
   else v.giderler.push(kalem);
   document.getElementById('mEkle').classList.remove('on');
   render();
-  // FIX 14: Yeni eklenen kaleme scroll et
   requestAnimationFrame(()=>{
     const secId=tip==='gelir'?'sec-gelir':'sec-gider';
     const sec=document.getElementById(secId);
@@ -1309,16 +1299,14 @@ async function kalemSil(tip,id){
   toast('🗑 Silinenlere taşındı');
 }
 
-// FIX 15: toggleOdendi — anlık güncelleme, render() çağrılıyor
 async function toggleOdendi(tip,id){
   const v=ayVerisi(aktifAy);
   const liste=tip==='gelir'?v.gelirler:v.giderler;
   const k=liste.find(x=>x.id===id);
   if(k)k.odendi=!k.odendi;
-  render(); // Anlık güncelleme
+  render(); 
   await fbKaydet();
 }
-
 
 function kalemDuzenleAc(tip,id){
   const v=ayVerisi(aktifAy);
@@ -1341,7 +1329,6 @@ function kalemDuzenleAc(tip,id){
   document.getElementById('mDuzenle').classList.add('on');
 }
 
-// Uzun basınca düzenleme
 let lpTimer=null;
 document.addEventListener('touchstart',e=>{
   const kalem=e.target.closest('.kalem');
@@ -1379,19 +1366,16 @@ async function duzenleKaydet(){
   render();await fbKaydet();toast('✅ Güncellendi');
 }
 
-/* ══ TOGGLE ══ */
 function toggleTikla(w){
   if(w==='tekrar'){tekrarAcik=!tekrarAcik;document.getElementById('tekrarToggle').className='toggle'+(tekrarAcik?' on':'');}
   else if(w==='yatirim'){yatirimAcik=!yatirimAcik;document.getElementById('yatirimToggle').className='toggle'+(yatirimAcik?' on':'');}
   else if(w==='dTekrar'){dTekrarAcik=!dTekrarAcik;document.getElementById('dTekrar').className='toggle'+(dTekrarAcik?' on':'');}
 }
 
-/* ══ TAB — FIX 16: Sekmeye tıklayınca ilgili bölüme scroll ══ */
 function tabSec(i){
   tabIdx=i;
   document.querySelectorAll('.tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===i));
   icerikRender();
-  // Tüm içerik bölümü görünür hale scroll et
   requestAnimationFrame(()=>{
     if(i===1){
       const sec=document.getElementById('sec-gelir');
@@ -1400,22 +1384,21 @@ function tabSec(i){
       const sec=document.getElementById('sec-gider');
       if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
     } else {
-      // Tümü sekmesinde sayfanın üstüne dön
       window.scrollTo({top:0,behavior:'smooth'});
     }
   });
 }
 
-/* ══ NAV ══ */
 function navSec(i){
   navIdx=i;
   document.querySelectorAll('.nitem').forEach((b,idx)=>b.classList.toggle('on',idx===i));
   document.getElementById('pageAy').className='page'+(i===0?' on':'');
   document.getElementById('pageGecmis').className='page'+(i===1?' on':'');
-  // FIX 17: FAB geçmiş sayfasında gizli
-  document.getElementById('fabBtn').style.display='none';
-  const qaw=document.querySelector('.quick-add-wrap'); if(qaw)qaw.style.display=(i===0 && document.body.classList.contains('app-ready'))?'flex':'none';
-  tipPopupKapat();
+  
+  const qaw=document.getElementById('fabContainer'); 
+  if(qaw)qaw.style.display=(i===0 && document.body.classList.contains('app-ready'))?'flex':'none';
+  
+  closeFab();
   window.scrollTo({top:0,behavior:'smooth'});
   if(i===1)gecmisRender();
 }
@@ -1424,13 +1407,12 @@ function ayDegis(d){
   const[y,m]=aktifAy.split('-').map(Number);
   const dt=new Date(y,m-1+d,1);
   aktifAy=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
-  tabIdx=0; // FIX 18: ay değişince tab sıfırla
+  tabIdx=0;
   document.querySelectorAll('.tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===0));
   render();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ══ GEÇMİŞ ══ */
 function gecmisRender(){
   const el=document.getElementById('gecmisIcerik');
   const aylar=Object.keys(veri.aylar).filter(k=>!k.startsWith('_')).sort((a,b)=>b.localeCompare(a));
@@ -1457,7 +1439,6 @@ function gecmisRender(){
   }).join('');
 }
 
-/* ══ YARDIMCILAR ══ */
 function fTL(n){return'₺'+(Math.round(n)||0).toLocaleString('tr-TR');}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2400);}
 function temaDegis(){
@@ -1467,12 +1448,6 @@ function temaDegis(){
   localStorage.setItem('masaygunu2Tema',document.documentElement.dataset.theme);
 }
 
-// FAB dışına tıklayınca popup kapat
-document.addEventListener('touchstart',e=>{
-  if(!e.target.closest('.fab')&&!e.target.closest('.tip-popup'))tipPopupKapat();
-},{passive:true});
-
-/* ══ INIT ══ */
 async function init(){
   const tema=localStorage.getItem('masaygunu2Tema')||'light';
   document.documentElement.dataset.theme=tema;
@@ -1488,7 +1463,6 @@ async function init(){
         document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
         const av=document.getElementById('avatar');
         if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';}
-        // Kullanıcı adı üst bardan kaldırıldı.
         lsYukle();render();
         await fbYukle();render();
         setSynk('ok');
@@ -1496,7 +1470,6 @@ async function init(){
       }else{
         user=null;veri={aylar:{},guncelleme:null};
         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
-        // Kullanıcı adı üst bardan kaldırıldı.
       }
     });
     return;
@@ -1505,7 +1478,6 @@ async function init(){
   document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
   const av=document.getElementById('avatar');
   if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
-  // Kullanıcı adı üst bardan kaldırıldı.
   lsYukle();render();
   await fbYukle();render();
   setSynk('ok');
@@ -1514,91 +1486,10 @@ async function init(){
 
 document.addEventListener('DOMContentLoaded',init);
 
-
-</script>
-<style>
-/* SON DÜZELTME: LOGIN BUTONLARI VE KART RENKLERİ */
-body:not(.app-ready) .quick-add-wrap,
-body.login-open .quick-add-wrap{
-  display:none!important;
-}
-
-body.app-ready:not(.login-open) .quick-add-wrap{
-  display:flex!important;
-}
-
-/* Silme/işaretleme için kullanılan arkadaki koyu yarım şeritleri gizle */
-.kalem-bg{
-  display:none!important;
-}
-
-/* Gelir kartları tamamen şeffaf yeşil */
-#sec-gelir .kalem{
-  background:rgba(42,173,98,.105)!important;
-  border:1px solid rgba(42,173,98,.16)!important;
-  box-shadow:0 10px 24px rgba(42,173,98,.055)!important;
-}
-
-/* Gider kartları tamamen şeffaf kırmızı */
-#sec-gider .kalem{
-  background:rgba(224,80,80,.105)!important;
-  border:1px solid rgba(224,80,80,.16)!important;
-  box-shadow:0 10px 24px rgba(224,80,80,.055)!important;
-}
-
-/* Dark mode tonları */
-[data-theme=dark] #sec-gelir .kalem{
-  background:rgba(42,173,98,.16)!important;
-  border-color:rgba(42,173,98,.22)!important;
-}
-
-[data-theme=dark] #sec-gider .kalem{
-  background:rgba(224,80,80,.16)!important;
-  border-color:rgba(224,80,80,.22)!important;
-}
-
-/* Üstteki Gelir/Gider özet kartları da tek renkte kalsın */
-.hcard.gelir{
-  background:rgba(42,173,98,.12)!important;
-  border:1px solid rgba(42,173,98,.16)!important;
-}
-
-.hcard.gider{
-  background:rgba(224,80,80,.12)!important;
-  border:1px solid rgba(224,80,80,.16)!important;
-}
-
-[data-theme=dark] .hcard.gelir{
-  background:rgba(42,173,98,.16)!important;
-}
-
-[data-theme=dark] .hcard.gider{
-  background:rgba(224,80,80,.16)!important;
-}
-
-/* Hızlı ekle butonları login sonrası altta düzgün dursun */
-.quick-add-wrap{
-  position:fixed!important;
-  left:50%!important;
-  right:auto!important;
-  bottom:86px!important;
-  transform:translateX(-50%)!important;
-  flex-direction:row!important;
-  gap:14px!important;
-  z-index:9999!important;
-}
-
-.quick-add-wrap button{
-  width:58px!important;
-  height:58px!important;
-  border-radius:22px!important;
-}
-</style>
-<script>
 function uiLoginDurumuAyarla(acik){
   document.body.classList.toggle('login-open', !!acik);
   document.body.classList.toggle('app-ready', !acik);
-  const q=document.querySelector('.quick-add-wrap');
+  const q=document.getElementById('fabContainer');
   if(q) q.style.display = acik ? 'none' : 'flex';
 }
 document.addEventListener('DOMContentLoaded', function(){
@@ -1618,34 +1509,3 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 </body>
 </html>
-<style>
-.hcard.gelir .hcard-lbl,
-.hcard.gelir .hcard-val{
-  color:#149251!important;
-}
-.hcard.gider .hcard-lbl,
-.hcard.gider .hcard-val{
-  color:#d63d3d!important;
-}
-</style>
-<style>
-.quick-add-wrap button{
-  width:60px!important;
-  height:60px!important;
-  border-radius:22px!important;
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  box-shadow:
-    0 14px 28px rgba(0,0,0,.12),
-    inset 0 1px 0 rgba(255,255,255,.35)!important;
-}
-.quick-add-wrap button:first-child{
-  background:linear-gradient(145deg,rgba(42,173,98,.92),rgba(42,173,98,.74))!important;
-}
-.quick-add-wrap button:last-child{
-  background:linear-gradient(145deg,rgba(224,80,80,.92),rgba(224,80,80,.74))!important;
-}
-.quick-add-wrap button:active{
-  transform:scale(.92)!important;
-}
-</style>
