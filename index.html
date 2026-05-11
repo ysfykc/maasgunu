@@ -40,7 +40,7 @@ input,select{font-family:var(--fd);font-size:inherit}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 input[type=number]{-moz-appearance:textfield}
 
-/* LOGIN SCREEN (TAM EKRAN GÖRSEL, AŞAĞI YASLI BUTON & SAĞ ÜST ROZET) */
+/* LOGIN SCREEN (TAM EKRAN GÖRSEL, KOMPAKT BUTON & SAĞ ÜST ROZET) */
 #login {
   position: fixed;
   inset: 0;
@@ -49,7 +49,7 @@ input[type=number]{-moz-appearance:textfield}
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 24px 32px;
+  padding: 0 32px 14vh; /* Butonu aşağıdan %14 yukarı iterek slogan boşluğuna oturtur */
 }
 .login-bg {
   position: absolute;
@@ -57,7 +57,7 @@ input[type=number]{-moz-appearance:textfield}
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%; 
+  object-position: center bottom; /* Görselin en altını (sloganı) ekranın en altına yaslar */
   z-index: -1;
 }
 
@@ -85,22 +85,24 @@ input[type=number]{-moz-appearance:textfield}
 
 #login .box {
   text-align: center;
-  max-width: 320px;
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 #loginBtn {
   width: 100%;
-  padding: 16px;
+  max-width: 250px; /* Buton genişliğini daralttık */
+  padding: 13px 16px; /* Buton yüksekliğini incelttik */
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.95);
   color: #1a1814;
-  font-size: 15px;
+  font-size: 14px; /* Yazı boyutunu biraz küçülttük */
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   backdrop-filter: blur(5px);
 }
 
