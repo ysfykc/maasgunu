@@ -13,7 +13,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
@@ -446,7 +445,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 <div class="mttl" id="mTtl">Gelir Ekle</div>
 
 <div id="fisTaraBtnWrap" style="margin-bottom:13px; display:none;">
-  <button class="sbtn" style="background:var(--blue-bg); color:var(--blue); border:1.5px dashed var(--blue); padding:14px; font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:none;" onclick="document.getElementById('fisInput').click()">
+  <button class="sbtn" style="background:var(--blue-bg); color:var(--blue); border:1.5px dashed var(--blue); padding:14px; font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:none;" onclick="document.getElementById('fisInput').click(); Haptic.light();">
      📸 Akıllı Fiş Okuyucu ile Doldur
   </button>
 </div>
@@ -501,6 +500,15 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 <div class="toast" id="toast"></div>
 
 <script>
+/* ══ HAPTIC ENGINE (TİTREŞİM MOTORU) ══ */
+const Haptic = {
+  light: () => { if(navigator.vibrate) navigator.vibrate(10); },
+  medium: () => { if(navigator.vibrate) navigator.vibrate(20); },
+  heavy: () => { if(navigator.vibrate) navigator.vibrate(40); },
+  success: () => { if(navigator.vibrate) navigator.vibrate([15, 40, 20]); },
+  error: () => { if(navigator.vibrate) navigator.vibrate([30, 40, 30]); }
+};
+
 /* ══ FIREBASE ══ */
 const CFG={apiKey:'AIzaSyADpIRNLQEIer_gplTgwKi_EKkfcyrYoqY',authDomain:'maasgunu-bd353.firebaseapp.com',projectId:'maasgunu-bd353',storageBucket:'maasgunu-bd353.firebasestorage.app',messagingSenderId:'485904329467',appId:'1:485904329467:web:579d932ae8f25958901e5e'};
 let db,auth,user=null;
@@ -560,6 +568,7 @@ async function fbYukle(){
 }
 
 async function girisYap(){
+  Haptic.light();
   const { signInWithPopup, GoogleAuthProvider } = window._fb;
   document.getElementById('loginBtn').textContent='⏳ Bekleyin...';
   try { await signInWithPopup(auth, new GoogleAuthProvider()); }
@@ -692,7 +701,11 @@ function aiInsightGoster(h){
   box.style.display='flex';
 }
 
-function aiOneriYenile(){ aiOneriIndex++; aiInsightGoster(hesapla(aktifAy)); }
+function aiOneriYenile(){ 
+  Haptic.light(); 
+  aiOneriIndex++; 
+  aiInsightGoster(hesapla(aktifAy)); 
+}
 
 function render(){
   document.getElementById('ayLbl').textContent=ayYazi(aktifAy);
@@ -763,6 +776,7 @@ function icerikRender(){
 }
 
 function toggleSilinenler(){
+  Haptic.light();
   silinenlerAcik = !silinenlerAcik;
   const el = document.getElementById('deletedBody');
   if(el) el.classList.toggle('on', silinenlerAcik);
@@ -804,6 +818,7 @@ function silinenlerRender(){
 }
 
 async function silineniGeriAl(tip,idx){
+  Haptic.success();
   const v=ayVerisi(aktifAy);
   const kaynak=tip==='gelir'?v.silinenGelirler:v.silinenGiderler;
   const hedef=tip==='gelir'?v.gelirler:v.giderler;
@@ -816,6 +831,7 @@ async function silineniGeriAl(tip,idx){
 }
 
 async function silineniKaliciSil(tip,idx){
+  Haptic.heavy();
   const v=ayVerisi(aktifAy);
   const kaynak=tip==='gelir'?v.silinenGelirler:v.silinenGiderler;
   if(!kaynak||!kaynak[idx])return;
@@ -873,6 +889,7 @@ function swipelariBagla(){
     let sx=0,sy=0,cx=0,swiping=false,moved=false;
     el.addEventListener('touchstart',e=>{
       sx=e.touches[0].clientX;sy=e.touches[0].clientY;swiping=true;moved=false;cx=0;
+      el.dataset.hapticed = '';
     },{passive:true});
     
     el.addEventListener('touchmove',e=>{
@@ -899,6 +916,15 @@ function swipelariBagla(){
              bgr.style.opacity = Math.min(1, Math.abs(cx) / 30);
          }
       }
+
+      // SİLME/İŞARETLEME SINIRINI GEÇİNCE TİTREŞİM (HAPTIC)
+      if(Math.abs(cx) > 70 && !el.dataset.hapticed) {
+          Haptic.medium();
+          el.dataset.hapticed = "1";
+      } else if (Math.abs(cx) <= 70) {
+          el.dataset.hapticed = "";
+      }
+
     },{passive:true});
     
     el.addEventListener('touchend',()=>{
@@ -934,6 +960,7 @@ function draglariBagla(){
     handle.addEventListener('touchstart',e=>{
       sy=e.touches[0].clientY;tip=wrap.dataset.tip;origIdx=parseInt(wrap.dataset.idx);
       wrap.querySelector('.kalem').classList.add('dragging');
+      Haptic.light();
     },{passive:true});
     handle.addEventListener('touchmove',e=>{
       e.preventDefault();
@@ -946,7 +973,12 @@ function draglariBagla(){
       const v=ayVerisi(aktifAy);
       const liste=tip==='gelir'?v.gelirler:v.giderler;
       const yeniIdx=Math.max(0,Math.min(liste.length-1,origIdx+adim));
-      if(yeniIdx!==origIdx){const[item]=liste.splice(origIdx,1);liste.splice(yeniIdx,0,item);fbKaydet();}
+      if(yeniIdx!==origIdx){
+        const[item]=liste.splice(origIdx,1);
+        liste.splice(yeniIdx,0,item);
+        fbKaydet();
+        Haptic.light();
+      }
       wrap.style.transform='';wrap.style.zIndex='';
       wrap.querySelector('.kalem').classList.remove('dragging');
       icerikRender();
@@ -956,11 +988,18 @@ function draglariBagla(){
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 
-function toggleFab(){ document.getElementById('fabContainer').classList.toggle('open'); }
-function closeFab(){ const f = document.getElementById('fabContainer'); if(f) f.classList.remove('open'); }
+function toggleFab(){ 
+  Haptic.medium();
+  document.getElementById('fabContainer').classList.toggle('open'); 
+}
+function closeFab(){ 
+  const f = document.getElementById('fabContainer'); 
+  if(f) f.classList.remove('open'); 
+}
 document.addEventListener('touchstart', e => { if(!e.target.closest('#fabContainer')) closeFab(); },{passive:true});
 
 function hizliEkle(ad, kat) {
+  Haptic.light();
   document.getElementById('eAd').value = ad;
   document.getElementById('eKat').value = kat;
   modalAc('gider');
@@ -968,6 +1007,7 @@ function hizliEkle(ad, kat) {
 }
 
 function modalAc(tip){
+  Haptic.light();
   aktifTip=tip;
   tekrarAcik=false;yatirimAcik=false;
   document.getElementById('tekrarToggle').classList.remove('on');
@@ -984,7 +1024,6 @@ function modalAc(tip){
   document.getElementById('taksitRow').style.display=tip==='gider'?'block':'none';
   document.getElementById('tekrarRow').style.display='flex';
   
-  // Sadece gider eklerken Fiş Tarayıcı görünsün
   document.getElementById('fisTaraBtnWrap').style.display = tip === 'gider' ? 'block' : 'none';
   document.getElementById('ocrLoading').style.display = 'none';
   document.getElementById('mBtn').disabled = false;
@@ -996,7 +1035,6 @@ function modalAc(tip){
   setTimeout(()=>document.getElementById('eTutar').focus(),350);
 }
 
-/* YENİ: YAPAY ZEKA FİŞ OKUMA SİSTEMİ (TESSERACT.JS) */
 async function fisOkut(e) {
   const file = e.target.files[0];
   if(!file) return;
@@ -1024,7 +1062,6 @@ async function fisOkut(e) {
     const text = ret.data.text.toUpperCase();
     await worker.terminate();
 
-    // 1. Marka ve Kategori Tahmini
     let tutar = 0; let ad = ""; let kat = "Diğer";
 
     if(text.includes('A101') || text.includes('BİM') || text.includes('BIM') || text.includes('MİGROS') || text.includes('MIGROS') || text.includes('ŞOK') || text.includes('SOK')) { ad = 'Market Alışverişi'; kat = 'Market'; }
@@ -1034,33 +1071,31 @@ async function fisOkut(e) {
     else if(text.includes('WAIKIKI') || text.includes('MAĞAZA') || text.includes('GİYİM')) { ad = 'Giyim'; kat = 'Alışveriş'; }
     else {
         let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
-        if(lines.length > 0) ad = lines[0].substring(0, 20); // İlk satırı marka ismi kabul et
+        if(lines.length > 0) ad = lines[0].substring(0, 20); 
     }
 
-    // 2. Akıllı Tutar Bulma Algoritması
     let lines = text.split('\n');
     let txtSayilar = text.match(/\d+[.,]\d{2}/g);
     let floatSayilar = txtSayilar ? txtSayilar.map(s => parseFloat(s.replace(',','.'))) : [];
 
-    // Önce "TOPLAM" veya "TUTAR" yazan satırı ara
     let toplamSatiri = lines.find(l => (l.includes('TOPLAM') || l.includes('TUTAR')) && /\d+[.,]\d{2}/.test(l) && !l.includes('KDV'));
     if(toplamSatiri) {
        let match = toplamSatiri.match(/\d+[.,]\d{2}/);
        if(match) tutar = parseFloat(match[0].replace(',','.'));
     } 
     if (tutar === 0 && floatSayilar.length > 0) {
-       // Eğer Toplam satırı bulunamazsa, fişteki en büyük sayıyı al (Nakit vs. üstü)
        tutar = Math.max(...floatSayilar);
     }
 
-    // 3. Verileri Forma Doldur
     document.getElementById('eAd').value = ad;
     if(tutar > 0) document.getElementById('eTutar').value = tutar;
     document.getElementById('eKat').value = kat;
 
+    Haptic.success();
     toast('✨ Fiş başarıyla okundu!');
   } catch(err) {
     console.error(err);
+    Haptic.error();
     toast('❌ Fiş okunamadı. Lütfen net çekin.');
     document.getElementById('fisTaraBtnWrap').style.display = 'block';
   } finally {
@@ -1077,12 +1112,11 @@ async function kalemKaydet(){
   const not=document.getElementById('eNot').value.trim();
   const taksit=parseInt(document.getElementById('eTaksit').value)||1;
 
-  if(!ad){toast('⚠️ Açıklama gir');return;}
-  if(!tutar){toast('⚠️ Tutar gir');return;}
+  if(!ad){ Haptic.error(); toast('⚠️ Açıklama gir');return;}
+  if(!tutar){ Haptic.error(); toast('⚠️ Tutar gir');return;}
 
   const tip = aktifTip === 'yatirim' ? 'gider' : aktifTip;
   const isYatirim = aktifTip === 'yatirim' || yatirimAcik;
-  
   const taksitGrupId = taksit > 1 ? uid() + '-grp' : null;
 
   for(let i=0; i<taksit; i++){
@@ -1116,7 +1150,9 @@ async function kalemKaydet(){
     const sec=document.getElementById(secId);
     if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
   });
+  
   await fbKaydet();
+  Haptic.success();
   toast('✅ Eklendi');
 }
 
@@ -1127,6 +1163,7 @@ function kalemSilOnay(tip, id) {
   if(!k) return;
 
   if(k.taksitGrupId) {
+    Haptic.medium();
     beklemeSilId = id;
     beklemeSilTip = tip;
     beklemeSilGrupId = k.taksitGrupId;
@@ -1159,6 +1196,7 @@ async function taksitTumunuSil() {
 
   render();
   await fbKaydet();
+  Haptic.heavy();
   toast('✅ Tüm taksitler silindi');
 }
 
@@ -1197,10 +1235,12 @@ async function gercekKalemSil(tip,id){
 
   render();
   await fbKaydet();
+  Haptic.heavy();
   toast('🗑 Silinenlere taşındı');
 }
 
 async function toggleOdendi(tip,id){
+  Haptic.medium();
   const v=ayVerisi(aktifAy);
   const liste=tip==='gelir'?v.gelirler:v.giderler;
   const k=liste.find(x=>x.id===id);
@@ -1209,6 +1249,7 @@ async function toggleOdendi(tip,id){
 }
 
 function kalemDuzenleAc(tip,id){
+  Haptic.light();
   const v=ayVerisi(aktifAy);
   const liste=tip==='gelir'?v.gelirler:v.giderler;
   const k=liste.find(x=>x.id===id);
@@ -1236,27 +1277,30 @@ document.addEventListener('touchmove',()=>clearTimeout(lpTimer),{passive:true});
 async function duzenleKaydet(){
   const ad=document.getElementById('dAd').value.trim();
   const tutar=parseFloat(document.getElementById('dTutar').value)||0;
-  if(!ad||!tutar){toast('⚠️ Boş bırakma');return;}
+  if(!ad||!tutar){ Haptic.error(); toast('⚠️ Boş bırakma');return;}
   const v=ayVerisi(aktifAy);
   const liste=duzenlenenTip==='gelir'?v.gelirler:v.giderler;
   const k=liste.find(x=>x.id===duzenlenenId);
   if(k){k.ad=document.getElementById('dAd').value.trim();k.tutar=tutar;k.kategori=document.getElementById('dKat').value.trim();k.not=document.getElementById('dNot').value.trim();k.tekrar=dTekrarAcik;}
   document.getElementById('mDuzenle').classList.remove('on');
-  render();await fbKaydet();toast('✅ Güncellendi');
+  render();await fbKaydet(); Haptic.success(); toast('✅ Güncellendi');
 }
 
 function toggleTikla(w){
+  Haptic.light();
   if(w==='tekrar'){tekrarAcik=!tekrarAcik;document.getElementById('tekrarToggle').classList.toggle('on',tekrarAcik);}
   else if(w==='yatirim'){yatirimAcik=!yatirimAcik;document.getElementById('yatirimToggle').classList.toggle('on',yatirimAcik);}
   else if(w==='dTekrar'){dTekrarAcik=!dTekrarAcik;document.getElementById('dTekrar').classList.toggle('on',dTekrarAcik);}
 }
 
 function tabSec(i){
+  Haptic.light();
   tabIdx=i; document.querySelectorAll('.tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===i)); icerikRender();
   requestAnimationFrame(()=>{ if(i===1){const s=document.getElementById('sec-gelir');if(s)s.scrollIntoView({behavior:'smooth',block:'start'});} else if(i===2){const s=document.getElementById('sec-gider');if(s)s.scrollIntoView({behavior:'smooth',block:'start'});} else {window.scrollTo({top:0,behavior:'smooth'});} });
 }
 
 function navSec(i){
+  Haptic.light();
   navIdx=i; document.querySelectorAll('.nitem').forEach((b,idx)=>b.classList.toggle('on',idx===i));
   document.getElementById('pageAy').className='page'+(i===0?' on':''); document.getElementById('pageGecmis').className='page'+(i===1?' on':'');
   const qaw=document.getElementById('fabContainer'); 
@@ -1265,6 +1309,7 @@ function navSec(i){
 }
 
 function ayDegis(d){
+  Haptic.light();
   aktifAy=ayEkleStr(aktifAy, d);
   tabIdx=0; document.querySelectorAll('.tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===0));
   render(); window.scrollTo({top:0,behavior:'smooth'});
@@ -1277,7 +1322,7 @@ function gecmisRender(){
   el.innerHTML=aylar.map(ay=>{
     const h=hesapla(ay); const renk=h.kalan>=0?'var(--green)':'var(--red)';
     return`<div class="gecmis-ay">
-      <div class="gecmis-ay-h" onclick="document.getElementById('ga${ay.replace('-','')}').classList.toggle('on')">
+      <div class="gecmis-ay-h" onclick="Haptic.light(); document.getElementById('ga${ay.replace('-','')}').classList.toggle('on')">
         <span class="gecmis-ay-lbl">${ayYazi(ay)}</span>
         <div class="gecmis-ay-r"><div class="gecmis-ay-kalan" style="color:${renk}">${h.kalan>=0?'+':''}${fTL(Math.abs(h.kalan))}</div><div class="gecmis-ay-oran">%${h.oran} harcandı</div></div>
       </div>
@@ -1293,8 +1338,13 @@ function gecmisRender(){
 }
 
 function fTL(n){return'₺'+(Math.round(n)||0).toLocaleString('tr-TR');}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2400);}
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2400);
+}
 function temaDegis(f=false){
+  Haptic.light();
   const isD=f||document.documentElement.dataset.theme==='light'; document.documentElement.dataset.theme=isD?'dark':'light'; document.getElementById('themeBtn').textContent=isD?'☀️':'🌙'; localStorage.setItem('masaygunu2Tema',isD?'dark':'light');
 }
 
