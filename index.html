@@ -105,7 +105,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .hcard-val{font-family:var(--fd);font-size:20px;font-weight:900;letter-spacing:-.04em}
 .hcard.kalan-pos .hcard-val,.hcard.kalan-neg .hcard-val{color:#fff}
 
-/* GÜNLÜK PUSULA (PACE TRACKER) */
+/* PUSULA */
 .pace-card { margin: 0 16px 10px; padding: 16px 18px; background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 22px; color: #fff; display: none; align-items: center; gap: 16px; box-shadow: var(--ios-shadow-soft); border:.5px solid rgba(255,255,255,0.1); animation: fadeAi .45s ease;}
 .pace-ico { font-size: 28px; background: rgba(255,255,255,0.15); width: 50px; height: 50px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.2); flex-shrink:0;}
 .pace-info { flex: 1; }
@@ -235,7 +235,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .nitem.on{background:var(--bg2);color:var(--green)}
 .nico{font-size:21px;line-height:1}
 
-/* HAREKETLİ FAB (SPEED DIAL) STİLLERİ - Z-INDEX DÜZELTİLDİ */
+/* FAB (SPEED DIAL) */
 .fab-container { position: fixed; bottom: 86px; right: 20px; z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .fab-actions { display: flex; flex-direction: column; gap: 14px; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.9); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .fab-container.open .fab-actions { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
@@ -252,7 +252,7 @@ body:not(.app-ready) .fab-container,
 body.login-open .fab-container { display: none !important; }
 body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 
-/* MODAL & TOGGLES (ŞALTERLER) */
+/* MODAL & TOGGLES */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:none;align-items:flex-end;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .ov.on{display:flex;animation:fi .2s ease}
 @keyframes fi{from{opacity:0}to{opacity:1}}
@@ -268,7 +268,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 .ipfx .pfx{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--txt3);pointer-events:none;font-weight:500}
 .ipfx .inp{padding-left:28px}
 
-/* TOGGLE SATIRI DÜZELTMESİ (TIKLAMA ALANI) */
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg2);border-radius:16px;margin-bottom:13px; transition: background .15s ease;}
 .toggle-row:active{background:var(--bg3);}
 .toggle-lbl{font-size:13px;font-weight:500;color:var(--txt)}
@@ -283,10 +282,10 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 .sbtn.g{background:linear-gradient(135deg,var(--green),var(--green2))}
 .sbtn.r{background:linear-gradient(135deg,var(--red),var(--red2))}
 .sbtn.p{background:linear-gradient(135deg,var(--purple),#8a60d4)}
-.cancel-btn{width:100%;padding:15px;margin-top:8px;font-size:14px;color:var(--txt2);font-weight:500;border-radius:18px;transition:.15s}
+.cancel-btn{width:100%;padding:15px;margin-top:8px;font-size:14px;color:var(--txt2);font-weight:500;border-radius:18px;transition:.15s;border:none;}
 .cancel-btn:active{background:var(--bg2)}
 
-/* EXIT MODAL (ÖZEL TASARIM) */
+/* UYARI MODALLARI (ÖZEL TASARIM) */
 .exit-ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); z-index:10000; display:none; align-items:center; justify-content:center; padding:32px; }
 .exit-mod { width:100%; max-width:300px; background:var(--surf); border-radius:28px; padding:24px; text-align:center; box-shadow:0 32px 64px rgba(0,0,0,0.25); animation:pop .3s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes pop { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
@@ -298,7 +297,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 .exit-btn.gray { background:var(--bg2); color:var(--txt); }
 .exit-btn:active { transform:scale(0.96); opacity:0.9; }
 
-/* DİĞER */
+/* TOAST */
 .toast{position:fixed;bottom:calc(var(--nav)+22px);left:50%;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:10px 20px;border-radius:var(--rp);font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none;box-shadow:var(--ios-shadow)}
 .toast.on{opacity:1}
 .page{display:none}
@@ -320,9 +319,21 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
   </div>
 </div>
 
+<div id="taksitModal" class="exit-ov">
+  <div class="exit-mod">
+    <div class="exit-ttl">Taksitli İşlem</div>
+    <div class="exit-msg">Bu taksitli bir işlem. Gelecekteki tüm taksitleri de silmek ister misiniz?</div>
+    <div class="exit-btns">
+      <button class="exit-btn red" onclick="taksitTumunuSil()">Tüm Taksitleri Sil</button>
+      <button class="exit-btn gray" onclick="taksitBunuSil()">Sadece Bu Ayı Sil</button>
+      <button class="cancel-btn" onclick="vazgecTaksitSil()" style="background:transparent; color:var(--txt3);">Vazgeç</button>
+    </div>
+  </div>
+</div>
+
 <div id="login">
   <img src="16379.png" class="login-bg" alt="Splash Background">
-  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v1.6</div>
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v1.7</div>
   <div class="box">
     <button id="loginBtn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
@@ -480,6 +491,11 @@ let veri={aylar:{},guncelleme:null};
 let aktifTip='gelir', tabIdx=0, navIdx=0, duzenlenenId=null, duzenlenenTip=null;
 let tekrarAcik=false, yatirimAcik=false, dTekrarAcik=false;
 let chartInst=null, aiOneriIndex=0;
+
+// Yeni eklenen taksit silme değişkenleri
+let beklemeSilId = null;
+let beklemeSilTip = null;
+let beklemeSilGrupId = null;
 
 function bugunAyId() {
   const bugun = new Date();
@@ -796,13 +812,17 @@ function kalemHtml(k,tip,idx){
   if(k.tekrar)badges.push(`<span class="badge tekrar">${tekrarYazi}</span>`);
   
   if(k.yatirim)badges.push('<span class="badge yatirim">Yatırım</span>');
+  
+  // Taksit grubu varsa ufak bir simge ekleyelim belli olsun
+  const taksitIkonu = k.taksitGrupId ? '🔢 ' : '';
+
   return`<div class="kalem-wrap" id="kw-${k.id}" data-id="${k.id}" data-tip="${tip}" data-idx="${idx}">
     <div class="kalem-bg"><div class="kalem-bg-l"><span>✓ İşaretle</span></div><div class="kalem-bg-r"><span>Sil 🗑</span></div></div>
     <div class="kalem" id="k-${k.id}" onclick="kalemDuzenleAc('${tip}','${k.id}')">
       <div class="kalem-handle" onclick="event.stopPropagation()"><span></span><span></span><span></span></div>
       <div class="kalem-check ${k.odendi?'on':''}" onclick="event.stopPropagation();toggleOdendi('${tip}','${k.id}')"></div>
       <div class="kalem-info">
-        <div class="kalem-ad ${k.odendi?'done':''}">${escHtml(k.ad)}</div>
+        <div class="kalem-ad ${k.odendi?'done':''}">${taksitIkonu}${escHtml(k.ad)}</div>
         <div class="kalem-meta">
           ${k.kategori?`<span class="kalem-not">${escHtml(k.kategori)}</span>`:''}
           ${k.not?`<span class="kalem-not">${escHtml(k.not)}</span>`:''}
@@ -875,7 +895,10 @@ function swipelariBagla(){
         setTimeout(()=>{toggleOdendi(tip,id);},300);
       } else if(cx<-70){
         el.style.transform='translateX(-120%)';el.style.transition='.3s ease';
-        setTimeout(()=>kalemSil(tip,id),300);
+        
+        // YENİ TAKSİT KONTROLLÜ SİLME YÖNLENDİRMESİ
+        setTimeout(()=>kalemSilOnay(tip,id),300);
+        
       } else {
         el.style.transform='';el.style.transition='.25s ease';
         if(bg && bg.classList.contains('kalem-bg')) {
@@ -963,12 +986,26 @@ async function kalemKaydet(){
 
   const tip = aktifTip === 'yatirim' ? 'gider' : aktifTip;
   const isYatirim = aktifTip === 'yatirim' || yatirimAcik;
+  
+  // YENİ: Taksitli işlemlere ortak bir Grup Kimliği (ID) atıyoruz
+  const taksitGrupId = taksit > 1 ? uid() + '-grp' : null;
 
   for(let i=0; i<taksit; i++){
     let hedefAy = ayEkleStr(aktifAy, i);
     let suffix = taksit > 1 ? ` (${i+1}/${taksit})` : '';
     let itemAd = ad + suffix;
-    let kalem = {id: uid(), ad: itemAd, tutar: tutar, kategori: kat, not: not, odendi: false, tekrar: (taksit === 1 && tekrarAcik), yatirim: isYatirim};
+    
+    let kalem = {
+      id: uid(), 
+      taksitGrupId: taksitGrupId, 
+      ad: itemAd, 
+      tutar: tutar, 
+      kategori: kat, 
+      not: not, 
+      odendi: false, 
+      tekrar: (taksit === 1 && tekrarAcik), 
+      yatirim: isYatirim
+    };
 
     if(!veri.aylar[hedefAy]){
         veri.aylar[hedefAy] = {gelirler: [], giderler: [], silinenGelirler: [], silinenGiderler: []};
@@ -986,6 +1023,90 @@ async function kalemKaydet(){
   });
   await fbKaydet();
   toast('✅ Eklendi');
+}
+
+/* YENİ: AKILLI TAKSİT SİLME SİSTEMİ */
+function kalemSilOnay(tip, id) {
+  const v=ayVerisi(aktifAy);
+  const liste = tip === 'gelir' ? v.gelirler : v.giderler;
+  const k = liste.find(x => x.id === id);
+  if(!k) return;
+
+  if(k.taksitGrupId) {
+    // Bu bir taksit, özel onay penceresini aç
+    beklemeSilId = id;
+    beklemeSilTip = tip;
+    beklemeSilGrupId = k.taksitGrupId;
+    document.getElementById('taksitModal').style.display='flex';
+  } else {
+    // Normal tekil harcama, direkt sil
+    gercekKalemSil(tip, id);
+  }
+}
+
+async function taksitTumunuSil() {
+  document.getElementById('taksitModal').style.display='none';
+  if(!beklemeSilGrupId) return;
+
+  Object.keys(veri.aylar).forEach(ayKey => {
+    const ayData = veri.aylar[ayKey];
+    const hedefListe = beklemeSilTip === 'gelir' ? ayData.gelirler : ayData.giderler;
+    const silinenHedef = beklemeSilTip === 'gelir' ? ayData.silinenGelirler : ayData.silinenGiderler;
+
+    const itemsToDelete = hedefListe.filter(x => x.taksitGrupId === beklemeSilGrupId);
+    itemsToDelete.forEach(item => {
+      if(silinenHedef) silinenHedef.push({...item, silindiTarih: new Date().toISOString()});
+    });
+
+    if (beklemeSilTip === 'gelir') {
+      ayData.gelirler = hedefListe.filter(x => x.taksitGrupId !== beklemeSilGrupId);
+    } else {
+      ayData.giderler = hedefListe.filter(x => x.taksitGrupId !== beklemeSilGrupId);
+    }
+  });
+
+  render();
+  await fbKaydet();
+  toast('✅ Tüm taksitler silindi');
+}
+
+async function taksitBunuSil() {
+  document.getElementById('taksitModal').style.display='none';
+  if(!beklemeSilId) return;
+  gercekKalemSil(beklemeSilTip, beklemeSilId);
+}
+
+function vazgecTaksitSil() {
+  document.getElementById('taksitModal').style.display='none';
+  // Kaydırılan kalemi eski yerine geri getir
+  if(beklemeSilId) {
+    const el = document.getElementById('k-' + beklemeSilId);
+    if(el) {
+      el.style.transform = '';
+      const bg = el.previousElementSibling;
+      if(bg && bg.classList.contains('kalem-bg')) bg.style.opacity = 0;
+    }
+  }
+}
+
+async function gercekKalemSil(tip,id){
+  const v=ayVerisi(aktifAy);
+  if(!v.silinenGelirler)v.silinenGelirler=[];
+  if(!v.silinenGiderler)v.silinenGiderler=[];
+
+  if(tip==='gelir'){
+    const k=v.gelirler.find(x=>x.id===id);
+    if(k)v.silinenGelirler.push({...k,silindiTarih:new Date().toISOString()});
+    v.gelirler=v.gelirler.filter(x=>x.id!==id);
+  } else {
+    const k=v.giderler.find(x=>x.id===id);
+    if(k)v.silinenGiderler.push({...k,silindiTarih:new Date().toISOString()});
+    v.giderler=v.giderler.filter(x=>x.id!==id);
+  }
+
+  render();
+  await fbKaydet();
+  toast('🗑 Silinenlere taşındı');
 }
 
 async function toggleOdendi(tip,id){
@@ -1090,9 +1211,6 @@ async function init(){
   const tema=localStorage.getItem('masaygunu2Tema')||'light'; document.documentElement.dataset.theme=tema; document.getElementById('themeBtn').textContent=tema==='dark'?'☀️':'🌙';
   const u=await fbBaslat();
   
-  // Geri tuşu tuzağı (history.pushState ve onpopstate) SİLİNDİ. 
-  // Artık geri tuşu uygulamayı normal bir şekilde arka plana atacak.
-
   if(!u){
     document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
     window._fb.onAuthStateChanged(auth,async kullanici=>{
