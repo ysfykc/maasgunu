@@ -13,6 +13,9 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 <style>
 :root {
   --bg:#f7f5f0; --bg2:#edeae3; --bg3:#e3e0d8;
@@ -197,7 +200,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .mini-chart:active{ transform:scale(.98); }
 .mini-chart-ttl{font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:12px}
 
-/* SİLİNENLER (GÖRÜNÜM İYİLEŞTİRMELERİ) */
+/* SİLİNENLER */
 .deleted-sec{ margin:8px 16px 12px; background:var(--ios-surface-strong)!important; backdrop-filter:var(--ios-blur); border:.5px solid var(--ios-ring)!important; border-radius:22px!important; overflow:hidden; box-shadow:var(--ios-shadow-soft); }
 .deleted-head{padding:14px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
 .deleted-title{font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;}
@@ -235,7 +238,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .nitem.on{background:var(--bg2);color:var(--green)}
 .nico{font-size:21px;line-height:1}
 
-/* HAREKETLİ FAB (SPEED DIAL) STİLLERİ - GÖRÜNMEZ KALKAN DÜZELTİLDİ */
+/* FAB */
 .fab-container { position: fixed; bottom: 86px; right: 20px; z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 14px; pointer-events: none; }
 .fab-actions { display: flex; flex-direction: column; gap: 14px; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.9); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .fab-container.open .fab-actions { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
@@ -247,9 +250,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .action-btn.gelir-btn { background: linear-gradient(145deg, rgba(42,173,98,0.92), rgba(42,173,98,0.74)); }
 .action-btn.gider-btn { background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74)); }
 .action-btn.quick-btn { background: linear-gradient(145deg, #f39c12, #d68910); font-size: 20px;}
-
-body:not(.app-ready) .fab-container,
-body.login-open .fab-container { display: none !important; }
+body:not(.app-ready) .fab-container, body.login-open .fab-container { display: none !important; }
 body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 
 /* MODAL & TOGGLES */
@@ -277,7 +278,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 .toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .toggle.on::after{left:23px}
 
-.sbtn{width:100%;padding:15px;border-radius:18px;font-size:14px;font-weight:700;margin-top:4px;color:#fff;transition:.15s}
+.sbtn{width:100%;padding:15px;border-radius:18px;font-size:14px;font-weight:700;margin-top:4px;color:#fff;transition:.15s; cursor:pointer;}
 .sbtn:active{opacity:.85}
 .sbtn.g{background:linear-gradient(135deg,var(--green),var(--green2))}
 .sbtn.r{background:linear-gradient(135deg,var(--red),var(--red2))}
@@ -308,6 +309,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 </head>
 <body>
 
+<input type="file" id="fisInput" accept="image/*" capture="environment" style="display:none" onchange="fisOkut(event)">
+
 <div id="exitModal" class="exit-ov">
   <div class="exit-mod">
     <div class="exit-ttl">Oturumu Kapat?</div>
@@ -333,7 +336,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 
 <div id="login">
   <img src="16379.png" class="login-bg" alt="Splash Background">
-  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v1.8</div>
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v1.9</div>
   <div class="box">
     <button id="loginBtn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
@@ -441,6 +444,20 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 <div class="modal">
 <div class="mhandle"></div>
 <div class="mttl" id="mTtl">Gelir Ekle</div>
+
+<div id="fisTaraBtnWrap" style="margin-bottom:13px; display:none;">
+  <button class="sbtn" style="background:var(--blue-bg); color:var(--blue); border:1.5px dashed var(--blue); padding:14px; font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:none;" onclick="document.getElementById('fisInput').click()">
+     📸 Akıllı Fiş Okuyucu ile Doldur
+  </button>
+</div>
+<div id="ocrLoading" style="display:none; text-align:center; padding: 18px; background:var(--bg2); border-radius:18px; margin-bottom:13px;">
+    <div style="font-size:28px; animation: pulse 1.5s infinite;">🤖</div>
+    <div id="ocrStatus" style="font-size:11px; font-weight:800; color:var(--txt2); margin-top:8px; text-transform:uppercase; letter-spacing:.05em;">Fiş İnceleniyor...</div>
+    <div style="width:100%; height:6px; background:var(--bg3); border-radius:var(--rp); margin-top:10px; overflow:hidden;">
+       <div id="ocrProg" style="width:0%; height:100%; background:var(--blue); transition: width .3s ease;"></div>
+    </div>
+</div>
+
 <div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" id="eAd" placeholder="örn. Maaş, Kira, Netflix…" type="text"/></div>
 <div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="eTutar" min="0" placeholder="0" step="any" type="number"/></div></div>
 
@@ -495,7 +512,7 @@ let chartInst=null, aiOneriIndex=0;
 let beklemeSilId = null;
 let beklemeSilTip = null;
 let beklemeSilGrupId = null;
-let silinenlerAcik = false; // YENİ: Çöp kutusunun açık kalma durumu
+let silinenlerAcik = false; 
 
 function bugunAyId() {
   const bugun = new Date();
@@ -545,9 +562,7 @@ async function fbYukle(){
 async function girisYap(){
   const { signInWithPopup, GoogleAuthProvider } = window._fb;
   document.getElementById('loginBtn').textContent='⏳ Bekleyin...';
-  try { 
-    await signInWithPopup(auth, new GoogleAuthProvider()); 
-  }
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
   catch(e) { 
     console.warn(e); 
     document.getElementById('loginBtn').textContent='⚠️ Tekrar Dene'; 
@@ -565,12 +580,10 @@ async function gercekCikisYap() {
 
 function setSynk(d){const el=document.getElementById('sync');if(!el)return;el.textContent=d==='loading'?'🔄':d==='ok'?'☁️':'📵';}
 
-/* ══ LOCAL STORAGE ══ */
 const LS='masaygunu2_v1';
 function lsKaydet(){try{localStorage.setItem(LS,JSON.stringify(veri));}catch(e){}}
 function lsYukle(){try{const d=JSON.parse(localStorage.getItem(LS)||'null');if(d&&d.aylar)veri=d;}catch(e){}}
 
-/* ══ VERİ ══ */
 function ayEkleStr(ay, d){
   let [y, m] = ay.split('-').map(Number);
   m += d;
@@ -749,7 +762,6 @@ function icerikRender(){
   draglariBagla();
 }
 
-/* YENİ: Çöp Kutusu Aç/Kapa Fonksiyonu */
 function toggleSilinenler(){
   silinenlerAcik = !silinenlerAcik;
   const el = document.getElementById('deletedBody');
@@ -967,14 +979,95 @@ function modalAc(tip){
   const cls={gelir:'sbtn g',gider:'sbtn r',yatirim:'sbtn p'};
   document.getElementById('mTtl').textContent=ttl[tip]||'Ekle';
   document.getElementById('mBtn').className=cls[tip]||'sbtn g';
+  
   document.getElementById('yatirimRow').style.display=tip==='gider'?'flex':'none';
   document.getElementById('taksitRow').style.display=tip==='gider'?'block':'none';
   document.getElementById('tekrarRow').style.display='flex';
   
+  // Sadece gider eklerken Fiş Tarayıcı görünsün
+  document.getElementById('fisTaraBtnWrap').style.display = tip === 'gider' ? 'block' : 'none';
+  document.getElementById('ocrLoading').style.display = 'none';
+  document.getElementById('mBtn').disabled = false;
+  document.getElementById('mBtn').style.opacity = '1';
+
   document.querySelector('#tekrarRow .toggle-lbl').textContent = tip === 'gelir' ? '🔄 Sabit Gelir' : '🔄 Sabit Gider';
   
   document.getElementById('mEkle').classList.add('on');
   setTimeout(()=>document.getElementById('eTutar').focus(),350);
+}
+
+/* YENİ: YAPAY ZEKA FİŞ OKUMA SİSTEMİ (TESSERACT.JS) */
+async function fisOkut(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  document.getElementById('fisInput').value = ''; 
+  
+  document.getElementById('fisTaraBtnWrap').style.display = 'none';
+  document.getElementById('ocrLoading').style.display = 'block';
+  document.getElementById('mBtn').disabled = true;
+  document.getElementById('mBtn').style.opacity = '0.5';
+
+  try {
+    const worker = await Tesseract.createWorker('tur', 1, {
+      logger: m => {
+        if(m.status === 'recognizing text'){
+          document.getElementById('ocrStatus').textContent = 'Metin Çözümleniyor... %' + Math.round(m.progress * 100);
+          document.getElementById('ocrProg').style.width = (m.progress * 100) + '%';
+        } else if(m.status.includes('loading')) {
+          document.getElementById('ocrStatus').textContent = 'Yapay Zeka Hazırlanıyor...';
+          document.getElementById('ocrProg').style.width = '30%';
+        }
+      }
+    });
+    
+    const ret = await worker.recognize(file);
+    const text = ret.data.text.toUpperCase();
+    await worker.terminate();
+
+    // 1. Marka ve Kategori Tahmini
+    let tutar = 0; let ad = ""; let kat = "Diğer";
+
+    if(text.includes('A101') || text.includes('BİM') || text.includes('BIM') || text.includes('MİGROS') || text.includes('MIGROS') || text.includes('ŞOK') || text.includes('SOK')) { ad = 'Market Alışverişi'; kat = 'Market'; }
+    else if(text.includes('SHELL') || text.includes('OPET') || text.includes('BP') || text.includes('PETROL')) { ad = 'Akaryakıt'; kat = 'Ulaşım'; }
+    else if(text.includes('STARBUCKS') || text.includes('CAFE') || text.includes('KAHVE')) { ad = 'Kahve'; kat = 'Dışarı'; }
+    else if(text.includes('ECZANE') || text.includes('İLAÇ')) { ad = 'Eczane'; kat = 'Sağlık'; }
+    else if(text.includes('WAIKIKI') || text.includes('MAĞAZA') || text.includes('GİYİM')) { ad = 'Giyim'; kat = 'Alışveriş'; }
+    else {
+        let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
+        if(lines.length > 0) ad = lines[0].substring(0, 20); // İlk satırı marka ismi kabul et
+    }
+
+    // 2. Akıllı Tutar Bulma Algoritması
+    let lines = text.split('\n');
+    let txtSayilar = text.match(/\d+[.,]\d{2}/g);
+    let floatSayilar = txtSayilar ? txtSayilar.map(s => parseFloat(s.replace(',','.'))) : [];
+
+    // Önce "TOPLAM" veya "TUTAR" yazan satırı ara
+    let toplamSatiri = lines.find(l => (l.includes('TOPLAM') || l.includes('TUTAR')) && /\d+[.,]\d{2}/.test(l) && !l.includes('KDV'));
+    if(toplamSatiri) {
+       let match = toplamSatiri.match(/\d+[.,]\d{2}/);
+       if(match) tutar = parseFloat(match[0].replace(',','.'));
+    } 
+    if (tutar === 0 && floatSayilar.length > 0) {
+       // Eğer Toplam satırı bulunamazsa, fişteki en büyük sayıyı al (Nakit vs. üstü)
+       tutar = Math.max(...floatSayilar);
+    }
+
+    // 3. Verileri Forma Doldur
+    document.getElementById('eAd').value = ad;
+    if(tutar > 0) document.getElementById('eTutar').value = tutar;
+    document.getElementById('eKat').value = kat;
+
+    toast('✨ Fiş başarıyla okundu!');
+  } catch(err) {
+    console.error(err);
+    toast('❌ Fiş okunamadı. Lütfen net çekin.');
+    document.getElementById('fisTaraBtnWrap').style.display = 'block';
+  } finally {
+    document.getElementById('ocrLoading').style.display = 'none';
+    document.getElementById('mBtn').disabled = false;
+    document.getElementById('mBtn').style.opacity = '1';
+  }
 }
 
 async function kalemKaydet(){
