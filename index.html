@@ -327,11 +327,11 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .portfoy-val { font-size: 16px; font-weight: 800; color: var(--txt); }
 .portfoy-price { font-size: 11px; color: var(--txt2); margin-top: 2px; }
 .p-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
-.p-badge.tefas { background: rgba(90,58,139,0.1); color: var(--purple); }
-.p-badge.bist { background: rgba(26,58,139,0.1); color: var(--blue); }
-.p-badge.abd { background: rgba(42,173,98,0.1); color: var(--green); }
-.p-badge.altin { background: rgba(184,96,16,0.1); color: var(--amber); }
-.p-badge.bes { background: rgba(255,159,10,0.1); color: var(--amber); }
+.p-badge.tefas { background: rgba(191,90,242,0.15); color: var(--purple); }
+.p-badge.bist { background: rgba(10,132,255,0.15); color: var(--blue); }
+.p-badge.abd { background: rgba(50,215,75,0.15); color: var(--green); }
+.p-badge.altin { background: rgba(255,159,10,0.15); color: var(--amber); }
+.p-badge.bes { background: rgba(255,69,58,0.15); color: var(--red); }
 .p-grp-ttl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--txt2); margin: 18px 16px 8px; }
 
 /* Kâr/Zarar Renkleri */
@@ -341,6 +341,21 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 #vLoader { display:none; position:fixed; top:var(--top); left:0; width:100%; height:3px; background:var(--bg2); z-index: 1000;}
 #vLoaderBar { height:100%; width:0%; background:var(--blue); transition:width 0.3s; }
+
+/* YENİ: HAREKETLİ ALEV ANİMASYONU */
+@keyframes fireBounce {
+   0%, 100% { transform: translateY(0) scale(1); }
+   50% { transform: translateY(-2px) scale(1.15); }
+}
+.fire-emoji {
+   position: absolute;
+   right: -8px;
+   top: -9px;
+   font-size: 15px;
+   animation: fireBounce 1.2s infinite ease-in-out;
+   filter: drop-shadow(0 2px 4px rgba(255,159,10,0.5));
+   z-index: 10;
+}
 </style>
 </head>
 <body>
@@ -465,12 +480,14 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
     <div id="pGenelKz" style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.9); margin-top:4px;">Kâr/Zarar: ₺0</div>
     
     <div id="pHedefWrap" style="display:none; margin-top:14px; text-align:left;">
-       <div style="display:flex; justify-content:space-between; font-size:10.5px; color:rgba(255,255,255,0.8); margin-bottom:5px; font-weight:700;">
+       <div style="display:flex; justify-content:space-between; font-size:10.5px; color:rgba(255,255,255,0.8); margin-bottom:6px; font-weight:700;">
            <span>Portföy Hedefi: <span id="pHedefVal"></span></span>
            <span id="pHedefPct"></span>
        </div>
-       <div class="prg-bar-wrap" style="height:5px; background:rgba(0,0,0,0.2); margin-bottom:0;">
-           <div class="prg-bar" id="pHedefBar" style="background:#30d158; width:0%"></div>
+       <div style="height:6px; background:rgba(0,0,0,0.2); border-radius:99px; position:relative; overflow:visible;">
+           <div id="pHedefBar" style="background:linear-gradient(90deg, #32d74b, #30d158); width:0%; height:100%; border-radius:99px; transition:width 0.6s cubic-bezier(0.4, 0, 0.2, 1); position:relative;">
+               <span class="fire-emoji" id="pHedefFire" style="display:none;">🔥</span>
+           </div>
        </div>
     </div>
 
@@ -1211,7 +1228,7 @@ async function ayarlarKaydet() {
   aktifAy = bugunAyId();
   document.getElementById('mAyarlar').classList.remove('on');
   render(); 
-  if(navIdx === 2) portfoyRender(); // portföy açıksa onu da yenile
+  if(navIdx === 2) portfoyRender(); 
   await fbKaydet(); Haptic.success(); toast('Ayarlar kaydedildi');
 }
 
@@ -1308,7 +1325,7 @@ function navSec(i){
   }
   
   const tBar=document.getElementById('topAyBar'); if(tBar) tBar.style.display = (i===0) ? 'flex' : 'none';
-  closeFab(); window.scrollTo({top:0,behavior:'smooth'}); 
+  window.scrollTo({top:0,behavior:'smooth'}); 
   if(i===1) gecmisRender(); if(i===2) portfoyRender();
 }
 
@@ -1354,7 +1371,6 @@ function togglePChart() {
     const wrap = document.getElementById('pChartWrap');
     if(showPChart) {
        wrap.style.display = 'block';
-       // Reset animation by redrawing
        let dataMap = {};
        veri.portfoy.forEach(v => { dataMap[v.tip] = (dataMap[v.tip] || 0) + (v.miktar * (v.sonFiyat||0)); });
        portfoyGrafikCiz(dataMap);
@@ -1377,7 +1393,7 @@ function vTipKontrol() {
    } else if (tip === 'bes') {
       document.getElementById('vKodRow').style.display = 'block';
       document.getElementById('vAltinRow').style.display = 'none';
-      document.getElementById('vMaliyetRow').style.display = 'none'; // BES'te kâr zarar yok
+      document.getElementById('vMaliyetRow').style.display = 'none'; 
       document.getElementById('vKodLbl').textContent = 'BES Şirketi (İsteğe Bağlı)';
       document.getElementById('vKod').placeholder = 'Örn: Allianz, Anadolu Hayat';
       document.getElementById('vMiktarLbl').textContent = 'Güncel Toplam Bakiye (₺)';
@@ -1405,7 +1421,7 @@ async function varlikKaydet() {
 
    let isBes = (tip === 'bes');
    let mf = isBes ? true : false;
-   let sf = isBes ? 1 : 0; // BES'te miktar = bakiye, birim fiyat = 1
+   let sf = isBes ? 1 : 0; 
    let cost = isBes ? miktar : maliyet;
 
    let mevcut = veri.portfoy.find(x => x.tip === tip && x.kod === kod);
@@ -1415,7 +1431,7 @@ async function varlikKaydet() {
        mevcut.miktar += miktar;
        mevcut.maliyet = mevcut.miktar > 0 ? (eskiToplam + yeniToplam) / mevcut.miktar : 0;
    } else if (mevcut && isBes) {
-       mevcut.miktar = miktar; // BES güncellenir
+       mevcut.miktar = miktar; 
        mevcut.maliyet = miktar;
    } else {
        veri.portfoy.push({ id: uid(), tip: tip, kod: kod, miktar: miktar, maliyet: cost, sonFiyat: sf, manuelFiyat: mf }); 
@@ -1453,10 +1469,11 @@ function portfoyRender() {
    veri.portfoy.forEach((v, idx) => {
        const vTotal = v.miktar * (v.sonFiyat || 0); 
        const vCostTotal = v.miktar * (v.maliyet || 0);
-       totalNetWorth += vTotal;
-       if(v.tip !== 'bes') totalCost += vCostTotal;
        
-       chartData[v.tip] = (chartData[v.tip] || 0) + vTotal;
+       if(!isNaN(vTotal)) totalNetWorth += vTotal;
+       if(v.tip !== 'bes' && !isNaN(vCostTotal)) totalCost += vCostTotal;
+       
+       chartData[v.tip] = (chartData[v.tip] || 0) + (isNaN(vTotal) ? 0 : vTotal);
        if(gruplar[v.tip]) { gruplar[v.tip].varliklar.push({...v, idx: idx, vTotal: vTotal, vCostTotal: vCostTotal}); }
    });
 
@@ -1468,6 +1485,7 @@ function portfoyRender() {
        document.getElementById('pHedefVal').textContent = fTL(hedef);
        document.getElementById('pHedefPct').textContent = '%' + pct.toFixed(1);
        document.getElementById('pHedefBar').style.width = pct + '%';
+       document.getElementById('pHedefFire').style.display = pct > 0 ? 'block' : 'none';
        hWrap.style.display = 'block';
    } else {
        hWrap.style.display = 'none';
@@ -1478,6 +1496,7 @@ function portfoyRender() {
    let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
    let genelKzClass = genelKz >= 0 ? 'pl-pos' : 'pl-neg';
    let genelKzSign = genelKz > 0 ? '+' : '';
+   document.getElementById('pToplam').textContent = fTL(totalNetWorth); 
    document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKzClass}">${genelKzSign}${fTL(genelKz)} (${genelKzSign}%${genelKzPct.toFixed(2)})</span>` : 'Maliyet verisi eksik';
 
    for (let gKey in gruplar) {
@@ -1653,10 +1672,7 @@ async function acikApiVeriCek(tip, kod, usdRate) {
       if (tip === 'altin') {
          const trData = await getTruncgilData();
          let gecerliKod = kod.toLowerCase();
-         if(trData && trData[gecerliKod] && trData[gecerliKod].Selling) {
-             return parseFloat(trData[gecerliKod].Selling.replace('.', '').replace(',', '.'));
-         }
-         return 0;
+         if(trData && trData[gecerliKod] && trData[gecerliKod].Selling) { return parseFloat(trData[gecerliKod].Selling.replace('.', '').replace(',', '.')); } return 0;
       }
       else if (tip === 'bist' || tip === 'abd') {
          let exchanges = tip === 'bist' ? ['IST'] : ['NASDAQ', 'NYSE', 'AMEX', 'BATS', 'NYSEARCA'];
@@ -1702,7 +1718,7 @@ async function acikApiVeriCek(tip, kod, usdRate) {
 
 async function portfoyGuncelle() {
    if(veri.portfoy.length === 0) return;
-   Haptic.medium(); toast('Tüm kaynaklar taranıyor...');
+   Haptic.medium(); toast('Piyasa verileri taranıyor...');
    const loader = document.getElementById('vLoader'); const loaderBar = document.getElementById('vLoaderBar');
    loader.style.display = 'block'; loaderBar.style.width = '5%'; loaderBar.style.background = 'var(--blue)';
    trDataCache = null; 
