@@ -246,8 +246,12 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .action-btn.gelir-btn { background: linear-gradient(145deg, rgba(42,173,98,0.92), rgba(42,173,98,0.74)); }
 .action-btn.gider-btn { background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74)); }
 .action-btn.quick-btn { background: linear-gradient(145deg, #f39c12, #d68910); font-size: 20px;}
+
+/* YENİ: FAB Gizleme Sınıfı */
+.fab-container.hide-fab { display: none !important; }
+
 body:not(.app-ready) .fab-container, body.login-open .fab-container { display: none !important; }
-body.app-ready:not(.login-open) .fab-container { display: flex !important; }
+body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 /* MODAL */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:none;align-items:flex-end;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -725,7 +729,7 @@ function ayYazi(periodId){
   let mg = getMaasGunu();
   if (mg === 1) return `${AYLAR[m-1]} ${yStr}`;
   let mgE = mg - 1;
-  if(mgE === 0) mgE = 31; // fallback
+  if(mgE === 0) mgE = 31; 
   return `${mg} ${AYLAR[m-1]} - ${mgE} ${AYLAR[m2-1]}`;
 }
 
@@ -1200,21 +1204,26 @@ function tabSec(i){ Haptic.light(); tabIdx=i; document.querySelectorAll('.tbtn')
 
 function navSec(i){
   Haptic.light(); navIdx=i; 
-  document.getElementById('nav0').classList.toggle('on', i===0); document.getElementById('nav1').classList.toggle('on', i===1); document.getElementById('nav2').classList.toggle('on', i===2);
-  document.getElementById('pageAy').className='page'+(i===0?' on':''); document.getElementById('pageGecmis').className='page'+(i===1?' on':''); document.getElementById('pagePortfoy').className='page'+(i===2?' on':'');
+  document.getElementById('nav0').classList.toggle('on', i===0); 
+  document.getElementById('nav1').classList.toggle('on', i===1); 
+  document.getElementById('nav2').classList.toggle('on', i===2);
+  
+  document.getElementById('pageAy').className='page'+(i===0?' on':''); 
+  document.getElementById('pageGecmis').className='page'+(i===1?' on':''); 
+  document.getElementById('pagePortfoy').className='page'+(i===2?' on':'');
   
   const qaw=document.getElementById('fabContainer'); 
   if(qaw) {
-     if(i === 0 && document.body.classList.contains('app-ready')) {
-         qaw.style.display = 'flex';
+     if(i === 0) {
+         qaw.classList.remove('hide-fab');
      } else {
-         qaw.style.display = 'none';
+         qaw.classList.add('hide-fab');
          qaw.classList.remove('open');
      }
   }
   
   const tBar=document.getElementById('topAyBar'); if(tBar) tBar.style.display = (i===0) ? 'flex' : 'none';
-  window.scrollTo({top:0,behavior:'smooth'}); 
+  closeFab(); window.scrollTo({top:0,behavior:'smooth'}); 
   if(i===1) gecmisRender(); if(i===2) portfoyRender();
 }
 
@@ -1282,7 +1291,6 @@ async function varlikKaydet() {
    
    if(miktar <= 0 || !kod) { Haptic.error(); toast('Tüm alanları doldurun'); return; }
 
-   // Akıllı Birleştirme (Mevcut varlık varsa üzerine ekle)
    let mevcut = veri.portfoy.find(x => x.tip === tip && x.kod === kod);
    if(mevcut) {
        mevcut.miktar += miktar;
@@ -1301,7 +1309,6 @@ function portfoyRender() {
    let totalNetWorth = 0; 
    let html = '';
 
-   // Varlıkları Gruplara Ayır
    const gruplar = {
        'bist': { ad: 'Türk Hisseleri (BIST)', class: 'bist', icon: '📈', varliklar: [] },
        'abd': { ad: 'ABD Hisseleri & ETF', class: 'abd', icon: '🇺🇸', varliklar: [] },
@@ -1314,7 +1321,6 @@ function portfoyRender() {
        if(gruplar[v.tip]) { gruplar[v.tip].varliklar.push({...v, idx: idx, vTotal: vTotal}); }
    });
 
-   // Grupları Ekrana Çiz
    for (let gKey in gruplar) {
        let g = gruplar[gKey];
        if (g.varliklar.length > 0) {
@@ -1381,7 +1387,6 @@ async function acikApiVeriCek(tip, kod, usdRate) {
    try {
       if (tip === 'altin') {
          const trData = await getTruncgilData();
-         // kod = gram-altin, ceyrek-altin vs..
          let gecerliKod = kod.toLowerCase();
          if(trData && trData[gecerliKod] && trData[gecerliKod].Selling) {
              return parseFloat(trData[gecerliKod].Selling.replace('.', '').replace(',', '.'));
