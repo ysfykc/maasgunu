@@ -250,9 +250,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .action-btn.gelir-btn { background: linear-gradient(145deg, rgba(42,173,98,0.92), rgba(42,173,98,0.74)); }
 .action-btn.gider-btn { background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74)); }
 
-/* YENİ: FAB Gizleme Sınıfı */
 .fab-container.hide-fab { display: none !important; }
-
 body:not(.app-ready) .fab-container, body.login-open .fab-container { display: none !important; }
 body.app-ready:not(.login-open) .fab-container { display: flex; }
 
@@ -265,7 +263,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .mhandle{width:36px;height:4px;background:var(--bg3);border-radius:var(--rp);margin:0 auto 18px}
 .mttl{font-family:var(--fd);font-size:22px;font-weight:900;letter-spacing:-.03em;color:var(--txt);margin-bottom:12px}
 
-/* YENİ: Hızlı Çipler */
 .quick-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:12px;scrollbar-width:none;}
 .quick-chips::-webkit-scrollbar{display:none;}
 .q-chip{background:var(--bg2);color:var(--txt2);font-size:12px;font-weight:700;padding:8px 14px;border-radius:999px;border:none;white-space:nowrap;transition:transform 0.15s;cursor:pointer;}
@@ -321,7 +318,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .portfoy-card { margin-bottom: 10px; background: var(--ios-surface-strong); border-radius: 20px; padding: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ios-shadow-soft); position: relative; overflow: hidden; cursor:pointer; transition:transform .15s;}
 .portfoy-card:active { transform:scale(0.98); }
 
-/* YENİ: PORTFÖY SİLİK İKON (FLİGRAN) */
 .p-bg-icon { position:absolute; right:-15px; bottom:-25px; opacity:0.18; font-size:80px; pointer-events:none; z-index:0; transform: rotate(-15deg); }
 [data-theme=dark] .p-bg-icon { opacity:0.10; }
 
@@ -341,13 +337,26 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .p-badge.bes { background: rgba(255,69,58,0.15); color: var(--red); }
 .p-grp-ttl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--txt2); margin: 18px 16px 8px; }
 
-/* Kâr/Zarar Renkleri */
 .pl-pos { color: var(--green); font-weight: 700; }
 .pl-neg { color: var(--red); font-weight: 700; }
 .pl-neu { color: var(--txt3); font-weight: 500; }
 
 #vLoader { display:none; position:fixed; top:var(--top); left:0; width:100%; height:3px; background:var(--bg2); z-index: 1000;}
 #vLoaderBar { height:100%; width:0%; background:var(--blue); transition:width 0.3s; }
+
+@keyframes fireBounce {
+   0%, 100% { transform: translateY(0) scale(1); }
+   50% { transform: translateY(-2px) scale(1.15); }
+}
+.fire-emoji {
+   position: absolute;
+   right: -8px;
+   top: -9px;
+   font-size: 15px;
+   animation: fireBounce 1.2s infinite ease-in-out;
+   filter: drop-shadow(0 2px 4px rgba(255,159,10,0.5));
+   z-index: 10;
+}
 </style>
 </head>
 <body>
@@ -472,6 +481,9 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
     <div class="hcard-lbl" style="color:rgba(255,255,255,.8)">Toplam Net Varlık</div>
     <div class="hcard-val" id="pToplam" style="font-size:32px; color:#fff;">₺0</div>
+    
+    <div id="pDovizToplam" style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.7); margin-top:2px; margin-bottom:6px;">≈ $0.00 | €0.00</div>
+    
     <div id="pGenelKz" style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.9); margin-top:4px;">Kâr/Zarar: ₺0</div>
     
     <div id="pHedefWrap" style="display:none; margin-top:14px; text-align:left;">
@@ -727,7 +739,7 @@ const Haptic = {
 /* ══ FIREBASE ══ */
 const CFG={apiKey:'AIzaSyADpIRNLQEIer_gplTgwKi_EKkfcyrYoqY',authDomain:'maasgunu-bd353.firebaseapp.com',projectId:'maasgunu-bd353',storageBucket:'maasgunu-bd353.firebasestorage.app',messagingSenderId:'485904329467',appId:'1:485904329467:web:579d932ae8f25958901e5e'};
 let db,auth,user=null;
-let veri={ aylar:{}, portfoy:[], ayarlar:{ maasGunu:15, portfoyHedef:0 }, guncelleme:null };
+let veri={ aylar:{}, portfoy:[], ayarlar:{ maasGunu:15, portfoyHedef:0 }, kurlar:{ USD:32.5, EUR:35.0 }, guncelleme:null };
 let aktifTip='gelir', tabIdx=0, navIdx=0, duzenlenenId=null, duzenlenenTip=null;
 let tekrarAcik=false, yatirimAcik=false, dTekrarAcik=false;
 let chartInst=null, portfoyChartInst=null, aiOneriIndex=0;
@@ -785,6 +797,7 @@ async function fbYukle(){
       const uzak=JSON.parse(snap.data().json||'{}');
       if(!uzak.portfoy) uzak.portfoy = []; 
       if(!uzak.ayarlar) uzak.ayarlar = { maasGunu: 15, portfoyHedef: 0 };
+      if(!uzak.kurlar) uzak.kurlar = { USD: 32.5, EUR: 35.0 };
       if((uzak.guncelleme||'2000')>(veri.guncelleme||'2000')){veri=uzak;lsKaydet();}
       else if((veri.guncelleme||'2000')>(uzak.guncelleme||'2000')){await fbKaydet();}
     }
@@ -812,7 +825,7 @@ function setSynk(d){const el=document.getElementById('sync');if(!el)return;el.te
 
 const LS='masaygunu2_v1';
 function lsKaydet(){try{localStorage.setItem(LS,JSON.stringify(veri));}catch(e){}}
-function lsYukle(){try{const d=JSON.parse(localStorage.getItem(LS)||'null');if(d&&d.aylar){veri=d; if(!veri.portfoy)veri.portfoy=[]; if(!veri.ayarlar)veri.ayarlar={maasGunu:15, portfoyHedef:0};}}catch(e){}}
+function lsYukle(){try{const d=JSON.parse(localStorage.getItem(LS)||'null');if(d&&d.aylar){veri=d; if(!veri.portfoy)veri.portfoy=[]; if(!veri.ayarlar)veri.ayarlar={maasGunu:15, portfoyHedef:0}; if(!veri.kurlar)veri.kurlar={USD:32.5,EUR:35.0};}}catch(e){}}
 
 function ayEkleStr(ay, d){
   let [y, m] = ay.split('-').map(Number);
@@ -1060,6 +1073,17 @@ async function silineniKaliciSil(tip,idx){
   if(!kaynak||!kaynak[idx])return;
   kaynak.splice(idx,1);
   render(); await fbKaydet(); toast('Kalıcı silindi');
+}
+
+async function silinenleriTemizle() {
+   Haptic.heavy();
+   if(confirm('Çöp kutusundaki TÜM kayıtlar kalıcı olarak silinecek. Emin misiniz?')) {
+      const v = ayVerisi(aktifAy);
+      v.silinenGelirler = [];
+      v.silinenGiderler = [];
+      document.getElementById('mAyarlar').classList.remove('on');
+      render(); await fbKaydet(); toast('🗑 Çöp kutusu boşaltıldı');
+   }
 }
 
 function kalemHtml(k,tip,idx){
@@ -1328,7 +1352,13 @@ function navSec(i){
   
   const tBar=document.getElementById('topAyBar'); if(tBar) tBar.style.display = (i===0) ? 'flex' : 'none';
   window.scrollTo({top:0,behavior:'smooth'}); 
-  if(i===1) gecmisRender(); if(i===2) portfoyRender();
+  
+  if(i===1) gecmisRender(); 
+  if(i===2) {
+     portfoyRender();
+     // Arka planda kurları sessizce güncelle
+     kurlariGuncelle().then(() => portfoyRender());
+  }
 }
 
 function ayDegis(d){ Haptic.light(); aktifAy=ayEkleStr(aktifAy, d); tabIdx=0; document.querySelectorAll('.tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===0)); render(); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -1459,6 +1489,7 @@ function portfoyRender() {
    if(veri.portfoy.length === 0) { 
       el.innerHTML = '<div class="empty-sec"><div class="empty-ico">💼</div>Henüz portföye varlık eklenmedi.</div>'; 
       document.getElementById('pToplam').textContent = '₺0'; 
+      document.getElementById('pDovizToplam').textContent = '≈ $0.00 | €0.00';
       document.getElementById('pGenelKz').textContent = 'Kâr/Zarar: ₺0';
       document.getElementById('pChartWrap').style.display = 'none';
       document.getElementById('pHedefWrap').style.display = 'none';
@@ -1479,7 +1510,6 @@ function portfoyRender() {
        'bes': { ad: 'Bireysel Emeklilik', class: 'bes', icon: '🛡️', varliklar: [] }
    };
 
-   // Geriye Dönük Uyumluluk (GRAM ALTIN Düzeltmesi)
    veri.portfoy.forEach(v => {
        if (v.tip === 'altin' && v.kod === 'GRAM ALTIN') v.kod = 'gram-altin';
    });
@@ -1508,13 +1538,20 @@ function portfoyRender() {
        hWrap.style.display = 'none';
    }
 
-   // Genel Kâr Zarar
+   // Genel TL ve Kâr Zarar
    let genelKz = totalNetWorth - totalCost; 
    let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
    let genelKzClass = genelKz >= 0 ? 'pl-pos' : 'pl-neg';
    let genelKzSign = genelKz > 0 ? '+' : '';
    document.getElementById('pToplam').textContent = fTL(totalNetWorth); 
    document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKzClass}">${genelKzSign}${fTL(genelKz)} (${genelKzSign}%${genelKzPct.toFixed(2)})</span>` : 'Maliyet verisi eksik';
+
+   // YENİ: DÖVİZ KARŞILIKLARI EKRANA BASILIYOR
+   let uRate = (veri.kurlar && veri.kurlar.USD > 0) ? veri.kurlar.USD : 32.5;
+   let eRate = (veri.kurlar && veri.kurlar.EUR > 0) ? veri.kurlar.EUR : 35.0;
+   let uTotal = totalNetWorth / uRate;
+   let eTotal = totalNetWorth / eRate;
+   document.getElementById('pDovizToplam').innerHTML = `≈ $${uTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} <span style="opacity:0.5; margin:0 4px;">|</span> €${eTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
 
    for (let gKey in gruplar) {
        let g = gruplar[gKey];
@@ -1747,9 +1784,15 @@ async function getTruncgilData() {
     catch(e) { return null; }
 }
 
-async function getUsdRate() {
-   try { const trData = await getTruncgilData(); if(trData && trData['USD'] && trData['USD'].Selling) return parseFloat(trData['USD'].Selling.replace('.', '').replace(',', '.')); } catch (e) {}
-   try { const res = await fetchWithTimeout('https://query1.finance.yahoo.com/v8/finance/chart/TRY=X?interval=1d&range=1d'); const data = await res.json(); return data.chart.result[0].meta.regularMarketPrice; } catch(e) { return 32.5; }
+async function kurlariGuncelle() {
+   try { 
+       const trData = await getTruncgilData(); 
+       if(trData) {
+           if(trData['USD'] && trData['USD'].Selling) veri.kurlar.USD = parseFloat(trData['USD'].Selling.replace('.', '').replace(',', '.')); 
+           if(trData['EUR'] && trData['EUR'].Selling) veri.kurlar.EUR = parseFloat(trData['EUR'].Selling.replace('.', '').replace(',', '.')); 
+           await fbKaydet();
+       }
+   } catch (e) {}
 }
 
 async function fetchGoogleFinance(kod, exchange) {
@@ -1829,8 +1872,8 @@ async function portfoyGuncelle() {
    trDataCache = null; 
    
    try {
-       let usdRate = 32.5;
-       if (veri.portfoy.some(v => v.tip === 'abd' && !v.manuelFiyat)) usdRate = await getUsdRate();
+       await kurlariGuncelle();
+       let usdRate = (veri.kurlar && veri.kurlar.USD > 0) ? veri.kurlar.USD : 32.5;
 
        const totalItems = veri.portfoy.length; let completed = 0; let failCount = 0;
        for(let i=0; i<veri.portfoy.length; i++) {
@@ -1862,13 +1905,13 @@ async function init(){
   if(!u){
     document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
     window._fb.onAuthStateChanged(auth,async kullanici=>{
-      if(kullanici){ user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false); const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} lsYukle(); render(); await fbYukle(); render(); setSynk('ok'); setInterval(fbKaydet,60000); }
-      else{ user=null;veri={aylar:{}, portfoy:[], ayarlar:{maasGunu:15, portfoyHedef:0}, guncelleme:null}; document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); }
+      if(kullanici){ user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false); const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} lsYukle(); render(); await fbYukle(); kurlariGuncelle().then(() => render()); setSynk('ok'); setInterval(fbKaydet,60000); }
+      else{ user=null;veri={aylar:{}, portfoy:[], ayarlar:{maasGunu:15, portfoyHedef:0}, kurlar:{USD:32.5,EUR:35.0}, guncelleme:null}; document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); }
     });
     return;
   }
   document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false); const av=document.getElementById('avatar'); if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
-  lsYukle(); render(); await fbYukle(); render(); setSynk('ok'); setInterval(fbKaydet,60000);
+  lsYukle(); render(); await fbYukle(); kurlariGuncelle().then(() => render()); setSynk('ok'); setInterval(fbKaydet,60000);
 }
 
 document.addEventListener('DOMContentLoaded',init);
