@@ -250,6 +250,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .action-btn.gider-btn { background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74)); }
 
 .fab-container.hide-fab { display: none !important; }
+
 body:not(.app-ready) .fab-container, body.login-open .fab-container { display: none !important; }
 body.app-ready:not(.login-open) .fab-container { display: flex; }
 
@@ -373,7 +374,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="login">
   <img src="16379.png" class="login-bg" alt="Splash Background">
-  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v3.0 Pro</div>
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v3.0.1 Pro</div>
   <div class="box">
     <button id="loginBtn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
@@ -602,7 +603,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
   <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
-  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v3.0 Pro</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v3.0.1 Pro</div>
   <div style="font-size:12px; color:var(--txt3);">Tasarım & Geliştirme: ysfykc</div>
   
   <button class="sbtn" style="background:var(--blue); margin-top:16px; font-size:13px; padding:12px;" onclick="verileriDisaAktar()">📥 Verilerimi İndir (Excel/CSV)</button>
@@ -1074,13 +1075,10 @@ async function silinenleriTemizle() {
    }
 }
 
-// YENİ: VERİ İNDİRME FONKSİYONU
 function verileriDisaAktar() {
     Haptic.light();
-    let csv = '\uFEFF'; // Türkçe karakterler için Excel BOM
-    csv += "Kayıt Tipi,Dönem,Kategori,Açıklama,Tutar (TL),Ekstra Bilgi\n";
+    let csv = "Kayıt Tipi;Dönem;Kategori;Açıklama;Tutar (TL);Ekstra Bilgi\n";
     
-    // Aylar (Gelir/Gider)
     const aylar = Object.keys(veri.aylar).sort((a,b) => b.localeCompare(a));
     aylar.forEach(ay => {
         const data = veri.aylar[ay];
@@ -1088,7 +1086,7 @@ function verileriDisaAktar() {
             data.gelirler.forEach(g => {
                 let ad = (g.ad || '').replace(/"/g, '""');
                 let kat = (g.kategori || '').replace(/"/g, '""');
-                csv += `"Gelir","${ay}","${kat}","${ad}","${g.tutar}",""\n`;
+                csv += `"Gelir";"${ay}";"${kat}";"${ad}";"${g.tutar}";""\n`;
             });
         }
         if (data.giderler) {
@@ -1096,25 +1094,28 @@ function verileriDisaAktar() {
                 let ad = (g.ad || '').replace(/"/g, '""');
                 let kat = (g.kategori || '').replace(/"/g, '""');
                 let yatirim = g.yatirim ? " (Yatırım)" : "";
-                csv += `"Gider","${ay}","${kat}","${ad}","${g.tutar}","${yatirim}"\n`;
+                csv += `"Gider";"${ay}";"${kat}";"${ad}";"${g.tutar}";"${yatirim}"\n`;
             });
         }
     });
 
-    // Portföy
     if (veri.portfoy && veri.portfoy.length > 0) {
         veri.portfoy.forEach(p => {
             let kod = (p.kod || '').replace(/"/g, '""');
             let tip = (p.tip || '').replace(/"/g, '""');
             let guncelTutar = p.miktar * (p.sonFiyat || 0);
             if (isNaN(guncelTutar)) guncelTutar = 0;
-            if (p.tip === 'bes') guncelTutar = p.miktar; // BES uses miktar as total balance
+            if (p.tip === 'bes') guncelTutar = p.miktar;
             
-            csv += `"Portföy","Güncel","${tip.toUpperCase()}","${kod}","${guncelTutar}","Miktar/Bakiye: ${p.miktar}, Maliyet: ${p.maliyet||0}"\n`;
+            csv += `"Portföy";"Güncel";"${tip.toUpperCase()}";"${kod}";"${guncelTutar}";"Miktar/Bakiye: ${p.miktar}, Maliyet: ${p.maliyet||0}"\n`;
         });
     }
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const encoder = new TextEncoder();
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+    const csvBytes = encoder.encode(csv);
+    
+    const blob = new Blob([bom, csvBytes], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -1765,7 +1766,6 @@ function aiPortfoyOneriUret() {
 
     let oneriler = [];
     
-    // Çeşitlilik Analizi
     let activeTypes = Object.values(tipToplam).filter(t => t > 0).length;
     if(activeTypes === 1) {
         oneriler.push("Tüm yumurtaları aynı sepete koymuşsunuz. Portföyünüzü farklı varlık sınıflarına (Örn: Altın, Döviz, BIST, ABD) dağıtarak riski azaltmayı düşünebilirsiniz.");
@@ -1773,7 +1773,6 @@ function aiPortfoyOneriUret() {
         oneriler.push("Harika bir çeşitlendirme yapmışsınız! Farklı varlık sınıflarına yatırım yapmak, piyasadaki dalgalanmalara karşı sizi koruyan en güçlü kalkandır.");
     }
 
-    // Altın Analizi
     let altinOran = total > 0 ? (tipToplam['altin'] / total) * 100 : 0;
     if(altinOran > 50) {
         oneriler.push(`Portföyünüzün %${altinOran.toFixed(0)}'si Altın'dan oluşuyor. Altın mükemmel bir güvenli limandır ancak uzun vadeli büyüme potansiyeli hisse senetleri veya fonlar kadar yüksek olmayabilir.`);
@@ -1781,26 +1780,22 @@ function aiPortfoyOneriUret() {
         oneriler.push("Portföyünüzde hiç altın bulunmuyor. Global kriz dönemlerinde koruma sağlaması için %10-15 civarında altın (fiziksel veya fon) bulundurmak iyi bir strateji olabilir.");
     }
 
-    // ABD Hisseleri Analizi
     let abdOran = total > 0 ? (tipToplam['abd'] / total) * 100 : 0;
     if(abdOran > 0) {
         oneriler.push("ABD hisseleri veya ETF'leri ile döviz bazlı getiri hedeflemeniz çok mantıklı. Uzun vadede enflasyona karşı kur koruması sağlar.");
     }
 
-    // BES Analizi
     if(tipToplam['bes'] === 0) {
         oneriler.push("Geleceğinizi güvence altına almak ve <strong>%30 Devlet Katkısından</strong> faydalanmak için Bireysel Emeklilik (BES) hesabı açmayı inceleyebilirsiniz.");
     } else {
         oneriler.push("BES ile geleceğinize yatırım yapmanız mükemmel bir adım. Devlet katkısı limitlerini her yıl maksimize etmeye çalışarak bileşik getiriden faydalanın.");
     }
 
-    // BIST Analizi
     let bistOran = total > 0 ? (tipToplam['bist'] / total) * 100 : 0;
     if(bistOran > 40) {
         oneriler.push(`Borsa İstanbul (BIST) ağırlığınız (%${bistOran.toFixed(0)}) oldukça yüksek. Yerel piyasa dalgalanmalarına karşı global (Yabancı Hisse/TEFAS Fonu/Döviz) tarafa da ağırlık verebilirsiniz.`);
     }
     
-    // Döviz Analizi
     let dovizOran = total > 0 ? (tipToplam['doviz'] / total) * 100 : 0;
     if(dovizOran > 30) {
         oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; bunu Eurobond (Yabancı Fon) veya ABD hisselerinde değerlendirmeyi düşünebilirsiniz.`);
