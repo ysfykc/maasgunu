@@ -14,7 +14,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 :root {
@@ -251,6 +250,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .action-btn.gider-btn { background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74)); }
 
 .fab-container.hide-fab { display: none !important; }
+
 body:not(.app-ready) .fab-container, body.login-open .fab-container { display: none !important; }
 body.app-ready:not(.login-open) .fab-container { display: flex; }
 
@@ -263,6 +263,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .mhandle{width:36px;height:4px;background:var(--bg3);border-radius:var(--rp);margin:0 auto 18px}
 .mttl{font-family:var(--fd);font-size:22px;font-weight:900;letter-spacing:-.03em;color:var(--txt);margin-bottom:12px}
 
+/* YENİ: Hızlı Çipler */
 .quick-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:12px;scrollbar-width:none;}
 .quick-chips::-webkit-scrollbar{display:none;}
 .q-chip{background:var(--bg2);color:var(--txt2);font-size:12px;font-weight:700;padding:8px 14px;border-radius:999px;border:none;white-space:nowrap;transition:transform 0.15s;cursor:pointer;}
@@ -343,20 +344,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 #vLoader { display:none; position:fixed; top:var(--top); left:0; width:100%; height:3px; background:var(--bg2); z-index: 1000;}
 #vLoaderBar { height:100%; width:0%; background:var(--blue); transition:width 0.3s; }
-
-@keyframes fireBounce {
-   0%, 100% { transform: translateY(0) scale(1); }
-   50% { transform: translateY(-2px) scale(1.15); }
-}
-.fire-emoji {
-   position: absolute;
-   right: -8px;
-   top: -9px;
-   font-size: 15px;
-   animation: fireBounce 1.2s infinite ease-in-out;
-   filter: drop-shadow(0 2px 4px rgba(255,159,10,0.5));
-   z-index: 10;
-}
 </style>
 </head>
 <body>
@@ -544,10 +531,10 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mttl" id="mTtl">Gelir Ekle</div>
 
 <div class="quick-chips" id="quickChipsGider" style="display:none;">
-   <button class="q-chip" onclick="hizliDoldur('🛒 Market', 'Market', event)">🛒 Market</button>
-   <button class="q-chip" onclick="hizliDoldur('⛽ Yakıt', 'Ulaşım', event)">⛽ Yakıt</button>
-   <button class="q-chip" onclick="hizliDoldur('☕ Kahve', 'Dışarı', event)">☕ Kahve</button>
-   <button class="q-chip" onclick="hizliDoldur('🍔 Yemek', 'Dışarı', event)">🍔 Yemek</button>
+   <button class="q-chip" onclick="hizliDoldur('💳 Kredi Kartı', 'Kredi Kartı', event)">💳 Kredi Kartı</button>
+   <button class="q-chip" onclick="hizliDoldur('🏦 Kredi Taksiti', 'Kredi', event)">🏦 Kredi Taksiti</button>
+   <button class="q-chip" onclick="hizliDoldur('🛒 Market Bütçesi', 'Market', event)">🛒 Market Bütçesi</button>
+   <button class="q-chip" onclick="hizliDoldur('🧾 Faturalar', 'Fatura', event)">🧾 Faturalar</button>
 </div>
 
 <div class="quick-chips" id="quickChipsGelir" style="display:none;">
@@ -1356,7 +1343,6 @@ function navSec(i){
   if(i===1) gecmisRender(); 
   if(i===2) {
      portfoyRender();
-     // Arka planda kurları sessizce güncelle
      kurlariGuncelle().then(() => portfoyRender());
   }
 }
@@ -1546,7 +1532,7 @@ function portfoyRender() {
    document.getElementById('pToplam').textContent = fTL(totalNetWorth); 
    document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKzClass}">${genelKzSign}${fTL(genelKz)} (${genelKzSign}%${genelKzPct.toFixed(2)})</span>` : 'Maliyet verisi eksik';
 
-   // YENİ: DÖVİZ KARŞILIKLARI EKRANA BASILIYOR
+   // DÖVİZ KARŞILIKLARI
    let uRate = (veri.kurlar && veri.kurlar.USD > 0) ? veri.kurlar.USD : 32.5;
    let eRate = (veri.kurlar && veri.kurlar.EUR > 0) ? veri.kurlar.EUR : 35.0;
    let uTotal = totalNetWorth / uRate;
@@ -1725,7 +1711,6 @@ function aiPortfoyOneriUret() {
 
     let oneriler = [];
     
-    // Çeşitlilik Analizi
     let activeTypes = Object.values(tipToplam).filter(t => t > 0).length;
     if(activeTypes === 1) {
         oneriler.push("Tüm yumurtaları aynı sepete koymuşsunuz. Portföyünüzü farklı varlık sınıflarına (Örn: Altın, Döviz, BIST, ABD) dağıtarak riski azaltmayı düşünebilirsiniz.");
@@ -1733,7 +1718,6 @@ function aiPortfoyOneriUret() {
         oneriler.push("Harika bir çeşitlendirme yapmışsınız! Farklı varlık sınıflarına yatırım yapmak, piyasadaki dalgalanmalara karşı sizi koruyan en güçlü kalkandır.");
     }
 
-    // Altın Analizi
     let altinOran = total > 0 ? (tipToplam['altin'] / total) * 100 : 0;
     if(altinOran > 50) {
         oneriler.push(`Portföyünüzün %${altinOran.toFixed(0)}'si Altın'dan oluşuyor. Altın mükemmel bir güvenli limandır ancak uzun vadeli büyüme potansiyeli hisse senetleri veya fonlar kadar yüksek olmayabilir.`);
@@ -1741,26 +1725,22 @@ function aiPortfoyOneriUret() {
         oneriler.push("Portföyünüzde hiç altın bulunmuyor. Global kriz dönemlerinde koruma sağlaması için %10-15 civarında altın (fiziksel veya fon) bulundurmak iyi bir strateji olabilir.");
     }
 
-    // ABD Hisseleri Analizi
     let abdOran = total > 0 ? (tipToplam['abd'] / total) * 100 : 0;
     if(abdOran > 0) {
         oneriler.push("ABD hisseleri veya ETF'leri ile döviz bazlı getiri hedeflemeniz çok mantıklı. Uzun vadede enflasyona karşı kur koruması sağlar.");
     }
 
-    // BES Analizi
     if(tipToplam['bes'] === 0) {
         oneriler.push("Geleceğinizi güvence altına almak ve <strong>%30 Devlet Katkısından</strong> faydalanmak için Bireysel Emeklilik (BES) hesabı açmayı inceleyebilirsiniz.");
     } else {
         oneriler.push("BES ile geleceğinize yatırım yapmanız mükemmel bir adım. Devlet katkısı limitlerini her yıl maksimize etmeye çalışarak bileşik getiriden faydalanın.");
     }
 
-    // BIST Analizi
     let bistOran = total > 0 ? (tipToplam['bist'] / total) * 100 : 0;
     if(bistOran > 40) {
         oneriler.push(`Borsa İstanbul (BIST) ağırlığınız (%${bistOran.toFixed(0)}) oldukça yüksek. Yerel piyasa dalgalanmalarına karşı global (Yabancı Hisse/TEFAS Fonu/Döviz) tarafa da ağırlık verebilirsiniz.`);
     }
     
-    // Döviz Analizi
     let dovizOran = total > 0 ? (tipToplam['doviz'] / total) * 100 : 0;
     if(dovizOran > 30) {
         oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; bunu Eurobond (Yabancı Fon) veya ABD hisselerinde değerlendirmeyi düşünebilirsiniz.`);
