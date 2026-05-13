@@ -4,7 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
-<meta content="#f7f5f0" name="theme-color"/>
+<meta content="#000000" name="theme-color" media="(prefers-color-scheme: dark)"/>
+<meta content="#f7f5f0" name="theme-color" media="(prefers-color-scheme: light)"/>
 <title>Maaş Günü</title>
 
 <link rel="manifest" href="manifest.json">
@@ -37,26 +38,29 @@
   --ios-ring:rgba(255,255,255,.55);
 }
 [data-theme=dark] {
-  --bg:#100f0d; --bg2:#1a1815; --bg3:#242118;
-  --surf:#1e1c18; --brd:rgba(255,255,255,.06); --brd2:rgba(255,255,255,.12);
-  --txt:#f0ece4; --txt2:#9a9690; --txt3:#5a5852;
-  --green:#4aad78; --green2:#5acd88; --green-bg:#0a1f14;
-  --red:#e05050; --red2:#f07070; --red-bg:#2a0e0e;
-  --amber:#e09040; --amber-bg:#201008;
-  --blue:#5a8ad4; --blue-bg:#0a1228;
-  --purple:#9a70d4; --purple-bg:#1a1028;
+  --bg:#000000; --bg2:#1c1c1e; --bg3:#2c2c2e;
+  --surf:#1c1c1e; --brd:rgba(255,255,255,.1); --brd2:rgba(255,255,255,.15);
+  --txt:#f2f2f7; --txt2:#a1a1aa; --txt3:#8e8e93;
+  --green:#32d74b; --green2:#30d158; --green-bg:#0a200f;
+  --red:#ff453a; --red2:#ff3b30; --red-bg:#240707;
+  --amber:#ff9f0a; --amber-bg:#231300;
+  --blue:#0a84ff; --blue-bg:#00142b;
+  --purple:#bf5af2; --purple-bg:#1a0823;
 
-  --ios-surface:rgba(30,28,24,.78);
-  --ios-surface-strong:rgba(30,28,24,.92);
-  --ios-shadow:0 16px 42px rgba(0,0,0,.36);
-  --ios-shadow-soft:0 8px 24px rgba(0,0,0,.24);
+  --ios-surface:rgba(28,28,30,.78);
+  --ios-surface-strong:rgba(28,28,30,.92);
+  --ios-shadow:0 16px 42px rgba(0,0,0,.5);
+  --ios-shadow-soft:0 8px 24px rgba(0,0,0,.3);
   --ios-ring:rgba(255,255,255,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{font-size:15px}
 body{font-family:var(--fd);background: radial-gradient(circle at 12% -6%, rgba(42,173,98,.18), transparent 30%), radial-gradient(circle at 92% 6%, rgba(90,58,139,.16), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--txt);min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto}
+
+[data-theme=dark] body { background: radial-gradient(circle at 12% -6%, rgba(50,215,75,.15), transparent 30%), radial-gradient(circle at 92% 6%, rgba(191,90,242,.15), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); }
+
 button{cursor:pointer;border:none;background:none;font-family:var(--fd)}
-input,select{font-family:var(--fd);font-size:inherit}
+input,select{font-family:var(--fd);font-size:inherit; color:var(--txt);}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 input[type=number]{-moz-appearance:textfield}
 
@@ -95,13 +99,13 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .hcard:active{transform:scale(.98)}
 .hcard.gelir{ background: linear-gradient(90deg, rgba(42,173,98,.24) 0%, rgba(42,173,98,.10) 38%, rgba(255,255,255,.92) 100%); }
 .hcard.gider{ background: linear-gradient(90deg, rgba(224,80,80,.24) 0%, rgba(224,80,80,.10) 38%, rgba(255,255,255,.92) 100%); }
-[data-theme=dark] .hcard.gelir{ background: linear-gradient(90deg, rgba(42,173,98,.30) 0%, rgba(42,173,98,.12) 38%, rgba(30,28,24,.94) 100%); }
-[data-theme=dark] .hcard.gider{ background: linear-gradient(90deg, rgba(224,80,80,.30) 0%, rgba(224,80,80,.12) 38%, rgba(30,28,24,.94) 100%); }
+[data-theme=dark] .hcard.gelir{ background: linear-gradient(90deg, rgba(50,215,75,.20) 0%, rgba(50,215,75,.08) 38%, rgba(28,28,30,.94) 100%); }
+[data-theme=dark] .hcard.gider{ background: linear-gradient(90deg, rgba(255,69,58,.20) 0%, rgba(255,69,58,.08) 38%, rgba(28,28,30,.94) 100%); }
 .hcard.kalan-pos{background:linear-gradient(135deg,var(--green),var(--green2));box-shadow:0 18px 42px rgba(26,122,66,.24)}
 .hcard.kalan-neg{background:linear-gradient(135deg,var(--red),var(--red2));box-shadow:0 18px 42px rgba(192,53,53,.24)}
 .hcard-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;opacity:.85}
-.hcard.gelir .hcard-lbl, .hcard.gelir .hcard-val{ color:#149251!important; }
-.hcard.gider .hcard-lbl, .hcard.gider .hcard-val{ color:#d63d3d!important; }
+.hcard.gelir .hcard-lbl, .hcard.gelir .hcard-val{ color:var(--green)!important; }
+.hcard.gider .hcard-lbl, .hcard.gider .hcard-val{ color:var(--red)!important; }
 .hcard.kalan-pos .hcard-lbl,.hcard.kalan-neg .hcard-lbl{color:rgba(255,255,255,.85)}
 .hcard-val{font-family:var(--fd);font-size:20px;font-weight:900;letter-spacing:-.04em}
 .hcard.kalan-pos .hcard-val,.hcard.kalan-neg .hcard-val{color:#fff}
@@ -190,8 +194,8 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 
 #sec-gelir .kalem{ background:rgba(42,173,98,.105)!important; border:1px solid rgba(42,173,98,.16)!important; box-shadow:0 10px 24px rgba(42,173,98,.055)!important; }
 #sec-gider .kalem{ background:rgba(224,80,80,.105)!important; border:1px solid rgba(224,80,80,.16)!important; box-shadow:0 10px 24px rgba(224,80,80,.055)!important; }
-[data-theme=dark] #sec-gelir .kalem{ background:rgba(42,173,98,.16)!important; border-color:rgba(42,173,98,.22)!important; }
-[data-theme=dark] #sec-gider .kalem{ background:rgba(224,80,80,.16)!important; border-color:rgba(224,80,80,.22)!important; }
+[data-theme=dark] #sec-gelir .kalem{ background:rgba(50,215,75,.15)!important; border-color:rgba(50,215,75,.25)!important; }
+[data-theme=dark] #sec-gider .kalem{ background:rgba(255,69,58,.15)!important; border-color:rgba(255,69,58,.25)!important; }
 
 /* GRAFİK & SİLİNENLER */
 .mini-chart{ margin:0 16px 10px; background:var(--ios-surface-strong)!important; backdrop-filter:var(--ios-blur); border:.5px solid var(--ios-ring)!important; border-radius:22px!important; padding:14px; box-shadow:var(--ios-shadow-soft); transition:all .25s ease; }
@@ -239,7 +243,7 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .fab-actions { display: flex; flex-direction: column; gap: 14px; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.9); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .fab-container.open .fab-actions { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
 .main-fab { width: 58px; height: 58px; border-radius: 29px; background: var(--txt); color: var(--bg); font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 28px rgba(0,0,0,0.25); border: none; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; pointer-events: auto; }
-[data-theme=dark] .main-fab { background: #f0ece4; color: #100f0d; }
+[data-theme=dark] .main-fab { background: #f2f2f7; color: #1c1c1e; }
 .fab-container.open .main-fab { transform: rotate(45deg); }
 .action-btn { width: 52px; height: 52px; border-radius: 20px; border: none; color: white; font-size: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: transform 0.15s ease; cursor: pointer; }
 .action-btn:active { transform: scale(0.92); }
@@ -327,6 +331,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .p-badge.bist { background: rgba(26,58,139,0.1); color: var(--blue); }
 .p-badge.abd { background: rgba(42,173,98,0.1); color: var(--green); }
 .p-badge.altin { background: rgba(184,96,16,0.1); color: var(--amber); }
+.p-badge.bes { background: rgba(255,159,10,0.1); color: var(--amber); }
 .p-grp-ttl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--txt2); margin: 18px 16px 8px; }
 
 /* Kâr/Zarar Renkleri */
@@ -454,26 +459,41 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div class="page" id="pagePortfoy">
-  <div class="hcard kalan-pos" style="margin:16px; background:linear-gradient(135deg, var(--blue), var(--purple)); box-shadow:0 18px 42px rgba(90,58,139,.3);">
+  <div class="hcard kalan-pos" style="margin:16px 16px 12px; background:linear-gradient(135deg, var(--blue), var(--purple)); box-shadow:0 18px 42px rgba(90,58,139,.3);">
     <div class="hcard-lbl" style="color:rgba(255,255,255,.8)">Toplam Net Varlık</div>
     <div class="hcard-val" id="pToplam" style="font-size:32px; color:#fff;">₺0</div>
     <div id="pGenelKz" style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.9); margin-top:4px;">Kâr/Zarar: ₺0</div>
-    <button onclick="portfoyGuncelle()" class="ai-mini-btn" style="margin-top:12px; background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.3);">
+    
+    <div id="pHedefWrap" style="display:none; margin-top:14px; text-align:left;">
+       <div style="display:flex; justify-content:space-between; font-size:10.5px; color:rgba(255,255,255,0.8); margin-bottom:5px; font-weight:700;">
+           <span>Portföy Hedefi: <span id="pHedefVal"></span></span>
+           <span id="pHedefPct"></span>
+       </div>
+       <div class="prg-bar-wrap" style="height:5px; background:rgba(0,0,0,0.2); margin-bottom:0;">
+           <div class="prg-bar" id="pHedefBar" style="background:#30d158; width:0%"></div>
+       </div>
+    </div>
+
+    <button onclick="portfoyGuncelle()" class="ai-mini-btn" style="margin-top:16px; background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.3);">
        🔄 Canlı Fiyatları Çek
     </button>
   </div>
   
-  <div class="mini-chart" id="pChartWrap" style="display:none; margin: 0 16px 12px;">
-     <div class="mini-chart-ttl" style="text-align:center;">Varlık Dağılımı</div>
-     <canvas id="portfoyChart" height="180"></canvas>
-  </div>
-  
-  <div style="padding: 0 16px; margin-bottom: 4px; display:flex; justify-content:space-between; align-items:center;">
+  <div style="padding: 0 16px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
      <div style="font-size:14px; font-weight:800; color:var(--txt2);">Varlık Listesi</div>
-     <button class="sbtn a" style="width:auto; padding:8px 16px; margin:0; border-radius:99px; font-size:12px;" onclick="modalVarlikAc()">+ Ekle</button>
+     <div style="display:flex; gap:6px;">
+        <button class="sbtn" style="width:auto; padding:8px 12px; margin:0; border-radius:99px; font-size:12px; background:var(--bg2); color:var(--txt);" onclick="togglePChart()">📊</button>
+        <button class="sbtn a" style="width:auto; padding:8px 16px; margin:0; border-radius:99px; font-size:12px;" onclick="modalVarlikAc()">+ Ekle</button>
+     </div>
+  </div>
+
+  <div class="mini-chart" id="pChartWrap" style="display:none; margin: 0 16px 12px; padding:10px;">
+     <div style="height:140px; position:relative;">
+        <canvas id="portfoyChart"></canvas>
+     </div>
   </div>
   
-  <div id="portfoyIcerik"></div>
+  <div id="portfoyIcerik" style="padding:0 16px 16px;"></div>
 </div>
 
 <div class="page" id="pageGecmis">
@@ -501,11 +521,18 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mhandle"></div>
 <div class="mttl" id="mTtl">Gelir Ekle</div>
 
-<div class="quick-chips" id="quickChips" style="display:none;">
+<div class="quick-chips" id="quickChipsGider" style="display:none;">
    <button class="q-chip" onclick="hizliDoldur('🛒 Market', 'Market', event)">🛒 Market</button>
    <button class="q-chip" onclick="hizliDoldur('⛽ Yakıt', 'Ulaşım', event)">⛽ Yakıt</button>
    <button class="q-chip" onclick="hizliDoldur('☕ Kahve', 'Dışarı', event)">☕ Kahve</button>
    <button class="q-chip" onclick="hizliDoldur('🍔 Yemek', 'Dışarı', event)">🍔 Yemek</button>
+</div>
+
+<div class="quick-chips" id="quickChipsGelir" style="display:none;">
+   <button class="q-chip" onclick="hizliDoldur('💵 Maaş', 'Maaş', event)">💵 Maaş</button>
+   <button class="q-chip" onclick="hizliDoldur('🏠 Kira Getirisi', 'Kira', event)">🏠 Kira</button>
+   <button class="q-chip" onclick="hizliDoldur('💸 Harçlık', 'Harçlık', event)">💸 Harçlık</button>
+   <button class="q-chip" onclick="hizliDoldur('🎁 Ek Gelir/Prim', 'Ek Gelir', event)">🎁 Prim</button>
 </div>
 
 <div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" id="eAd" placeholder="örn. Maaş, Kira, Netflix…" type="text"/></div>
@@ -551,12 +578,28 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="modal">
 <div class="mhandle"></div>
 <div class="mttl">⚙️ Ayarlar</div>
+
 <div class="igrp">
   <label class="ilbl">Maaş Günü (Ayın kaçıncı günü?)</label>
   <input class="inp" id="ayarMaasGunu" type="number" min="1" max="31" placeholder="Örn: 15" />
 </div>
+
+<div class="igrp">
+  <label class="ilbl">Portföy Büyüme Hedefi (₺)</label>
+  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarHedef" type="number" min="0" placeholder="Örn: 1000000" /></div>
+</div>
+
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
+
+<div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
+  <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
+  <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v3.0 Pro</div>
+  <div style="font-size:12px; color:var(--txt3);">Tasarım & Geliştirme: Yusuf Aykaç</div>
+  <button class="exit-btn red" onclick="silinenleriTemizle()" style="margin-top:24px; font-size:13px; padding:12px;">🗑 Çöp Kutusunu Boşalt</button>
+</div>
+
 </div>
 </div>
 
@@ -571,12 +614,13 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
      <option value="tefas">Yatırım Fonu (TEFAS)</option>
      <option value="bist">Türk Hissesi (BIST)</option>
      <option value="abd">ABD Hissesi / ETF</option>
-     <option value="altin">Altın</option>
+     <option value="altin">Altın (Fiziksel / Banka)</option>
+     <option value="bes">Bireysel Emeklilik (BES)</option>
   </select>
 </div>
 
 <div class="igrp" id="vKodRow">
-  <label class="ilbl">Hisse / Fon Kodu</label>
+  <label class="ilbl" id="vKodLbl">Hisse / Fon Kodu</label>
   <input class="inp" id="vKod" placeholder="Örn: YAS veya THYAO" type="text" style="text-transform:uppercase"/>
 </div>
 
@@ -593,13 +637,13 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div class="igrp">
-  <label class="ilbl">Miktar (Adet / Lot / Gram)</label>
+  <label class="ilbl" id="vMiktarLbl">Miktar (Adet / Lot / Gram)</label>
   <input class="inp" id="vMiktar" min="0" placeholder="0" step="any" type="number"/>
 </div>
 
-<div class="igrp">
-  <label class="ilbl">Birim Maliyet / Alış Fiyatı (Kâr-Zarar Hesabı İçin)</label>
-  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vMaliyet" min="0" placeholder="Örn: 300.50 (Boş bırakılabilir)" step="any" type="number"/></div>
+<div class="igrp" id="vMaliyetRow">
+  <label class="ilbl">Ortalama Maliyet (Birim Alış Fiyatı)</label>
+  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vMaliyet" min="0" placeholder="Boş bırakılabilir" step="any" type="number"/></div>
 </div>
 
 <button class="sbtn a" onclick="varlikKaydet()">✓ Varlığı Kaydet</button>
@@ -613,7 +657,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mttl" id="vdTtl">Varlık Düzenle</div>
 
 <div class="igrp">
-  <label class="ilbl">Miktar (Adet / Lot / Gram)</label>
+  <label class="ilbl">Miktar</label>
   <input class="inp" id="vdMiktar" min="0" step="any" type="number"/>
 </div>
 
@@ -653,7 +697,7 @@ const Haptic = {
 /* ══ FIREBASE ══ */
 const CFG={apiKey:'AIzaSyADpIRNLQEIer_gplTgwKi_EKkfcyrYoqY',authDomain:'maasgunu-bd353.firebaseapp.com',projectId:'maasgunu-bd353',storageBucket:'maasgunu-bd353.firebasestorage.app',messagingSenderId:'485904329467',appId:'1:485904329467:web:579d932ae8f25958901e5e'};
 let db,auth,user=null;
-let veri={ aylar:{}, portfoy:[], ayarlar:{ maasGunu:15 }, guncelleme:null };
+let veri={ aylar:{}, portfoy:[], ayarlar:{ maasGunu:15, portfoyHedef:0 }, guncelleme:null };
 let aktifTip='gelir', tabIdx=0, navIdx=0, duzenlenenId=null, duzenlenenTip=null;
 let tekrarAcik=false, yatirimAcik=false, dTekrarAcik=false;
 let chartInst=null, portfoyChartInst=null, aiOneriIndex=0;
@@ -662,11 +706,13 @@ let beklemeSilId = null;
 let beklemeSilTip = null;
 let beklemeSilGrupId = null;
 let silinenlerAcik = false; 
+let showPChart = false;
 
 let aktifVarlikId = null;
 let vdManuelFiyatAcik = false;
 
 function getMaasGunu() { return (veri.ayarlar && veri.ayarlar.maasGunu) ? parseInt(veri.ayarlar.maasGunu) : 15; }
+function getPortfoyHedefi() { return (veri.ayarlar && veri.ayarlar.portfoyHedef) ? parseFloat(veri.ayarlar.portfoyHedef) : 0; }
 
 function bugunAyId() {
   const bugun = new Date();
@@ -708,7 +754,7 @@ async function fbYukle(){
     if(snap.exists()){
       const uzak=JSON.parse(snap.data().json||'{}');
       if(!uzak.portfoy) uzak.portfoy = []; 
-      if(!uzak.ayarlar) uzak.ayarlar = { maasGunu: 15 };
+      if(!uzak.ayarlar) uzak.ayarlar = { maasGunu: 15, portfoyHedef: 0 };
       if((uzak.guncelleme||'2000')>(veri.guncelleme||'2000')){veri=uzak;lsKaydet();}
       else if((veri.guncelleme||'2000')>(uzak.guncelleme||'2000')){await fbKaydet();}
     }
@@ -736,7 +782,7 @@ function setSynk(d){const el=document.getElementById('sync');if(!el)return;el.te
 
 const LS='masaygunu2_v1';
 function lsKaydet(){try{localStorage.setItem(LS,JSON.stringify(veri));}catch(e){}}
-function lsYukle(){try{const d=JSON.parse(localStorage.getItem(LS)||'null');if(d&&d.aylar){veri=d; if(!veri.portfoy)veri.portfoy=[]; if(!veri.ayarlar)veri.ayarlar={maasGunu:15};}}catch(e){}}
+function lsYukle(){try{const d=JSON.parse(localStorage.getItem(LS)||'null');if(d&&d.aylar){veri=d; if(!veri.portfoy)veri.portfoy=[]; if(!veri.ayarlar)veri.ayarlar={maasGunu:15, portfoyHedef:0};}}catch(e){}}
 
 function ayEkleStr(ay, d){
   let [y, m] = ay.split('-').map(Number);
@@ -775,7 +821,7 @@ function ayYazi(periodId){
   let mg = getMaasGunu();
   if (mg === 1) return `${AYLAR[m-1]} ${yStr}`;
   let mgE = mg - 1;
-  if(mgE === 0) mgE = 31; 
+  if(mgE === 0) mgE = new Date(parseInt(yStr), m-1, 0).getDate(); 
   return `${mg} ${AYLAR[m-1]} - ${mgE} ${AYLAR[m2-1]}`;
 }
 
@@ -986,6 +1032,17 @@ async function silineniKaliciSil(tip,idx){
   render(); await fbKaydet(); toast('Kalıcı silindi');
 }
 
+async function silinenleriTemizle() {
+   Haptic.heavy();
+   if(confirm('Çöp kutusundaki TÜM kayıtlar kalıcı olarak silinecek. Emin misiniz?')) {
+      const v = ayVerisi(aktifAy);
+      v.silinenGelirler = [];
+      v.silinenGiderler = [];
+      document.getElementById('mAyarlar').classList.remove('on');
+      render(); await fbKaydet(); toast('🗑 Çöp kutusu boşaltıldı');
+   }
+}
+
 function kalemHtml(k,tip,idx){
   const renk=tip==='gelir'?'g':'r';
   const badges=[];
@@ -1023,8 +1080,8 @@ function grafikRender(v){
   if(!entries.length){ctx.closest('.mini-chart').innerHTML+='<p style="text-align:center;color:var(--txt3);font-size:12px;padding:20px">Gider verisi yok</p>';return;}
   if(chartInst)chartInst.destroy();
   chartInst=new Chart(ctx,{type:'doughnut',
-    data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v),backgroundColor:['#c03535','#1a7a42','#1a3a8b','#b86010','#5a3a8b','#1a6b6b','#7a5a1a','#6b1a5a'],borderWidth:2,borderColor:getComputedStyle(document.documentElement).getPropertyValue('--surf')||'#fff'}]},
-    options:{responsive:true,cutout:'60%',plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:c=>` ${fTL(c.raw)}`}}}}
+    data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v),backgroundColor:['#ff453a','#32d74b','#0a84ff','#ff9f0a','#bf5af2','#30d158','#ff3b30','#1a3a8b'],borderWidth:2,borderColor:getComputedStyle(document.documentElement).getPropertyValue('--surf')||'#fff'}]},
+    options:{responsive:true,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label: function(context){let total=context.chart._metasets[context.datasetIndex].total;let value=context.raw;let pct=((value/total)*100).toFixed(1)+'%';return ` ${fTL(value)} (${pct})`;}}}}}
   });
 }
 
@@ -1123,7 +1180,8 @@ function modalAc(tip){
   const cls={gelir:'sbtn g',gider:'sbtn r',yatirim:'sbtn p'};
   document.getElementById('mTtl').textContent=ttl[tip]||'Ekle'; document.getElementById('mBtn').className=cls[tip]||'sbtn g';
   
-  document.getElementById('quickChips').style.display = tip === 'gider' ? 'flex' : 'none';
+  document.getElementById('quickChipsGider').style.display = tip === 'gider' ? 'flex' : 'none';
+  document.getElementById('quickChipsGelir').style.display = tip === 'gelir' ? 'flex' : 'none';
 
   document.getElementById('yatirimRow').style.display=tip==='gider'?'flex':'none';
   document.getElementById('taksitRow').style.display=tip==='gider'?'block':'none';
@@ -1137,17 +1195,24 @@ function modalAc(tip){
 function ayarlarAc() {
   Haptic.light();
   document.getElementById('ayarMaasGunu').value = getMaasGunu();
+  document.getElementById('ayarHedef').value = getPortfoyHedefi() || '';
   document.getElementById('mAyarlar').classList.add('on');
 }
 
 async function ayarlarKaydet() {
   let mg = parseInt(document.getElementById('ayarMaasGunu').value) || 15;
   if(mg < 1) mg = 1; if(mg > 31) mg = 31;
+  let hedef = parseFloat(document.getElementById('ayarHedef').value) || 0;
+  
   if(!veri.ayarlar) veri.ayarlar = {};
   veri.ayarlar.maasGunu = mg;
+  veri.ayarlar.portfoyHedef = hedef;
+  
   aktifAy = bugunAyId();
   document.getElementById('mAyarlar').classList.remove('on');
-  render(); await fbKaydet(); Haptic.success(); toast('Ayarlar kaydedildi');
+  render(); 
+  if(navIdx === 2) portfoyRender(); // portföy açıksa onu da yenile
+  await fbKaydet(); Haptic.success(); toast('Ayarlar kaydedildi');
 }
 
 async function kalemKaydet(){
@@ -1243,7 +1308,7 @@ function navSec(i){
   }
   
   const tBar=document.getElementById('topAyBar'); if(tBar) tBar.style.display = (i===0) ? 'flex' : 'none';
-  window.scrollTo({top:0,behavior:'smooth'}); 
+  closeFab(); window.scrollTo({top:0,behavior:'smooth'}); 
   if(i===1) gecmisRender(); if(i===2) portfoyRender();
 }
 
@@ -1283,6 +1348,21 @@ const altinIsimleri = {
     'cumhuriyet-altini': 'Cumhuriyet Altını'
 };
 
+function togglePChart() {
+    Haptic.light();
+    showPChart = !showPChart;
+    const wrap = document.getElementById('pChartWrap');
+    if(showPChart) {
+       wrap.style.display = 'block';
+       // Reset animation by redrawing
+       let dataMap = {};
+       veri.portfoy.forEach(v => { dataMap[v.tip] = (dataMap[v.tip] || 0) + (v.miktar * (v.sonFiyat||0)); });
+       portfoyGrafikCiz(dataMap);
+    } else {
+       wrap.style.display = 'none';
+    }
+}
+
 function modalVarlikAc() {
    Haptic.light(); document.getElementById('vKod').value = ''; document.getElementById('vMiktar').value = ''; document.getElementById('vMaliyet').value = ''; document.getElementById('vTip').value = 'tefas'; vTipKontrol(); document.getElementById('mPortfoy').classList.add('on');
 }
@@ -1292,9 +1372,21 @@ function vTipKontrol() {
    if(tip === 'altin') {
       document.getElementById('vKodRow').style.display = 'none';
       document.getElementById('vAltinRow').style.display = 'block';
+      document.getElementById('vMaliyetRow').style.display = 'block';
+      document.getElementById('vMiktarLbl').textContent = 'Miktar (Adet / Gram)';
+   } else if (tip === 'bes') {
+      document.getElementById('vKodRow').style.display = 'block';
+      document.getElementById('vAltinRow').style.display = 'none';
+      document.getElementById('vMaliyetRow').style.display = 'none'; // BES'te kâr zarar yok
+      document.getElementById('vKodLbl').textContent = 'BES Şirketi (İsteğe Bağlı)';
+      document.getElementById('vKod').placeholder = 'Örn: Allianz, Anadolu Hayat';
+      document.getElementById('vMiktarLbl').textContent = 'Güncel Toplam Bakiye (₺)';
    } else {
       document.getElementById('vKodRow').style.display = 'block';
       document.getElementById('vAltinRow').style.display = 'none';
+      document.getElementById('vMaliyetRow').style.display = 'block';
+      document.getElementById('vKodLbl').textContent = 'Hisse / Fon Kodu';
+      document.getElementById('vMiktarLbl').textContent = 'Miktar (Adet / Lot)';
       document.getElementById('vKod').placeholder = tip === 'abd' ? 'Örn: AAPL, TSLA, QQQ' : 'Örn: YAS veya THYAO';
    }
 }
@@ -1306,22 +1398,32 @@ async function varlikKaydet() {
    let kod = "";
    
    if(tip === 'altin') { kod = document.getElementById('vAltinTip').value; } 
+   else if (tip === 'bes') { kod = document.getElementById('vKod').value.trim() || 'BES Birikimi'; }
    else { kod = document.getElementById('vKod').value.trim().toUpperCase(); }
    
    if(miktar <= 0 || !kod) { Haptic.error(); toast('Miktar ve Kod zorunludur'); return; }
 
+   let isBes = (tip === 'bes');
+   let mf = isBes ? true : false;
+   let sf = isBes ? 1 : 0; // BES'te miktar = bakiye, birim fiyat = 1
+   let cost = isBes ? miktar : maliyet;
+
    let mevcut = veri.portfoy.find(x => x.tip === tip && x.kod === kod);
-   if(mevcut) {
+   if(mevcut && !isBes) {
        let eskiToplam = mevcut.miktar * (mevcut.maliyet || 0);
        let yeniToplam = miktar * maliyet;
        mevcut.miktar += miktar;
        mevcut.maliyet = mevcut.miktar > 0 ? (eskiToplam + yeniToplam) / mevcut.miktar : 0;
+   } else if (mevcut && isBes) {
+       mevcut.miktar = miktar; // BES güncellenir
+       mevcut.maliyet = miktar;
    } else {
-       veri.portfoy.push({ id: uid(), tip: tip, kod: kod, miktar: miktar, maliyet: maliyet, sonFiyat: 0, manuelFiyat: false }); 
+       veri.portfoy.push({ id: uid(), tip: tip, kod: kod, miktar: miktar, maliyet: cost, sonFiyat: sf, manuelFiyat: mf }); 
    }
    
    document.getElementById('mPortfoy').classList.remove('on');
-   await fbKaydet(); Haptic.success(); toast('Varlık Eklendi'); portfoyGuncelle();
+   await fbKaydet(); Haptic.success(); toast('Varlık Eklendi'); 
+   if(!isBes) portfoyGuncelle(); else portfoyRender();
 }
 
 function portfoyRender() {
@@ -1331,6 +1433,7 @@ function portfoyRender() {
       document.getElementById('pToplam').textContent = '₺0'; 
       document.getElementById('pGenelKz').textContent = 'Kâr/Zarar: ₺0';
       document.getElementById('pChartWrap').style.display = 'none';
+      document.getElementById('pHedefWrap').style.display = 'none';
       return; 
    }
    
@@ -1343,27 +1446,39 @@ function portfoyRender() {
        'bist': { ad: 'Türk Hisseleri (BIST)', class: 'bist', icon: '📈', varliklar: [] },
        'abd': { ad: 'ABD Hisseleri & ETF', class: 'abd', icon: '🇺🇸', varliklar: [] },
        'tefas': { ad: 'Yatırım Fonları (TEFAS)', class: 'tefas', icon: '📊', varliklar: [] },
-       'altin': { ad: 'Altın', class: 'altin', icon: '🪙', varliklar: [] }
+       'altin': { ad: 'Altın', class: 'altin', icon: '🪙', varliklar: [] },
+       'bes': { ad: 'Bireysel Emeklilik', class: 'bes', icon: '🛡️', varliklar: [] }
    };
 
    veri.portfoy.forEach((v, idx) => {
        const vTotal = v.miktar * (v.sonFiyat || 0); 
        const vCostTotal = v.miktar * (v.maliyet || 0);
        totalNetWorth += vTotal;
-       totalCost += vCostTotal;
+       if(v.tip !== 'bes') totalCost += vCostTotal;
        
        chartData[v.tip] = (chartData[v.tip] || 0) + vTotal;
-
        if(gruplar[v.tip]) { gruplar[v.tip].varliklar.push({...v, idx: idx, vTotal: vTotal, vCostTotal: vCostTotal}); }
    });
 
-   let genelKz = totalNetWorth - totalCost;
+   // Hedef İlerlemesi
+   const hedef = getPortfoyHedefi();
+   const hWrap = document.getElementById('pHedefWrap');
+   if(hedef > 0) {
+       let pct = Math.min(100, (totalNetWorth / hedef) * 100);
+       document.getElementById('pHedefVal').textContent = fTL(hedef);
+       document.getElementById('pHedefPct').textContent = '%' + pct.toFixed(1);
+       document.getElementById('pHedefBar').style.width = pct + '%';
+       hWrap.style.display = 'block';
+   } else {
+       hWrap.style.display = 'none';
+   }
+
+   // Genel Kâr Zarar
+   let genelKz = totalNetWorth - totalCost; 
    let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
    let genelKzClass = genelKz >= 0 ? 'pl-pos' : 'pl-neg';
    let genelKzSign = genelKz > 0 ? '+' : '';
-   
-   document.getElementById('pToplam').textContent = fTL(totalNetWorth); 
-   document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Kâr/Zarar: <span class="${genelKzClass}">${genelKzSign}${fTL(genelKz)} (${genelKzSign}%${genelKzPct.toFixed(2)})</span>` : 'Maliyet verisi eksik';
+   document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKzClass}">${genelKzSign}${fTL(genelKz)} (${genelKzSign}%${genelKzPct.toFixed(2)})</span>` : 'Maliyet verisi eksik';
 
    for (let gKey in gruplar) {
        let g = gruplar[gKey];
@@ -1373,7 +1488,9 @@ function portfoyRender() {
                let title = v.tip === 'altin' ? altinIsimleri[v.kod] : v.kod;
                
                let plHtml = '';
-               if (v.maliyet > 0 && v.vTotal > 0) {
+               if (v.tip === 'bes') {
+                   plHtml = `<span class="pl-neu">BES Birikimi</span>`;
+               } else if (v.maliyet > 0 && v.vTotal > 0) {
                    let pl = v.vTotal - v.vCostTotal;
                    let plPct = (pl / v.vCostTotal) * 100;
                    let plClass = pl >= 0 ? 'pl-pos' : 'pl-neg';
@@ -1387,7 +1504,7 @@ function portfoyRender() {
                <div class="portfoy-card" onclick="varlikDuzenleAc('${v.id}')">
                   <div class="portfoy-left">
                      <div class="portfoy-ad">${escHtml(title)}</div>
-                     <div class="portfoy-meta"><span class="p-badge ${g.class}">${v.tip.toUpperCase()}</span><span>${v.miktar.toLocaleString('tr-TR')} Adet</span></div>
+                     <div class="portfoy-meta"><span class="p-badge ${g.class}">${v.tip.toUpperCase()}</span><span>${v.tip==='bes'?'Bakiye':'Miktar'}: ${v.miktar.toLocaleString('tr-TR')}</span></div>
                   </div>
                   <div class="portfoy-right">
                      <div class="portfoy-val">${fTL(v.vTotal)}</div>
@@ -1399,17 +1516,16 @@ function portfoyRender() {
    }
 
    el.innerHTML = html;
-   portfoyGrafikCiz(chartData);
+   if(showPChart) portfoyGrafikCiz(chartData);
 }
 
 function portfoyGrafikCiz(dataMap) {
-    const wrap = document.getElementById('pChartWrap');
     const ctx = document.getElementById('portfoyChart');
     if(!ctx) return;
 
     const labels = []; const data = []; const bgColors = [];
-    const colors = { 'bist': '#1a3a8b', 'abd': '#1a7a42', 'tefas': '#5a3a8b', 'altin': '#b86010' };
-    const names = { 'bist': 'Türk Hisseleri', 'abd': 'ABD Hisseleri', 'tefas': 'Yatırım Fonları', 'altin': 'Altın' };
+    const colors = { 'bist': '#0a84ff', 'abd': '#32d74b', 'tefas': '#bf5af2', 'altin': '#ff9f0a', 'bes': '#ff3b30' };
+    const names = { 'bist': 'BIST', 'abd': 'ABD/ETF', 'tefas': 'Fon', 'altin': 'Altın', 'bes': 'BES' };
 
     for(let k in dataMap) {
         if(dataMap[k] > 0) {
@@ -1419,14 +1535,20 @@ function portfoyGrafikCiz(dataMap) {
         }
     }
 
-    if(data.length === 0) { wrap.style.display = 'none'; return; }
-    wrap.style.display = 'block';
-
     if(portfoyChartInst) portfoyChartInst.destroy();
     portfoyChartInst = new Chart(ctx, {
         type: 'doughnut',
         data: { labels: labels, datasets: [{ data: data, backgroundColor: bgColors, borderWidth: 2, borderColor: getComputedStyle(document.documentElement).getPropertyValue('--surf')||'#fff' }] },
-        options: { responsive: true, cutout: '65%', plugins: { legend: { labels: { font: { family: 'DM Sans', size: 11 } } }, tooltip: { callbacks: { label: c => ` ${fTL(c.raw)}` } } } }
+        options: { 
+           responsive: true, 
+           maintainAspectRatio: false,
+           cutout: '65%', 
+           layout: { padding: 0 },
+           plugins: { 
+               legend: { position: 'right', labels: { boxWidth:12, padding:10, font: { family: 'DM Sans', size: 11, weight:'bold' }, color: getComputedStyle(document.documentElement).getPropertyValue('--txt') } }, 
+               tooltip: { callbacks: { label: function(c){ let tot=c.chart._metasets[c.datasetIndex].total; let val=c.raw; let pct=((val/tot)*100).toFixed(1)+'%'; return ` ${fTL(val)} (${pct})`; } } } 
+           } 
+        }
     });
 }
 
@@ -1442,10 +1564,16 @@ function varlikDuzenleAc(id) {
     document.getElementById('vdMiktar').value = v.miktar || 0;
     document.getElementById('vdMaliyet').value = v.maliyet || 0;
     
-    vdManuelFiyatAcik = !!v.manuelFiyat;
-    document.getElementById('vdOtoFiyatToggle').className = 'toggle' + (vdManuelFiyatAcik ? ' on' : '');
-    document.getElementById('vdFiyatRow').style.display = vdManuelFiyatAcik ? 'block' : 'none';
-    document.getElementById('vdFiyat').value = v.sonFiyat || 0;
+    if(v.tip === 'bes') {
+       document.getElementById('vdOtoFiyatToggle').parentElement.style.display = 'none';
+       document.getElementById('vdFiyatRow').style.display = 'none';
+    } else {
+       document.getElementById('vdOtoFiyatToggle').parentElement.style.display = 'flex';
+       vdManuelFiyatAcik = !!v.manuelFiyat;
+       document.getElementById('vdOtoFiyatToggle').className = 'toggle' + (vdManuelFiyatAcik ? ' on' : '');
+       document.getElementById('vdFiyatRow').style.display = vdManuelFiyatAcik ? 'block' : 'none';
+       document.getElementById('vdFiyat').value = v.sonFiyat || 0;
+    }
 
     document.getElementById('mPortfoyDuzenle').classList.add('on');
 }
@@ -1466,10 +1594,15 @@ async function varlikDuzenleKaydet() {
     
     v.miktar = miktar;
     v.maliyet = parseFloat(document.getElementById('vdMaliyet').value) || 0;
-    v.manuelFiyat = vdManuelFiyatAcik;
     
-    if(vdManuelFiyatAcik) {
-        v.sonFiyat = parseFloat(document.getElementById('vdFiyat').value) || 0;
+    if(v.tip !== 'bes') {
+        v.manuelFiyat = vdManuelFiyatAcik;
+        if(vdManuelFiyatAcik) {
+            v.sonFiyat = parseFloat(document.getElementById('vdFiyat').value) || 0;
+        }
+    } else {
+        v.sonFiyat = 1;
+        v.maliyet = miktar;
     }
 
     document.getElementById('mPortfoyDuzenle').classList.remove('on');
@@ -1520,7 +1653,10 @@ async function acikApiVeriCek(tip, kod, usdRate) {
       if (tip === 'altin') {
          const trData = await getTruncgilData();
          let gecerliKod = kod.toLowerCase();
-         if(trData && trData[gecerliKod] && trData[gecerliKod].Selling) { return parseFloat(trData[gecerliKod].Selling.replace('.', '').replace(',', '.')); } return 0;
+         if(trData && trData[gecerliKod] && trData[gecerliKod].Selling) {
+             return parseFloat(trData[gecerliKod].Selling.replace('.', '').replace(',', '.'));
+         }
+         return 0;
       }
       else if (tip === 'bist' || tip === 'abd') {
          let exchanges = tip === 'bist' ? ['IST'] : ['NASDAQ', 'NYSE', 'AMEX', 'BATS', 'NYSEARCA'];
@@ -1566,7 +1702,7 @@ async function acikApiVeriCek(tip, kod, usdRate) {
 
 async function portfoyGuncelle() {
    if(veri.portfoy.length === 0) return;
-   Haptic.medium(); toast('Piyasa verileri taranıyor...');
+   Haptic.medium(); toast('Tüm kaynaklar taranıyor...');
    const loader = document.getElementById('vLoader'); const loaderBar = document.getElementById('vLoaderBar');
    loader.style.display = 'block'; loaderBar.style.width = '5%'; loaderBar.style.background = 'var(--blue)';
    trDataCache = null; 
@@ -1578,7 +1714,10 @@ async function portfoyGuncelle() {
        const totalItems = veri.portfoy.length; let completed = 0; let failCount = 0;
        for(let i=0; i<veri.portfoy.length; i++) {
           let v = veri.portfoy[i]; 
-          if(v.manuelFiyat) { completed++; loaderBar.style.width = (5 + (completed / totalItems) * 95) + '%'; continue; } // Manuel girilmişse API'yi atla
+          if(v.manuelFiyat || v.tip === 'bes') { 
+              completed++; loaderBar.style.width = (5 + (completed / totalItems) * 95) + '%'; 
+              continue; 
+          }
           
           let yeniFiyat = await acikApiVeriCek(v.tip, v.kod, usdRate);
           if(yeniFiyat > 0) { v.sonFiyat = yeniFiyat; } else { failCount++; }
@@ -1603,7 +1742,7 @@ async function init(){
     document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
     window._fb.onAuthStateChanged(auth,async kullanici=>{
       if(kullanici){ user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false); const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} lsYukle(); render(); await fbYukle(); render(); setSynk('ok'); setInterval(fbKaydet,60000); }
-      else{ user=null;veri={aylar:{}, portfoy:[], ayarlar:{maasGunu:15}, guncelleme:null}; document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); }
+      else{ user=null;veri={aylar:{}, portfoy:[], ayarlar:{maasGunu:15, portfoyHedef:0}, guncelleme:null}; document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); }
     });
     return;
   }
