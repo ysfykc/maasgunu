@@ -304,7 +304,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .scroll-anchor{height:1px;display:block}
 
-/* V2.5 PORTFÖY KARTLARI & LOADER */
+/* V2.6 PORTFÖY KARTLARI & LOADER */
 .portfoy-card { margin-bottom: 10px; background: var(--ios-surface-strong); border-radius: 20px; padding: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ios-shadow-soft); position: relative; overflow: hidden; }
 .portfoy-left { display: flex; flex-direction: column; gap: 4px; }
 .portfoy-ad { font-size: 14px; font-weight: 800; color: var(--txt); }
@@ -353,7 +353,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex !important; }
 
 <div id="login">
   <img src="16379.png" class="login-bg" alt="Splash Background">
-  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v2.5</div>
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • v2.6</div>
   <div class="box">
     <button id="loginBtn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
@@ -1176,7 +1176,7 @@ function gecmisRender(){
 }
 
 /* =========================================
-   V2.5 KESİN ÇÖZÜM: TİMER VE ZIRHLI MOTOR
+   V2.6 KESİN ÇÖZÜM: GOOGLE FINANCE & TIMEOUT SİSTEMİ
    ========================================= */
 
 function modalVarlikAc() {
@@ -1184,7 +1184,7 @@ function modalVarlikAc() {
 }
 
 function vTipKontrol() {
-   const tip = document.getElementById('vTip').value; document.getElementById('vKodRow').style.display = (tip === 'altin') ? 'none' : 'block'; document.getElementById('vKod').placeholder = tip === 'abd' ? 'Örn: AAPL, TSLA, SPY' : 'Örn: YAS veya THYAO';
+   const tip = document.getElementById('vTip').value; document.getElementById('vKodRow').style.display = (tip === 'altin') ? 'none' : 'block'; document.getElementById('vKod').placeholder = tip === 'abd' ? 'Örn: AAPL, TSLA, QQQ' : 'Örn: YAS veya THYAO';
 }
 
 async function varlikKaydet() {
@@ -1223,87 +1223,94 @@ async function varlikSil(idx) {
    if(confirm('Bu varlığı silmek istediğinize emin misiniz?')) { veri.portfoy.splice(idx, 1); portfoyRender(); await fbKaydet(); Haptic.heavy(); }
 }
 
-/* YENİ: ZAMAN AŞIMI (TIMEOUT) İLE KİLİTLENMEYEN FETCH FONKSİYONU */
-async function fetchWithTimeout(url, options = {}, timeout = 4000) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(id);
-    return response;
+// Zaman Korumalı Proxy Çekim Motoru (Maksimum 3.5 Saniye)
+async function fetchHtmlWithProxies(url) {
+    const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+    ];
+    for (let u of proxies) {
+        try {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 3500); 
+            let res = await fetch(u, { cache: 'no-store', signal: controller.signal });
+            clearTimeout(id);
+            if (res.ok) {
+                let text = await res.text();
+                if (u.includes('allorigins')) {
+                    let json = JSON.parse(text);
+                    if (json.contents && json.contents.length > 500) return json.contents;
+                } else {
+                    if (text.length > 500) return text;
+                }
+            }
+        } catch(e) {}
+    }
+    return null;
 }
 
-/* YENİ: IŞIK HIZINDA YEREL TRUNCGIL API (ALTIN VE DOLAR İÇİN) */
+// Google Finance Doğrudan Kazıyıcı (BIST ve ABD İçin Yenilmez)
+async function fetchGoogleFinance(kod, exchange) {
+     let html = await fetchHtmlWithProxies(`https://www.google.com/finance/quote/${kod}:${exchange}`);
+     if (html) {
+         let m = html.match(/class="YMlKec fxKbKc"[^>]*>[^\d]*([\d.,]+)/i);
+         if (m) return parseFloat(m[1].replace(/,/g, ''));
+     }
+     return 0;
+}
+
+// Truncgil Doğrudan (Altın ve Dolar)
 let trDataCache = null;
 async function getTruncgilData() {
     if(trDataCache) return trDataCache;
     try {
-        const res = await fetchWithTimeout('https://finans.truncgil.com/v3/today.json');
-        trDataCache = await res.json(); return trDataCache;
+        const controller = new AbortController(); const id = setTimeout(() => controller.abort(), 3000);
+        const res = await fetch('https://finans.truncgil.com/v3/today.json', { signal: controller.signal });
+        clearTimeout(id); trDataCache = await res.json(); return trDataCache;
     } catch(e) { return null; }
 }
 
 async function getUsdRate() {
    try {
        const trData = await getTruncgilData();
-       if(trData && trData['USD'] && trData['USD'].Selling) {
-          return parseFloat(trData['USD'].Selling.replace('.', '').replace(',', '.'));
-       }
-   } catch (e) {}
-   try {
-       const res = await fetchWithTimeout('https://query1.finance.yahoo.com/v8/finance/chart/TRY=X?interval=1d&range=1d');
-       const data = await res.json();
-       return data.chart.result[0].meta.regularMarketPrice;
-   } catch(e) { return 32.5; }
+       if(trData && trData['USD'] && trData['USD'].Selling) return parseFloat(trData['USD'].Selling.replace('.', '').replace(',', '.'));
+   } catch (e) {} return 32.5;
 }
 
 async function acikApiVeriCek(tip, kod, usdRate) {
    try {
       if (tip === 'altin') {
          const trData = await getTruncgilData();
-         if(trData && trData['gram-altin'] && trData['gram-altin'].Selling) {
-             return parseFloat(trData['gram-altin'].Selling.replace('.', '').replace(',', '.'));
-         }
+         if(trData && trData['gram-altin'] && trData['gram-altin'].Selling) return parseFloat(trData['gram-altin'].Selling.replace('.', '').replace(',', '.'));
          return 0;
       }
       else if (tip === 'bist' || tip === 'abd') {
-         const symbol = tip === 'bist' ? `${kod}.IS` : kod;
-         const urls = [
-            `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
-            `https://corsproxy.io/?${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?interval=1d&range=1d')}`,
-            `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?interval=1d&range=1d')}`
-         ];
-         for(let u of urls) {
-             try {
-                 let r = await fetchWithTimeout(u, { cache: 'no-store' });
-                 if (r.ok) {
-                     let d = await r.json(); let price = d.chart.result[0].meta.regularMarketPrice;
-                     if (price > 0) return tip === 'abd' ? price * usdRate : price;
-                 }
-             } catch(e) {}
+         // Google Finance üzerinden önce varsayılan borsalara (IST/NASDAQ) bakar
+         let gfExchange = tip === 'bist' ? 'IST' : 'NASDAQ';
+         let p = await fetchGoogleFinance(kod, gfExchange);
+         if (p > 0) return tip === 'abd' ? p * usdRate : p;
+         
+         // ABD hissesi NASDAQ'ta yoksa NYSE'ye bakar
+         if (tip === 'abd') {
+             p = await fetchGoogleFinance(kod, 'NYSE');
+             if (p > 0) return p * usdRate;
          }
          return 0;
       }
       else if (tip === 'tefas') {
-         const tefasUrl = `https://www.tefas.gov.tr/FonAnaliz.aspx?FonKod=${kod}`;
-         const proxies = [
-            `https://api.allorigins.win/get?url=${encodeURIComponent(tefasUrl)}`,
-            `https://corsproxy.io/?${encodeURIComponent(tefasUrl)}`
-         ];
-         for(let p of proxies) {
-             try {
-                 let r = await fetchWithTimeout(p, { cache: 'no-store' }, 5000);
-                 if(r.ok) {
-                     let html = await r.text();
-                     if(p.includes('allorigins')) { let j = JSON.parse(html); html = j.contents; }
-                     // En Gelişmiş TEFAS Okuyucu Algoritması
-                     let m = html.match(/(?:Fiyat|Son Fiyat).*?<\/span>\s*<span[^>]*>([\d.,]+)<\/span>/is);
-                     if(!m) m = html.match(/>(\d{1,3}(?:\.\d{3})*,\d{6})</); // örn. >1.234,123456< veya >12,123456<
-                     if(m) {
-                         let valStr = m[1].replace(/\./g, '').replace(',', '.');
-                         return parseFloat(valStr);
-                     }
-                 }
-             } catch(e) {}
+         // 1. TEFAS Orijinal Site
+         let html = await fetchHtmlWithProxies(`https://www.tefas.gov.tr/FonAnaliz.aspx?FonKod=${kod}`);
+         if(html) {
+             let m = html.match(/Fiyat.*?<\/span>\s*<span[^>]*>([\d.,]+)<\/span>/is);
+             if(!m) m = html.match(/>(\d{1,3}(?:\.\d{3})*,\d{6})</);
+             if(m) return parseFloat(m[1].split('.').join('').replace(',', '.'));
+         }
+         // 2. TEFAS Çökerse Fintables Yedeği
+         html = await fetchHtmlWithProxies(`https://fintables.com/fonlar/${kod}`);
+         if(html) {
+             let m = html.match(/Fiyat.*?<div[^>]*>([\d.,]+)<\/div>/is);
+             if(!m) m = html.match(/>(\d+,\d{4,6})</);
+             if(m) return parseFloat(m[1].split('.').join('').replace(',', '.'));
          }
          return 0;
       }
@@ -1312,27 +1319,32 @@ async function acikApiVeriCek(tip, kod, usdRate) {
 
 async function portfoyGuncelle() {
    if(veri.portfoy.length === 0) return;
-   Haptic.medium(); toast('Canlı fiyatlar çekiliyor...');
+   Haptic.medium(); toast('Canlı fiyatlar taranıyor...');
    const loader = document.getElementById('vLoader'); const loaderBar = document.getElementById('vLoaderBar');
-   loader.style.display = 'block'; loaderBar.style.width = '10%';
+   loader.style.display = 'block'; loaderBar.style.width = '5%'; loaderBar.style.background = 'var(--blue)';
    trDataCache = null; 
    
-   try {
-       let usdRate = 32.5;
-       if (veri.portfoy.some(v => v.tip === 'abd')) { usdRate = await getUsdRate(); }
+   let usdRate = 32.5;
+   if (veri.portfoy.some(v => v.tip === 'abd')) usdRate = await getUsdRate();
 
-       const totalItems = veri.portfoy.length; let completed = 0;
-       for(let i=0; i<veri.portfoy.length; i++) {
-          let v = veri.portfoy[i]; let yeniFiyat = await acikApiVeriCek(v.tip, v.kod, usdRate);
-          if(yeniFiyat > 0) { v.sonFiyat = yeniFiyat; }
-          completed++; loaderBar.style.width = (10 + (completed / totalItems) * 90) + '%';
-       }
-       portfoyRender(); await fbKaydet(); Haptic.success(); toast('Portföy Güncellendi!');
-   } catch (error) {
-       Haptic.error(); toast('Bazı fiyatlar çekilemedi');
-   } finally {
-       setTimeout(() => { loader.style.display = 'none'; loaderBar.style.width = '0%'; }, 500);
+   const totalItems = veri.portfoy.length; 
+   let completed = 0; let failCount = 0;
+
+   for(let i=0; i<veri.portfoy.length; i++) {
+      let v = veri.portfoy[i]; let yeniFiyat = await acikApiVeriCek(v.tip, v.kod, usdRate);
+      if(yeniFiyat > 0) { v.sonFiyat = yeniFiyat; } else { failCount++; }
+      completed++; loaderBar.style.width = (5 + (completed / totalItems) * 95) + '%';
    }
+
+   portfoyRender(); await fbKaydet(); 
+   
+   if (failCount > 0) {
+       Haptic.error(); loaderBar.style.background = 'var(--red)'; toast(`${failCount} varlık güncellenemedi!`);
+   } else {
+       Haptic.success(); toast('Tüm portföy güncellendi!');
+   }
+   
+   setTimeout(() => { loader.style.display = 'none'; }, 1500);
 }
 
 function fTL(n){return'₺'+(Math.round(n)||0).toLocaleString('tr-TR');}
