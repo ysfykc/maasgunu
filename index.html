@@ -250,7 +250,6 @@ main{padding-top:calc(var(--top) + 46px);padding-bottom:calc(var(--nav) + 120px)
 .action-btn.gider-btn { background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74)); }
 
 .fab-container.hide-fab { display: none !important; }
-
 body:not(.app-ready) .fab-container, body.login-open .fab-container { display: none !important; }
 body.app-ready:not(.login-open) .fab-container { display: flex; }
 
@@ -263,7 +262,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .mhandle{width:36px;height:4px;background:var(--bg3);border-radius:var(--rp);margin:0 auto 18px}
 .mttl{font-family:var(--fd);font-size:22px;font-weight:900;letter-spacing:-.03em;color:var(--txt);margin-bottom:12px}
 
-/* YENİ: Hızlı Çipler */
 .quick-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:12px;scrollbar-width:none;}
 .quick-chips::-webkit-scrollbar{display:none;}
 .q-chip{background:var(--bg2);color:var(--txt2);font-size:12px;font-weight:700;padding:8px 14px;border-radius:999px;border:none;white-space:nowrap;transition:transform 0.15s;cursor:pointer;}
@@ -606,7 +604,10 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
   <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v3.0 Pro</div>
   <div style="font-size:12px; color:var(--txt3);">Tasarım & Geliştirme: ysfykc</div>
-  <button class="exit-btn red" onclick="silinenleriTemizle()" style="margin-top:24px; font-size:13px; padding:12px;">🗑 Çöp Kutusunu Boşalt</button>
+  
+  <button class="sbtn" style="background:var(--blue); margin-top:16px; font-size:13px; padding:12px;" onclick="verileriDisaAktar()">📥 Verilerimi İndir (Excel/CSV)</button>
+  
+  <button class="exit-btn red" onclick="silinenleriTemizle()" style="margin-top:10px; font-size:13px; padding:12px;">🗑 Çöp Kutusunu Boşalt</button>
 </div>
 
 </div>
@@ -1071,6 +1072,59 @@ async function silinenleriTemizle() {
       document.getElementById('mAyarlar').classList.remove('on');
       render(); await fbKaydet(); toast('🗑 Çöp kutusu boşaltıldı');
    }
+}
+
+// YENİ: VERİ İNDİRME FONKSİYONU
+function verileriDisaAktar() {
+    Haptic.light();
+    let csv = '\uFEFF'; // Türkçe karakterler için Excel BOM
+    csv += "Kayıt Tipi,Dönem,Kategori,Açıklama,Tutar (TL),Ekstra Bilgi\n";
+    
+    // Aylar (Gelir/Gider)
+    const aylar = Object.keys(veri.aylar).sort((a,b) => b.localeCompare(a));
+    aylar.forEach(ay => {
+        const data = veri.aylar[ay];
+        if (data.gelirler) {
+            data.gelirler.forEach(g => {
+                let ad = (g.ad || '').replace(/"/g, '""');
+                let kat = (g.kategori || '').replace(/"/g, '""');
+                csv += `"Gelir","${ay}","${kat}","${ad}","${g.tutar}",""\n`;
+            });
+        }
+        if (data.giderler) {
+            data.giderler.forEach(g => {
+                let ad = (g.ad || '').replace(/"/g, '""');
+                let kat = (g.kategori || '').replace(/"/g, '""');
+                let yatirim = g.yatirim ? " (Yatırım)" : "";
+                csv += `"Gider","${ay}","${kat}","${ad}","${g.tutar}","${yatirim}"\n`;
+            });
+        }
+    });
+
+    // Portföy
+    if (veri.portfoy && veri.portfoy.length > 0) {
+        veri.portfoy.forEach(p => {
+            let kod = (p.kod || '').replace(/"/g, '""');
+            let tip = (p.tip || '').replace(/"/g, '""');
+            let guncelTutar = p.miktar * (p.sonFiyat || 0);
+            if (isNaN(guncelTutar)) guncelTutar = 0;
+            if (p.tip === 'bes') guncelTutar = p.miktar; // BES uses miktar as total balance
+            
+            csv += `"Portföy","Güncel","${tip.toUpperCase()}","${kod}","${guncelTutar}","Miktar/Bakiye: ${p.miktar}, Maliyet: ${p.maliyet||0}"\n`;
+        });
+    }
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "MaasGunu_Verileri.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast("Veriler cihazınıza indirildi 📥");
+    Haptic.success();
 }
 
 function kalemHtml(k,tip,idx){
@@ -1711,6 +1765,7 @@ function aiPortfoyOneriUret() {
 
     let oneriler = [];
     
+    // Çeşitlilik Analizi
     let activeTypes = Object.values(tipToplam).filter(t => t > 0).length;
     if(activeTypes === 1) {
         oneriler.push("Tüm yumurtaları aynı sepete koymuşsunuz. Portföyünüzü farklı varlık sınıflarına (Örn: Altın, Döviz, BIST, ABD) dağıtarak riski azaltmayı düşünebilirsiniz.");
@@ -1718,6 +1773,7 @@ function aiPortfoyOneriUret() {
         oneriler.push("Harika bir çeşitlendirme yapmışsınız! Farklı varlık sınıflarına yatırım yapmak, piyasadaki dalgalanmalara karşı sizi koruyan en güçlü kalkandır.");
     }
 
+    // Altın Analizi
     let altinOran = total > 0 ? (tipToplam['altin'] / total) * 100 : 0;
     if(altinOran > 50) {
         oneriler.push(`Portföyünüzün %${altinOran.toFixed(0)}'si Altın'dan oluşuyor. Altın mükemmel bir güvenli limandır ancak uzun vadeli büyüme potansiyeli hisse senetleri veya fonlar kadar yüksek olmayabilir.`);
@@ -1725,22 +1781,26 @@ function aiPortfoyOneriUret() {
         oneriler.push("Portföyünüzde hiç altın bulunmuyor. Global kriz dönemlerinde koruma sağlaması için %10-15 civarında altın (fiziksel veya fon) bulundurmak iyi bir strateji olabilir.");
     }
 
+    // ABD Hisseleri Analizi
     let abdOran = total > 0 ? (tipToplam['abd'] / total) * 100 : 0;
     if(abdOran > 0) {
         oneriler.push("ABD hisseleri veya ETF'leri ile döviz bazlı getiri hedeflemeniz çok mantıklı. Uzun vadede enflasyona karşı kur koruması sağlar.");
     }
 
+    // BES Analizi
     if(tipToplam['bes'] === 0) {
         oneriler.push("Geleceğinizi güvence altına almak ve <strong>%30 Devlet Katkısından</strong> faydalanmak için Bireysel Emeklilik (BES) hesabı açmayı inceleyebilirsiniz.");
     } else {
         oneriler.push("BES ile geleceğinize yatırım yapmanız mükemmel bir adım. Devlet katkısı limitlerini her yıl maksimize etmeye çalışarak bileşik getiriden faydalanın.");
     }
 
+    // BIST Analizi
     let bistOran = total > 0 ? (tipToplam['bist'] / total) * 100 : 0;
     if(bistOran > 40) {
         oneriler.push(`Borsa İstanbul (BIST) ağırlığınız (%${bistOran.toFixed(0)}) oldukça yüksek. Yerel piyasa dalgalanmalarına karşı global (Yabancı Hisse/TEFAS Fonu/Döviz) tarafa da ağırlık verebilirsiniz.`);
     }
     
+    // Döviz Analizi
     let dovizOran = total > 0 ? (tipToplam['doviz'] / total) * 100 : 0;
     if(dovizOran > 30) {
         oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; bunu Eurobond (Yabancı Fon) veya ABD hisselerinde değerlendirmeyi düşünebilirsiniz.`);
