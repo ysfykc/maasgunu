@@ -543,7 +543,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
    <button class="q-chip" onclick="hizliDoldur('🎁 Ek Gelir/Prim', 'Ek Gelir', event)">🎁 Prim</button>
 </div>
 
-<div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" id="eAd" placeholder="örn. Maaş, Kira, Netflix…" type="text"/></div>
+<div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" id="eAd" placeholder="örn. Kredi Kartı, Kira…" type="text"/></div>
 <div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="eTutar" min="0" placeholder="0" step="any" type="number"/></div></div>
 
 <div class="igrp" id="taksitRow"><label class="ilbl">Taksit <span style="color:var(--txt3);font-weight:400">(Ay)</span></label><input class="inp" id="eTaksit" type="number" min="1" value="1" placeholder="1"/></div>
@@ -632,7 +632,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div class="igrp" id="vKodRow">
-  <label class="ilbl" id="vKodLbl">Hisse / Fon Kodu</label>
+  <label class="ilbl" id="vKodLbl">Hisse / Fon Kodu (Manuel Güncellenecek)</label>
   <input class="inp" id="vKod" placeholder="Örn: YAS veya THYAO" type="text" style="text-transform:uppercase"/>
 </div>
 
@@ -1077,7 +1077,8 @@ async function silinenleriTemizle() {
 
 function verileriDisaAktar() {
     Haptic.light();
-    let csv = "Kayıt Tipi;Dönem;Kategori;Açıklama;Tutar (TL);Ekstra Bilgi\n";
+    let csv = '\uFEFF'; 
+    csv += "Kayıt Tipi;Dönem;Kategori;Açıklama;Tutar (TL);Ekstra Bilgi\n";
     
     const aylar = Object.keys(veri.aylar).sort((a,b) => b.localeCompare(a));
     aylar.forEach(ay => {
@@ -1111,11 +1112,7 @@ function verileriDisaAktar() {
         });
     }
 
-    const encoder = new TextEncoder();
-    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-    const csvBytes = encoder.encode(csv);
-    
-    const blob = new Blob([bom, csvBytes], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -1398,6 +1395,7 @@ function navSec(i){
   if(i===1) gecmisRender(); 
   if(i===2) {
      portfoyRender();
+     // Arka planda kurları sessizce güncelle
      kurlariGuncelle().then(() => portfoyRender());
   }
 }
@@ -1483,7 +1481,14 @@ function vTipKontrol() {
       document.getElementById('vMiktarLbl').textContent = 'Güncel Toplam Bakiye (₺)';
    } else {
       document.getElementById('vKodRow').style.display = 'block';
-      document.getElementById('vKodLbl').textContent = 'Hisse / Fon Kodu';
+      
+      // YENİ TEFAS UYARISI
+      if(tip === 'tefas') {
+          document.getElementById('vKodLbl').textContent = 'Fon Kodu (Manuel Güncellenecek)';
+      } else {
+          document.getElementById('vKodLbl').textContent = 'Hisse / Fon Kodu';
+      }
+      
       document.getElementById('vMiktarLbl').textContent = 'Miktar (Adet / Lot)';
       document.getElementById('vKod').placeholder = tip === 'abd' ? 'Örn: AAPL, TSLA, QQQ' : 'Örn: YAS veya THYAO';
    }
@@ -1503,9 +1508,10 @@ async function varlikKaydet() {
    if(miktar <= 0 || !kod) { Haptic.error(); toast('Miktar ve Kod zorunludur'); return; }
 
    let isBes = (tip === 'bes');
-   let mf = isBes ? true : false;
-   let sf = isBes ? 1 : 0; 
+   let isTefas = (tip === 'tefas');
+   let mf = (isBes || isTefas) ? true : false;
    let cost = isBes ? miktar : maliyet;
+   let sf = isBes ? 1 : (isTefas ? cost : 0);
 
    let mevcut = veri.portfoy.find(x => x.tip === tip && x.kod === kod);
    if(mevcut && !isBes) {
@@ -1522,7 +1528,7 @@ async function varlikKaydet() {
    
    document.getElementById('mPortfoy').classList.remove('on');
    await fbKaydet(); Haptic.success(); toast('Varlık Eklendi'); 
-   if(!isBes) portfoyGuncelle(); else portfoyRender();
+   if(!isBes && !isTefas) portfoyGuncelle(); else portfoyRender();
 }
 
 function portfoyRender() {
@@ -1692,10 +1698,16 @@ function varlikDuzenleAc(id) {
     document.getElementById('vdMaliyet').value = v.maliyet || 0;
     
     if(v.tip === 'bes') {
-       document.getElementById('vdOtoFiyatToggle').parentElement.style.display = 'none';
+       document.getElementById('vdOtoFiyatToggleWrap').style.display = 'none';
        document.getElementById('vdFiyatRow').style.display = 'none';
+    } else if (v.tip === 'tefas') {
+       document.getElementById('vdOtoFiyatToggleWrap').style.display = 'none';
+       vdManuelFiyatAcik = true;
+       v.manuelFiyat = true;
+       document.getElementById('vdFiyatRow').style.display = 'block';
+       document.getElementById('vdFiyat').value = v.sonFiyat || 0;
     } else {
-       document.getElementById('vdOtoFiyatToggle').parentElement.style.display = 'flex';
+       document.getElementById('vdOtoFiyatToggleWrap').style.display = 'flex';
        vdManuelFiyatAcik = !!v.manuelFiyat;
        document.getElementById('vdOtoFiyatToggle').className = 'toggle' + (vdManuelFiyatAcik ? ' on' : '');
        document.getElementById('vdFiyatRow').style.display = vdManuelFiyatAcik ? 'block' : 'none';
@@ -1877,25 +1889,6 @@ async function acikApiVeriCek(tip, kod, usdRate) {
          }
          return 0;
       }
-      else if (tip === 'tefas') {
-         const tefasSources = [ `https://www.tefas.gov.tr/FonAnaliz.aspx?FonKod=${kod}`, `https://yatirimci.akbank.com.tr/yatirimcifonu/fon-detay.aspx?fonkod=${kod}`, `https://www.isyatirim.com.tr/tr-tr/analiz/fon/Sayfalar/fon-detay.aspx?fonkod=${kod}` ];
-         const proxies = [ `https://api.allorigins.win/get?url=`, `https://api.codetabs.com/v1/proxy?quest=` ];
-         for(let src of tefasSources) {
-             for(let proxy of proxies) {
-                 try {
-                     let url = proxy + encodeURIComponent(src); let r = await fetchWithTimeout(url, { cache: 'no-store' }, 3500);
-                     if(r.ok) {
-                         let text = await r.text(); let html = proxy.includes('allorigins') ? JSON.parse(text).contents : text;
-                         if (!html || html.includes('Just a moment')) continue;
-                         let m = html.match(/(?:Fiyat|Değer|Fon Fiyatı).*?(\d{1,3}(?:\.\d{3})*,\d{4,6})/is);
-                         if(!m) m = html.match(/(\d{1,3}(?:\.\d{3})*,\d{4,6})/); 
-                         if(m) return parseFloat(m[1].replace(/\./g, '').replace(',', '.'));
-                     }
-                 } catch(e) {}
-             }
-         }
-         return 0;
-      }
    } catch (e) { return 0; }
 }
 
@@ -1913,7 +1906,8 @@ async function portfoyGuncelle() {
        const totalItems = veri.portfoy.length; let completed = 0; let failCount = 0;
        for(let i=0; i<veri.portfoy.length; i++) {
           let v = veri.portfoy[i]; 
-          if(v.manuelFiyat || v.tip === 'bes') { 
+          if(v.tip === 'tefas') v.manuelFiyat = true; 
+          if(v.manuelFiyat || v.tip === 'bes' || v.tip === 'tefas') { 
               completed++; loaderBar.style.width = (5 + (completed / totalItems) * 95) + '%'; 
               continue; 
           }
@@ -1924,7 +1918,7 @@ async function portfoyGuncelle() {
        }
 
        portfoyRender(); await fbKaydet(); 
-       if (failCount > 0) { Haptic.error(); loaderBar.style.background = 'var(--red)'; toast(`${failCount} varlık güncellenemedi! (Manuel Fiyatı Açın)`); } 
+       if (failCount > 0) { Haptic.error(); loaderBar.style.background = 'var(--red)'; toast(`${failCount} varlık güncellenemedi!`); } 
        else { Haptic.success(); toast('Tüm portföy başarıyla çekildi!'); }
    } catch (error) { Haptic.error(); toast('Bağlantı sorunu oluştu'); } 
    finally { setTimeout(() => { loader.style.display = 'none'; loaderBar.style.width = '0%'; }, 1500); }
