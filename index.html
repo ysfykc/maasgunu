@@ -822,7 +822,26 @@ async function kurlariGuncelle() {
        }
        
        const d = await r.json(); 
-       const s = k => parseFloat((d[k]?.Selling || "0").toString().replace('.', '').replace(',', '.'));
+       
+       // AKILLI SAYI ÇEVİRİCİ: API'den gelen karmaşık sayı formatlarını hatasız çözer
+       const s = (k) => {
+           let val = d[k]?.Selling;
+           if (!val) return 0;
+           if (typeof val === 'number') return val;
+           
+           val = val.toString().trim();
+           
+           // Eğer hem nokta hem virgül varsa (örn: "2.450,55") -> Noktayı sil, virgülü nokta yap
+           if (val.includes('.') && val.includes(',')) {
+               return parseFloat(val.replace(/\./g, '').replace(',', '.'));
+           }
+           // Sadece virgül varsa (örn: "33,50") -> Virgülü nokta yap
+           if (val.includes(',') && !val.includes('.')) {
+               return parseFloat(val.replace(',', '.'));
+           }
+           // Sadece nokta varsa veya tam sayıysa (örn: "33.50" veya "2400") -> Olduğu gibi çevir
+           return parseFloat(val);
+       };
        
        const g = s('GRA');
        if(g > 0) {
@@ -842,6 +861,7 @@ async function kurlariGuncelle() {
        }
    } catch (e) { console.warn("Kur Hatası", e); }
 }
+
 
 /* ══ MAAŞ GÜNÜ TEMEL FONKSİYONLARI ══ */
 function ayEkleStr(ay, d){ let [y, m] = ay.split('-').map(Number); m += d; while(m > 12) { m -= 12; y++; } while(m < 1) { m += 12; y--; } return `${y}-${String(m).padStart(2, '0')}`; }
