@@ -82,7 +82,7 @@ input,select{font-family:var(--fd);font-size:inherit; color:var(--txt);}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 input[type=number]{-moz-appearance:textfield}
 
-/* TEMEL BİLEŞENLER (LOGIN, TOPBAR, NAV, FAB) */
+/* TEMEL BİLEŞENLER */
 #login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 0 32px 14vh; }
 .login-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; z-index: -1; }
 .login-badge { position: absolute; top: 24px; right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
@@ -227,7 +227,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .kalem-check.on{background:var(--green);border-color:var(--green)}
 .kalem-check.on::after{content:'✓';font-size:13px;color:#fff;font-weight:800}
 
-/* YENİ KALEM İNFO YAPISI: Orantısız metinler için revize edildi */
 .kalem-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px;}
 .kalem-ad{font-size:15px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1;letter-spacing:-.01em;}
 .kalem-ad.done{text-decoration:line-through;color:var(--txt3)}
@@ -615,6 +614,47 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <button class="cancel-btn" onclick="document.getElementById('mPortfoy').classList.remove('on')">İptal</button>
 </div></div>
 
+<div class="ov" id="mPortfoyDuzenle" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+<div class="mhandle"></div>
+<div class="mttl" id="vdTtl">Varlık Düzenle</div>
+
+<div class="igrp">
+  <label class="ilbl" id="vdMiktarLbl">Miktar</label>
+  <input class="inp" id="vdMiktar" min="0" step="any" type="number"/>
+</div>
+
+<div class="igrp" id="vdMaliyetRow">
+  <label class="ilbl">Ortalama Maliyet (Birim Fiyat)</label>
+  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vdMaliyet" min="0" step="any" type="number"/></div>
+</div>
+
+<div class="toggle-row" onclick="toggleVdManuelFiyat()" style="cursor:pointer" id="vdOtoFiyatToggleWrap">
+  <div><div class="toggle-lbl">✍️ Fiyatı Manuel Gir</div><div class="toggle-sub">Otomatik güncellemeyi durdurur</div></div>
+  <div class="toggle" id="vdOtoFiyatToggle"></div>
+</div>
+
+<div class="igrp" id="vdFiyatRow" style="display:none;">
+  <label class="ilbl">Sabit Fiyatı Girin</label>
+  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vdFiyat" min="0" step="any" type="number"/></div>
+</div>
+
+<button class="sbtn a" onclick="varlikDuzenleKaydet()">✓ Değişiklikleri Kaydet</button>
+<button class="exit-btn red" onclick="varlikSilButton()" style="margin-top:8px;">🗑 Varlığı Sil</button>
+<button class="cancel-btn" onclick="document.getElementById('mPortfoyDuzenle').classList.remove('on')">İptal</button>
+</div>
+</div>
+
+<div class="ov" id="mAiPortfoy" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+<div class="mhandle"></div>
+<div class="mttl">🤖 Portföy Analizi</div>
+<div id="aiPortfoyMetin" style="font-size:14px; color:var(--txt2); line-height:1.6; margin-bottom:16px; background:var(--bg2); padding:16px; border-radius:16px;"></div>
+<button class="sbtn p" onclick="aiPortfoyOneriUret()">🔄 Başka Bir Tavsiye Ver</button>
+<button class="cancel-btn" onclick="document.getElementById('mAiPortfoy').classList.remove('on')">Kapat</button>
+</div>
+</div>
+
 <div class="ov" id="mBorc" onclick="if(event.target===this)this.classList.remove('on')">
 <div class="modal">
 <div class="mhandle"></div>
@@ -687,7 +727,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
   <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Süper App</div>
-  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.1 Pro</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.2 Pro</div>
   <div style="font-size:12px; color:var(--txt3);">Maaş Günü & Borcum Birleşimi</div>
 </div>
 </div>
@@ -823,23 +863,13 @@ async function kurlariGuncelle() {
        
        const d = await r.json(); 
        
-       // AKILLI SAYI ÇEVİRİCİ: API'den gelen karmaşık sayı formatlarını hatasız çözer
        const s = (k) => {
            let val = d[k]?.Selling;
            if (!val) return 0;
            if (typeof val === 'number') return val;
-           
            val = val.toString().trim();
-           
-           // Eğer hem nokta hem virgül varsa (örn: "2.450,55") -> Noktayı sil, virgülü nokta yap
-           if (val.includes('.') && val.includes(',')) {
-               return parseFloat(val.replace(/\./g, '').replace(',', '.'));
-           }
-           // Sadece virgül varsa (örn: "33,50") -> Virgülü nokta yap
-           if (val.includes(',') && !val.includes('.')) {
-               return parseFloat(val.replace(',', '.'));
-           }
-           // Sadece nokta varsa veya tam sayıysa (örn: "33.50" veya "2400") -> Olduğu gibi çevir
+           if (val.includes('.') && val.includes(',')) { return parseFloat(val.replace(/\./g, '').replace(',', '.')); }
+           if (val.includes(',') && !val.includes('.')) { return parseFloat(val.replace(',', '.')); }
            return parseFloat(val);
        };
        
@@ -861,7 +891,6 @@ async function kurlariGuncelle() {
        }
    } catch (e) { console.warn("Kur Hatası", e); }
 }
-
 
 /* ══ MAAŞ GÜNÜ TEMEL FONKSİYONLARI ══ */
 function ayEkleStr(ay, d){ let [y, m] = ay.split('-').map(Number); m += d; while(m > 12) { m -= 12; y++; } while(m < 1) { m += 12; y--; } return `${y}-${String(m).padStart(2, '0')}`; }
@@ -926,7 +955,7 @@ function navSec(i){
   window.scrollTo({top:0,behavior:'smooth'}); 
   
   if(i===1) gecmisRender(); 
-  if(i===2) { portfoyRender(); portfoyGuncelle(); }
+  if(i===2) { portfoyRender(); }
   if(i===3) { renderBorcum(); kurlariGuncelle().then(() => renderBorcum()); }
 }
 function ayDegis(d){ Haptic.light(); aktifAy=ayEkleStr(aktifAy, d); tabIdx=0; document.querySelectorAll('.tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===0)); render(); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -1110,6 +1139,7 @@ function vTipKontrol() {
    else if (tip === 'bes') { document.getElementById('vKodRow').style.display = 'block'; document.getElementById('vMaliyetRow').style.display = 'none'; document.getElementById('vKodLbl').textContent = 'BES Şirketi (İsteğe Bağlı)'; document.getElementById('vMiktarLbl').textContent = 'Güncel Toplam Bakiye (₺)'; } 
    else { document.getElementById('vKodRow').style.display = 'block'; document.getElementById('vKodLbl').textContent = 'Hisse / Fon Kodu'; document.getElementById('vMiktarLbl').textContent = 'Miktar (Adet/Lot)'; }
 }
+
 async function varlikKaydet() {
    const tip = document.getElementById('vTip').value; const miktar = parseFloat(document.getElementById('vMiktar').value) || 0; const maliyet = parseFloat(document.getElementById('vMaliyet').value) || 0; let kod = "";
    if(tip === 'altin') { kod = document.getElementById('vAltinTip').value; } else if(tip === 'doviz') { kod = document.getElementById('vDovizTip').value; } else if (tip === 'bes') { kod = document.getElementById('vKod').value.trim() || 'BES Birikimi'; } else { kod = document.getElementById('vKod').value.trim().toUpperCase(); }
@@ -1143,6 +1173,11 @@ function portfoyRender() {
            html += `<div class="p-grp-ttl">${g.ad}</div>`;
            g.varliklar.forEach(v => {
                let title = v.tip === 'altin' ? (altinIsimMap[v.kod] || v.kod) : v.kod;
+               if(v.tip === 'doviz') {
+                   const dIsim = {'usd':'Amerikan Doları (USD)', 'eur':'Euro (EUR)', 'gbp':'İngiliz Sterlini (GBP)'};
+                   title = dIsim[v.kod.toLowerCase()] || v.kod;
+               }
+               
                let plHtml = '';
                if (v.tip !== 'bes' && v.maliyet > 0 && v.vTotal > 0) { let pl = v.vTotal - v.vCostTotal; let plPct = (pl / v.vCostTotal) * 100; plHtml = `<span class="${pl >= 0 ? 'pl-pos' : 'pl-neg'}">${pl > 0 ? '+' : ''}₺${Math.abs(pl).toLocaleString('tr-TR', {maximumFractionDigits:0})} (${pl > 0 ? '+' : ''}%${plPct.toFixed(1)})</span>`; }
                html += `<div class="portfoy-card" onclick="varlikDuzenleAc('${v.id}')"><div class="portfoy-left"><div class="portfoy-ad">${escHtml(title)}</div><div class="portfoy-meta"><span class="p-badge ${g.class}">${v.tip.toUpperCase()}</span><span>${v.tip==='bes'?'Bakiye':'Adet'}: ${v.miktar}</span></div></div><div class="portfoy-right"><div class="portfoy-val">${fTL(v.vTotal)}</div><div class="portfoy-price">${plHtml}</div></div><div class="p-bg-icon">${g.icon}</div></div>`;
@@ -1155,6 +1190,150 @@ function portfoyRender() {
        portfoyChartInst = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(chartData), datasets: [{ data: Object.values(chartData), backgroundColor: ['#0a84ff','#32d74b','#bf5af2','#ff9f0a','#32ade6','#ff3b30'], borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right' } } } });
    }
 }
+
+// ----------------------------------------------------
+// DÜZELTİLEN FONKSİYONLAR: PORTFÖY DÜZENLEME & AI
+// ----------------------------------------------------
+
+function varlikDuzenleAc(id) {
+    Haptic.light();
+    let v = veri.portfoy.find(x => x.id === id);
+    if(!v) return;
+    aktifVarlikId = id;
+    
+    let title = v.kod;
+    if(v.tip === 'altin') title = altinIsimMap[v.kod] || v.kod;
+    if(v.tip === 'doviz') {
+       const dIsim = {'usd':'Amerikan Doları (USD)', 'eur':'Euro (EUR)', 'gbp':'İngiliz Sterlini (GBP)'};
+       title = dIsim[v.kod.toLowerCase()] || v.kod;
+    }
+
+    document.getElementById('vdTtl').textContent = '💼 ' + title;
+    document.getElementById('vdMiktar').value = v.miktar || 0;
+    document.getElementById('vdMaliyet').value = v.maliyet || 0;
+    
+    if(v.tip === 'bes') {
+       document.getElementById('vdOtoFiyatToggleWrap').style.display = 'none';
+       document.getElementById('vdFiyatRow').style.display = 'none';
+    } else if (v.tip === 'tefas') {
+       document.getElementById('vdOtoFiyatToggleWrap').style.display = 'none';
+       vdManuelFiyatAcik = true;
+       v.manuelFiyat = true;
+       document.getElementById('vdFiyatRow').style.display = 'block';
+       document.getElementById('vdFiyat').value = v.sonFiyat || 0;
+    } else {
+       document.getElementById('vdOtoFiyatToggleWrap').style.display = 'flex';
+       vdManuelFiyatAcik = !!v.manuelFiyat;
+       document.getElementById('vdOtoFiyatToggle').className = 'toggle' + (vdManuelFiyatAcik ? ' on' : '');
+       document.getElementById('vdFiyatRow').style.display = vdManuelFiyatAcik ? 'block' : 'none';
+       document.getElementById('vdFiyat').value = v.sonFiyat || 0;
+    }
+
+    document.getElementById('mPortfoyDuzenle').classList.add('on');
+}
+
+function toggleVdManuelFiyat() {
+    Haptic.light();
+    vdManuelFiyatAcik = !vdManuelFiyatAcik;
+    document.getElementById('vdOtoFiyatToggle').classList.toggle('on', vdManuelFiyatAcik);
+    document.getElementById('vdFiyatRow').style.display = vdManuelFiyatAcik ? 'block' : 'none';
+}
+
+async function varlikDuzenleKaydet() {
+    let v = veri.portfoy.find(x => x.id === aktifVarlikId);
+    if(!v) return;
+    
+    let miktar = parseFloat(document.getElementById('vdMiktar').value);
+    if(isNaN(miktar) || miktar <= 0) { Haptic.error(); toast('Geçerli bir miktar girin'); return; }
+    
+    v.miktar = miktar;
+    v.maliyet = parseFloat(document.getElementById('vdMaliyet').value) || 0;
+    
+    if(v.tip !== 'bes') {
+        v.manuelFiyat = vdManuelFiyatAcik;
+        if(vdManuelFiyatAcik) {
+            v.sonFiyat = parseFloat(document.getElementById('vdFiyat').value) || 0;
+        }
+    } else {
+        v.sonFiyat = 1;
+        v.maliyet = miktar;
+    }
+
+    document.getElementById('mPortfoyDuzenle').classList.remove('on');
+    portfoyRender(); await fbKaydet(); Haptic.success(); toast('Varlık güncellendi');
+}
+
+async function varlikSilButton() {
+    if(confirm('Bu varlığı portföyden silmek istediğinize emin misiniz?')) { 
+        veri.portfoy = veri.portfoy.filter(x => x.id !== aktifVarlikId);
+        document.getElementById('mPortfoyDuzenle').classList.remove('on');
+        portfoyRender(); await fbKaydet(); Haptic.heavy(); toast('Varlık silindi');
+    }
+}
+
+function aiPortfoyOneriUret() {
+    Haptic.light();
+    const p = veri.portfoy;
+    if(p.length === 0) {
+        document.getElementById('aiPortfoyMetin').innerHTML = "Henüz portföyünüzde bir varlık bulunmuyor. Yatırım yolculuğuna başlamak için sağ üstteki <strong>+ Ekle</strong> butonunu kullanabilirsiniz. İlk adım her zaman en önemlisidir!";
+        document.getElementById('mAiPortfoy').classList.add('on');
+        return;
+    }
+
+    let total = 0;
+    let tipToplam = { 'bist':0, 'abd':0, 'tefas':0, 'altin':0, 'bes':0, 'doviz':0 };
+    p.forEach(v => {
+        let vT = v.miktar * (v.sonFiyat||0);
+        if(!isNaN(vT)) {
+            total += vT;
+            tipToplam[v.tip] = (tipToplam[v.tip]||0) + vT;
+        }
+    });
+
+    let oneriler = [];
+    
+    let activeTypes = Object.values(tipToplam).filter(t => t > 0).length;
+    if(activeTypes === 1) {
+        oneriler.push("Tüm yumurtaları aynı sepete koymuşsunuz. Portföyünüzü farklı varlık sınıflarına (Örn: Altın, Döviz, BIST, ABD) dağıtarak riski azaltmayı düşünebilirsiniz.");
+    } else if(activeTypes >= 3) {
+        oneriler.push("Harika bir çeşitlendirme yapmışsınız! Farklı varlık sınıflarına yatırım yapmak, piyasadaki dalgalanmalara karşı sizi koruyan en güçlü kalkandır.");
+    }
+
+    let altinOran = total > 0 ? (tipToplam['altin'] / total) * 100 : 0;
+    if(altinOran > 50) {
+        oneriler.push(`Portföyünüzün %${altinOran.toFixed(0)}'si Altın'dan oluşuyor. Altın mükemmel bir güvenli limandır ancak uzun vadeli büyüme potansiyeli hisse senetleri veya fonlar kadar yüksek olmayabilir.`);
+    } else if (altinOran === 0) {
+        oneriler.push("Portföyünüzde hiç altın bulunmuyor. Global kriz dönemlerinde koruma sağlaması için %10-15 civarında altın (fiziksel veya fon) bulundurmak iyi bir strateji olabilir.");
+    }
+
+    let abdOran = total > 0 ? (tipToplam['abd'] / total) * 100 : 0;
+    if(abdOran > 0) {
+        oneriler.push("ABD hisseleri veya ETF'leri ile döviz bazlı getiri hedeflemeniz çok mantıklı. Uzun vadede enflasyona karşı kur koruması sağlar.");
+    }
+
+    if(tipToplam['bes'] === 0) {
+        oneriler.push("Geleceğinizi güvence altına almak ve <strong>%30 Devlet Katkısından</strong> faydalanmak için Bireysel Emeklilik (BES) hesabı açmayı inceleyebilirsiniz.");
+    } else {
+        oneriler.push("BES ile geleceğinize yatırım yapmanız mükemmel bir adım. Devlet katkısı limitlerini her yıl maksimize etmeye çalışarak bileşik getiriden faydalanın.");
+    }
+
+    let bistOran = total > 0 ? (tipToplam['bist'] / total) * 100 : 0;
+    if(bistOran > 40) {
+        oneriler.push(`Borsa İstanbul (BIST) ağırlığınız (%${bistOran.toFixed(0)}) oldukça yüksek. Yerel piyasa dalgalanmalarına karşı global (Yabancı Hisse/TEFAS Fonu/Döviz) tarafa da ağırlık verebilirsiniz.`);
+    }
+    
+    let dovizOran = total > 0 ? (tipToplam['doviz'] / total) * 100 : 0;
+    if(dovizOran > 30) {
+        oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; bunu Eurobond (Yabancı Fon) veya ABD hisselerinde değerlendirmeyi düşünebilirsiniz.`);
+    }
+
+    let randomOneri = oneriler[Math.floor(Math.random() * oneriler.length)];
+    
+    document.getElementById('aiPortfoyMetin').innerHTML = `<strong>✨ Akıllı Analiz:</strong><br><br>${randomOneri}`;
+    document.getElementById('mAiPortfoy').classList.add('on');
+}
+
+// ----------------------------------------------------
 
 async function portfoyGuncelle() {
    if(veri.portfoy.length === 0) return; Haptic.medium(); toast('Piyasa verileri taranıyor...');
@@ -1220,10 +1399,6 @@ async function portfoyGuncelle() {
    else { Haptic.success(); toast('Tüm piyasa verileri çekildi!'); }
    setTimeout(() => { loader.style.display = 'none'; loaderBar.style.width = '0%'; }, 1500);
 }
-
-function varlikDuzenleAc(id) { aktifVarlikId = id; document.getElementById('mPortfoyDuzenle').classList.add('on'); }
-async function varlikSilButton() { if(confirm('Silmek istediğinize emin misiniz?')) { veri.portfoy = veri.portfoy.filter(x => x.id !== aktifVarlikId); document.getElementById('mPortfoyDuzenle').classList.remove('on'); portfoyRender(); await fbKaydet(); } }
-function aiPortfoyOneriUret() { toast("Akıllı analiz çok yakında..."); }
 
 /* ====================================================
    YENİ: BORCUM (ALTIN HESABIM) ENTEGRASYONU
