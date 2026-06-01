@@ -838,11 +838,18 @@ function ayEkleStr(ay, d){
   return `${y}-${String(m).padStart(2, '0')}`;
 }
 
+// ----------------------------------------------------
+// DİNAMİK TEKRAR KONTROLÜ - GÜNCEL EDİLEN KISIM BURASI
+// ----------------------------------------------------
 function ayVerisi(ay){
   if(!veri.aylar[ay])veri.aylar[ay]={gelirler:[],giderler:[],silinenGelirler:[],silinenGiderler:[]};
   if(!veri.aylar[ay].silinenGelirler)veri.aylar[ay].silinenGelirler=[];
   if(!veri.aylar[ay].silinenGiderler)veri.aylar[ay].silinenGiderler=[];
-  if(!veri.aylar[ay]._tekrarUygulandi){tekrarlayanlariUygula(ay);veri.aylar[ay]._tekrarUygulandi=true;}
+  
+  // _tekrarUygulandi kontrolü tamamen kaldırıldı. 
+  // Artık her açıldığında eksik var mı diye kontrol edecek.
+  tekrarlayanlariUygula(ay);
+  
   return veri.aylar[ay];
 }
 
@@ -850,14 +857,28 @@ function tekrarlayanlariUygula(ay){
   const pk = ayEkleStr(ay, -1);
   if(!veri.aylar[pk])return;
   const pv=veri.aylar[pk],cv=veri.aylar[ay];
+  
+  const silinenGelirler = cv.silinenGelirler || [];
+  const silinenGiderler = cv.silinenGiderler || [];
+
   [...pv.gelirler,...pv.giderler].filter(k=>k.tekrar).forEach(k=>{
-    const tip=pv.gelirler.includes(k)?'gelirler':'giderler';
-    if(!(cv[tip]||[]).some(x=>x.kaynakId===k.id||x.ad===k.ad)){
+    const isGelir = pv.gelirler.includes(k);
+    const tip = isGelir ? 'gelirler' : 'giderler';
+    const silinenListe = isGelir ? silinenGelirler : silinenGiderler;
+    
+    // 1. Bu kalem zaten o aya kopyalanmış mı?
+    const zatenVar = (cv[tip]||[]).some(x=>x.kaynakId===k.id||x.ad===k.ad);
+    
+    // 2. Kullanıcı bu kalemi bu ay içinde bilerek silmiş mi?
+    const dahaOnceSilinmis = silinenListe.some(x=>x.kaynakId===k.id||x.ad===k.ad);
+    
+    if(!zatenVar && !dahaOnceSilinmis){
       cv[tip]=cv[tip]||[];
       cv[tip].push({...k,id:uid(),odendi:false,kaynakId:k.id});
     }
   });
 }
+// ----------------------------------------------------
 
 function ayYazi(periodId){
   const [yStr, mStr] = periodId.split('-');
