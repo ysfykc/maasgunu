@@ -6,7 +6,7 @@
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="#000000" name="theme-color" media="(prefers-color-scheme: dark)"/>
 <meta content="#f7f5f0" name="theme-color" media="(prefers-color-scheme: light)"/>
-<title>Süper App</title>
+<title>Maaş Günü</title>
 
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="16379.png">
@@ -355,7 +355,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="login">
   <img src="16379.png" class="login-bg" alt="Splash Background">
-  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Süper App v4.6 Pro</div>
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.1 Pro</div>
   <div style="text-align:center; width:100%; display:flex; justify-content:center;">
     <button id="loginBtn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
@@ -367,7 +367,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <header class="topbar">
 <div class="logo">
   <img class="logo-ico" src="16379.png" alt="Logo">
-  Altın Hesabım
+  Maaş Günü
 </div>
 <div class="tbr">
 <span id="sync" style="font-size:18px;">🔄</span>
@@ -721,9 +721,9 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
-  <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Süper App</div>
-  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.6 Pro</div>
-  <div style="font-size:12px; color:var(--txt3);">Maaş Günü & Borcum Birleşimi</div>
+  <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.1 Pro</div>
+  <div style="font-size:12px; color:var(--txt3);">Maaş Günü & Altın Hesabım Birleşimi</div>
 </div>
 </div>
 </div>
@@ -763,6 +763,63 @@ function bugunAyId() {
   return `${y}-${String(m).padStart(2, '0')}`;
 }
 let aktifAy=bugunAyId();
+
+/* ══ AKILLI SİMÜLASYON MOTORU (GÜNCELLENDİ) ══ */
+function simulasyonRiskBul(h, v) {
+    let bakiye = h.kalan;
+    let currentDay = new Date().getDate();
+    let daysToCheck = [];
+    
+    // Önümüzdeki 30 günü listele
+    for(let i=1; i<=30; i++) {
+        let d = currentDay + i;
+        if(d > 31) d -= 31;
+        daysToCheck.push(d);
+    }
+    
+    for(let d of daysToCheck) {
+        // 1. Önce o gün gelecek GELECEK GELİRLERİ bakiyeye ekle
+        let gunGelirleri = v.gelirler.filter(x => !x.odendi && x.gun === d);
+        let topGunGelir = gunGelirleri.reduce((s, x) => s + x.tutar, 0);
+        bakiye += topGunGelir;
+
+        // 2. Sonra o günkü GİDERLERİ bakiyeden düş
+        let gunGiderleri = v.giderler.filter(x => !x.odendi && x.gun === d);
+        let topGunGider = gunGiderleri.reduce((s, x) => s + x.tutar, 0);
+        
+        if(topGunGider > 0) {
+            bakiye -= topGunGider;
+            // Eğer gelirler eklendikten SONRA BİLE bakiye eksiye düşüyorsa uyar
+            if(bakiye < 0) {
+                return { gun: d, eksi: Math.abs(bakiye), giderler: gunGiderleri.map(x=>x.ad).join(', ') };
+            }
+        }
+    }
+    return null;
+}
+
+/* ══ YAKLAŞAN ÖDEMELER WIDGET'I ══ */
+function yaklasanOdemelerHtml(v) {
+   const bugun = new Date().getDate();
+   const mg = getMaasGunu();
+   const unpaid = v.giderler.filter(x => !x.odendi && x.gun).sort((a,b) => {
+       let dA = a.gun >= bugun ? a.gun - bugun : (30 - bugun + a.gun);
+       let dB = b.gun >= bugun ? b.gun - bugun : (30 - bugun + b.gun);
+       return dA - dB;
+   }).slice(0, 3);
+   
+   if(!unpaid.length) return '';
+   
+   let html = '<div class="sec-hdr" style="margin-top:16px;"><span class="sec-ttl">🗓 Yaklaşan Ödemeler</span></div><div style="background:var(--ios-surface-strong); border-radius:18px; padding:12px; box-shadow:var(--ios-shadow-soft); margin-bottom:12px;">';
+   unpaid.forEach(k => {
+       let gunFark = k.gun - bugun;
+       let gunText = gunFark === 0 ? 'Bugün' : gunFark === 1 ? 'Yarın' : gunFark > 1 ? gunFark + ' gün sonra' : 'Günü geçti (' + k.gun + 'i)';
+       if(k.gun < bugun && (bugun - k.gun) < 15 ) gunText = 'Günü geçti (' + k.gun + 'i)';
+       html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:.5px solid var(--brd);"><div style="display:flex; align-items:center; gap:8px;"><div style="width:8px; height:8px; border-radius:50%; background:var(--amber);"></div><div><div style="font-size:13px; font-weight:700;">${escHtml(k.ad)}</div><div style="font-size:11px; color:var(--txt3);">${gunText}</div></div></div><div style="font-size:13px; font-weight:800; color:var(--red);">₺${k.tutar}</div></div>`;
+   });
+   html += '</div>';
+   return html;
+}
 
 async function fbBaslat(){
   const{initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
@@ -930,64 +987,6 @@ function closeFab(){ const f = document.getElementById('fabContainer'); if(f) f.
 document.addEventListener('touchstart', e => { if(!e.target.closest('#fabContainer')) closeFab(); },{passive:true});
 function hizliDoldur(ad, kat, e) { e.preventDefault(); Haptic.light(); document.getElementById('eAd').value = ad; document.getElementById('eKat').value = kat; document.getElementById('eTutar').focus(); }
 
-/* ══ YAKLAŞAN ÖDEMELER WIDGET'I ══ */
-function yaklasanOdemelerHtml(v) {
-   const bugun = new Date().getDate();
-   const mg = getMaasGunu();
-   const unpaid = v.giderler.filter(x => !x.odendi && x.gun).sort((a,b) => {
-       let dA = a.gun >= bugun ? a.gun - bugun : (30 - bugun + a.gun);
-       let dB = b.gun >= bugun ? b.gun - bugun : (30 - bugun + b.gun);
-       return dA - dB;
-   }).slice(0, 3);
-   
-   if(!unpaid.length) return '';
-   
-   let html = '<div class="sec-hdr" style="margin-top:16px;"><span class="sec-ttl">🗓 Yaklaşan Ödemeler</span></div><div style="background:var(--ios-surface-strong); border-radius:18px; padding:12px; box-shadow:var(--ios-shadow-soft); margin-bottom:12px;">';
-   unpaid.forEach(k => {
-       let gunFark = k.gun - bugun;
-       let gunText = gunFark === 0 ? 'Bugün' : gunFark === 1 ? 'Yarın' : gunFark > 1 ? gunFark + ' gün sonra' : 'Günü geçti (' + k.gun + 'i)';
-       if(k.gun < bugun && (bugun - k.gun) < 15 ) gunText = 'Günü geçti (' + k.gun + 'i)';
-       html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:.5px solid var(--brd);"><div style="display:flex; align-items:center; gap:8px;"><div style="width:8px; height:8px; border-radius:50%; background:var(--amber);"></div><div><div style="font-size:13px; font-weight:700;">${escHtml(k.ad)}</div><div style="font-size:11px; color:var(--txt3);">${gunText}</div></div></div><div style="font-size:13px; font-weight:800; color:var(--red);">₺${k.tutar}</div></div>`;
-   });
-   html += '</div>';
-   return html;
-}
-
-/* ══ AKILLI SİMÜLASYON MOTORU (GÜNCELLENDİ) ══ */
-function simulasyonRiskBul(h, v) {
-    let bakiye = h.kalan;
-    let currentDay = new Date().getDate();
-    let daysToCheck = [];
-    
-    // Önümüzdeki 30 günü listele
-    for(let i=1; i<=30; i++) {
-        let d = currentDay + i;
-        if(d > 31) d -= 31;
-        daysToCheck.push(d);
-    }
-    
-    for(let d of daysToCheck) {
-        // 1. Önce o gün gelecek GELECEK GELİRLERİ bakiyeye ekle
-        let gunGelirleri = v.gelirler.filter(x => !x.odendi && x.gun === d);
-        let topGunGelir = gunGelirleri.reduce((s, x) => s + x.tutar, 0);
-        bakiye += topGunGelir;
-
-        // 2. Sonra o günkü GİDERLERİ bakiyeden düş
-        let gunGiderleri = v.giderler.filter(x => !x.odendi && x.gun === d);
-        let topGunGider = gunGiderleri.reduce((s, x) => s + x.tutar, 0);
-        
-        if(topGunGider > 0) {
-            bakiye -= topGunGider;
-            // Eğer gelirler eklendikten SONRA BİLE bakiye eksiye düşüyorsa uyar
-            if(bakiye < 0) {
-                return { gun: d, eksi: Math.abs(bakiye), giderler: gunGiderleri.map(x=>x.ad).join(', ') };
-            }
-        }
-    }
-    return null;
-}
-
-
 /* ══ NAVİGASYON ══ */
 function navSec(i){
   Haptic.light(); navIdx=i; 
@@ -1038,7 +1037,6 @@ function icerikRender(){
   }
   let html=''; const gG=tabIdx===0||tabIdx===1; const gD=tabIdx===0||tabIdx===2;
   
-  // Yaklaşan ödemeler sadece "Tümü" (0) sekmesinde görünsün
   if(tabIdx === 0) html += yaklasanOdemelerHtml(v);
 
   if(gG){ const top=v.gelirler.reduce((s,k)=>s+k.tutar,0); const aktifTop=v.gelirler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0); html+=`<div class="sec" id="sec-gelir"><div class="sec-hdr"><span class="sec-ttl">🟢 Gelirler</span><span class="sec-total g">${fTL(aktifTop)} / ${fTL(top)}</span></div>`; html+=v.gelirler.length?v.gelirler.map((k,i)=>kalemHtml(k,'gelir',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🟢</div>Henüz gelir eklenmedi</div>'; html+='</div>'; }
@@ -1095,7 +1093,7 @@ function paceHesapla(h) {
 function aiOnerileriUret(h){
   const v=ayVerisi(aktifAy); const giderSayisi=v.giderler.length; const odenmeyen=v.giderler.filter(k=>!k.odendi).reduce((s,k)=>s+k.tutar,0); const yatirim=h.yatirim||0; const liste=[];
   
-  // RİSK SİMÜLASYONU KONTROLÜ (EN YÜKSEK ÖNCELİK)
+  // RİSK SİMÜLASYONU KONTROLÜ
   const risk = simulasyonRiskBul(h, v);
   if(risk) {
       document.getElementById('aiInsight').classList.add('alert');
@@ -1204,6 +1202,8 @@ function grafikRender(v){
       for(let i=0; i<=30; i++) {
           labels.push(d);
           let exp = v.giderler.filter(x => x.gun === d).reduce((s,x)=>s+x.tutar, 0);
+          let inc = v.gelirler.filter(x => x.gun === d).reduce((s,x)=>s+x.tutar, 0);
+          curBal += inc;
           curBal -= exp;
           dataLine.push(curBal);
           d++; if(d > 31) d = 1;
@@ -1427,6 +1427,71 @@ function aiPortfoyOneriUret() {
 
 // ----------------------------------------------------
 
+async function portfoyGuncelle() {
+   if(veri.portfoy.length === 0) return; Haptic.medium(); toast('Piyasa verileri taranıyor...');
+   
+   const loader = document.getElementById('vLoader'); const loaderBar = document.getElementById('vLoaderBar');
+   loader.style.display = 'block'; loaderBar.style.width = '10%'; loaderBar.style.background = 'var(--blue)';
+   
+   await kurlariGuncelle();
+   let usdRate = parseFloat(veri.kurlar?.usd || veri.kurlar?.USD) || 33.0;
+
+   const totalItems = veri.portfoy.length; let completed = 0; let failCount = 0;
+   
+   for(let i=0; i<veri.portfoy.length; i++) {
+      let v = veri.portfoy[i]; 
+      if(v.tip === 'tefas') v.manuelFiyat = true; 
+      if(v.manuelFiyat || v.tip === 'bes' || v.tip === 'tefas') { 
+          completed++; loaderBar.style.width = (10 + (completed / totalItems) * 90) + '%'; 
+          continue; 
+      }
+      
+      let yeniFiyat = 0;
+      
+      if (v.tip === 'altin') {
+         let k = v.kod === 'GRAM ALTIN' ? 'gram_altin' : v.kod;
+         yeniFiyat = veri.kurlar[k] || veri.kurlar.gram_altin;
+      } else if (v.tip === 'doviz') {
+         let k = v.kod.toLowerCase();
+         yeniFiyat = veri.kurlar[k] || veri.kurlar[v.kod];
+      } else if (v.tip === 'bist' || v.tip === 'abd') {
+         let yfSymbol = v.tip === 'bist' ? `${v.kod.toUpperCase().trim()}.IS` : v.kod.toUpperCase().trim();
+         let yfUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yfSymbol}?interval=1d&range=1d`;
+         try {
+            let r = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(yfUrl)}`, {cache:'no-store'}, 3500);
+            if(r.ok) {
+               let json = await r.json();
+               let p = json.chart.result[0].meta.regularMarketPrice;
+               if(p > 0) yeniFiyat = v.tip === 'abd' ? (p * usdRate) : p;
+            }
+         } catch(e) {}
+         
+         if(!yeniFiyat) {
+            let exchanges = v.tip === 'bist' ? ['IST'] : ['NASDAQ', 'NYSE', 'AMEX'];
+            for (let exc of exchanges) { 
+                try {
+                   let u = `https://api.allorigins.win/get?url=${encodeURIComponent('https://www.google.com/finance/quote/'+v.kod+':'+exc)}`;
+                   let r = await fetchWithTimeout(u, {cache:'no-store'}, 3000);
+                   if(r.ok) {
+                      let text = await r.text(); let html = JSON.parse(text).contents;
+                      let m = html.match(/class="YMlKec fxKbKc"[^>]*>[^\d]*([\d.,]+)/i); 
+                      if(m) { let p = parseFloat(m[1].replace(/,/g, '')); if(p > 0) { yeniFiyat = v.tip === 'abd' ? (p * usdRate) : p; break; } }
+                   }
+                } catch(e) {}
+            }
+         }
+      }
+      
+      if(yeniFiyat > 0) { v.sonFiyat = yeniFiyat; } else { failCount++; }
+      completed++; loaderBar.style.width = (10 + (completed / totalItems) * 90) + '%';
+   }
+
+   portfoyRender(); renderBorcum(); await fbKaydet(); 
+   if (failCount > 0) { Haptic.error(); loaderBar.style.background = 'var(--red)'; toast(`${failCount} varlık güncellenemedi!`); } 
+   else { Haptic.success(); toast('Tüm piyasa verileri çekildi!'); }
+   setTimeout(() => { loader.style.display = 'none'; loaderBar.style.width = '0%'; }, 1500);
+}
+
 /* ====================================================
    YENİ: BORCUM (ALTIN HESABIM) ENTEGRASYONU
    ==================================================== */
@@ -1637,12 +1702,6 @@ async function odemeKaydet() {
 
 /* ══ BAŞLAT ══ */
 async function init(){
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW Hatası:', err));
-    });
-  }
-
   const tema=localStorage.getItem('masaygunu2Tema')||'light'; document.documentElement.dataset.theme=tema; document.getElementById('themeBtn').textContent=tema==='dark'?'☀️':'🌙';
   const u=await fbBaslat();
   if(!u){
@@ -1661,9 +1720,6 @@ async function init(){
              }
            } setSynk('ok');
          }, (err) => { setSynk('off'); });
-         
-         // Init sonrası bildirim kontrolü
-         gunlukBildirimKontrolu();
       } else { 
          user=null;veri={aylar:{}, portfoy:[], borclar:[], ayarlar:{maasGunu:15, portfoyHedef:0}, kurlar:{usd:32.5,eur:35.0,USD:32.5,EUR:35.0}, guncelleme:null}; 
          document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); 
@@ -1685,9 +1741,6 @@ async function init(){
       }
     } setSynk('ok');
   }, (err) => { setSynk('off'); });
-
-  // Init sonrası bildirim kontrolü
-  gunlukBildirimKontrolu();
 }
 
 document.addEventListener('DOMContentLoaded',init);
