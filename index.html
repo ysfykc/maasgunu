@@ -953,21 +953,32 @@ function yaklasanOdemelerHtml(v) {
    return html;
 }
 
-/* ══ AKILLI SİMÜLASYON MOTORU ══ */
+/* ══ AKILLI SİMÜLASYON MOTORU (GÜNCELLENDİ) ══ */
 function simulasyonRiskBul(h, v) {
     let bakiye = h.kalan;
     let currentDay = new Date().getDate();
     let daysToCheck = [];
+    
+    // Önümüzdeki 30 günü listele
     for(let i=1; i<=30; i++) {
         let d = currentDay + i;
         if(d > 31) d -= 31;
         daysToCheck.push(d);
     }
+    
     for(let d of daysToCheck) {
+        // 1. Önce o gün gelecek GELECEK GELİRLERİ bakiyeye ekle
+        let gunGelirleri = v.gelirler.filter(x => !x.odendi && x.gun === d);
+        let topGunGelir = gunGelirleri.reduce((s, x) => s + x.tutar, 0);
+        bakiye += topGunGelir;
+
+        // 2. Sonra o günkü GİDERLERİ bakiyeden düş
         let gunGiderleri = v.giderler.filter(x => !x.odendi && x.gun === d);
         let topGunGider = gunGiderleri.reduce((s, x) => s + x.tutar, 0);
+        
         if(topGunGider > 0) {
             bakiye -= topGunGider;
+            // Eğer gelirler eklendikten SONRA BİLE bakiye eksiye düşüyorsa uyar
             if(bakiye < 0) {
                 return { gun: d, eksi: Math.abs(bakiye), giderler: gunGiderleri.map(x=>x.ad).join(', ') };
             }
@@ -975,6 +986,7 @@ function simulasyonRiskBul(h, v) {
     }
     return null;
 }
+
 
 /* ══ NAVİGASYON ══ */
 function navSec(i){
