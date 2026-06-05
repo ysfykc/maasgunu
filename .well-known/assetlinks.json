@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "io.github.ysfykc",
-    "sha256_cert_fingerprints": ["A9:2B:97:7A:A9:4F:FD:D1:5A:FA:92:DF:4A:B7:85:D9:C4:4C:BC:12:84:20:F5:9A:98:04:4C:5A:C0:76:F8:4B"]
+    "package_name": "com.ysfykc.maasgunu",
+    "sha256_cert_fingerprints": ["3D:25:9F:46:34:91:41:04:06:95:78:F5:A2:B6:AC:A9:57:73:78:59:AD:FD:D3:5B:D9:DE:C7:D8:6E:82:5F:03"]
   }
 }]
