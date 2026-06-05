@@ -1,7 +1,8 @@
 {
   "name": "Maaş Günü",
   "short_name": "Maaş Günü",
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f7f5f0",
   "theme_color": "#f7f5f0",
