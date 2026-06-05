@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "io.github.ysfykc.maasgunu",
-    "sha256_cert_fingerprints": ["A5:10:B3:B5:B6:76:D1:1B:15:B0:4C:90:64:EA:97:3A:2F:0F:6B:70:DB:0D:9C:F3:F0:44:ED:04:BC:06:B2:D6"]
+    "sha256_cert_fingerprints": ["16:36:B1:D2:8E:35:6B:8B:35:C6:14:E6:77:BA:35:DD:AB:27:E3:A2:DE:CA:F4:D1:53:DD:39:57:95:56:5C:BC"]
   }
 }]
