@@ -1,1 +1,9 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.ysfykc.maasgunu",
+        "sha256_cert_fingerprints": ["7B:BC:89:A3:3C:4B:79:D3:D7:B5:8E:B3:3A:19:C6:F4:0F:EE:22:40:52:BA:9E:5D:67:18:3B:74:5B:2C:54:3A"]
+      }
+    }]
 
