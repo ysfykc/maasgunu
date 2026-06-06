@@ -73,7 +73,7 @@
   --ios-ring:rgba(255,255,255,.08);
 }
 
-/* 1. AŞAMA: SKELETON LOADING (SHIMMER) */
+/* 1. AŞAMA EKLENTİSİ: SKELETON LOADING (SHIMMER) ANİMASYONU */
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .skel {
   color: transparent !important;
@@ -86,26 +86,8 @@
 .hcard.gelir .skel, .hcard.gider .skel { background: linear-gradient(90deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.05) 75%); }
 [data-theme=dark] .hcard.gelir .skel, [data-theme=dark] .hcard.gider .skel { background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%); }
 
-/* 2. AŞAMA: ONBOARDING CSS */
-.onboard-ov { position: fixed; inset: 0; z-index: 20000; background: var(--bg); display: flex; flex-direction: column; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
-.onboard-ov.hidden { display: none !important; }
-.ob-slide { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 40px; animation: pop .4s cubic-bezier(0.34, 1.56, 0.64, 1); flex: 1; }
-.ob-slide.active { display: flex; }
-.ob-icon { font-size: 84px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.1)); }
-.ob-title { font-family: var(--fs); font-size: 38px; color: var(--txt); margin-bottom: 16px; line-height: 1.1; letter-spacing: -1px; }
-.ob-desc { font-size: 15px; color: var(--txt2); line-height: 1.6; font-weight: 500; }
-.ob-bot { margin-top: auto; width: 100%; }
-.ob-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; }
-.ob-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brd2); transition: .3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.ob-dot.active { background: var(--green); width: 28px; border-radius: 999px; }
-.ob-actions { display: flex; justify-content: space-between; align-items: center; padding: 0 32px; }
-.ob-btn-skip { color: var(--txt3); font-weight: 700; background: none; border: none; font-size: 15px; padding: 10px; cursor: pointer; outline: none; }
-.ob-btn-next { background: linear-gradient(135deg, var(--green), var(--green2)); color: #fff; border: none; padding: 14px 28px; border-radius: 18px; font-weight: 800; font-size: 15px; box-shadow: 0 10px 24px rgba(26,122,66,.3); cursor: pointer; transition: transform 0.15s; outline: none; }
-.ob-btn-next:active { transform: scale(0.92); }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{font-size:15px; background-color: #000000;} 
+html{font-size:15px}
 body{font-family:var(--fd);background: radial-gradient(circle at 12% -6%, rgba(42,173,98,.18), transparent 30%), radial-gradient(circle at 92% 6%, rgba(90,58,139,.16), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--txt);min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto}
 
 [data-theme=dark] body { background: radial-gradient(circle at 12% -6%, rgba(50,215,75,.15), transparent 30%), radial-gradient(circle at 92% 6%, rgba(191,90,242,.15), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); }
@@ -117,13 +99,11 @@ input[type=number]{-moz-appearance:textfield}
 #login input::placeholder { color: rgba(255,255,255,0.4); }
 #login input:focus { border-color: rgba(255,255,255,0.5) !important; background: rgba(255,255,255,0.18) !important; }
 
-/* TIKLANMAMA SORUNUNU ÇÖZEN YEPYENİ GİRİŞ EKRANI (LOGIN) CSS'İ */
-#login { position: fixed; inset: 0; z-index: 9999; background: #000; overflow: hidden; }
-.login-bg { position: absolute; inset: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 35%, #1a7a42 0%, #0a1a0e 80%); pointer-events: none; z-index: 1; }
-.login-content { position: relative; z-index: 2; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-.login-badge { position: absolute; top: calc(24px + env(safe-area-inset-top)); right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none; }
-.login-action-btn { transition: transform 0.15s ease, opacity 0.15s ease; cursor: pointer; outline: none; }
-.login-action-btn:active { transform: scale(0.95) !important; opacity: 0.85; }
+/* TEMEL BİLEŞENLER */
+#login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; }
+.login-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 35%, #1a7a42 0%, #0a1a0e 80%); }
+.login-badge { position: absolute; top: 24px; right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+#loginBtn { width: 100%; padding: 15px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #1a1814; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: none; cursor: pointer; }
 
 /* STABİL YERLEŞİM CSS BLOĞU */
 .topbar{ position:fixed; top:0; left:0; right:0; height:calc(var(--top) + env(safe-area-inset-top)); background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-bottom:.5px solid var(--brd2); display:flex; align-items:center; justify-content:space-between; padding:env(safe-area-inset-top) 16px 0; z-index:200; border-color:rgba(0,0,0,.06); }
@@ -403,35 +383,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="vLoader"><div id="vLoaderBar"></div></div>
 
-<div id="onboardingOverlay" class="onboard-ov hidden">
-  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-      <div class="ob-slide active">
-        <div class="ob-icon">📊</div>
-        <div class="ob-title">Bütçeni Yönet</div>
-        <div class="ob-desc">Maaşını, gelirlerini ve sabit giderlerini kolayca takip et. Paranın nereye gittiğini gör, kontrolü eline al.</div>
-      </div>
-      <div class="ob-slide">
-        <div class="ob-icon">🥇</div>
-        <div class="ob-title">Altın Borçları</div>
-        <div class="ob-desc">Canlı piyasa verileriyle güncellenen altın ve döviz borçlarını tek ekrandan, kuruşu kuruşuna takip et.</div>
-      </div>
-      <div class="ob-slide">
-        <div class="ob-icon">💼</div>
-        <div class="ob-title">Portföyünü Büyüt</div>
-        <div class="ob-desc">Hisse senedi, fon ve döviz yatırımlarını ekle. Finansal hedeflerine doğru adım adım ilerle.</div>
-      </div>
-  </div>
-  <div class="ob-bot">
-      <div class="ob-dots">
-        <div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div>
-      </div>
-      <div class="ob-actions">
-         <button class="ob-btn-skip" onclick="obBitir()">Atla</button>
-         <button class="ob-btn-next" onclick="obIleri()">İleri</button>
-      </div>
-  </div>
-</div>
-
 <div id="undoToast"></div>
 
 <div id="mConfirm" class="exit-ov">
@@ -458,47 +409,46 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="login">
   <div class="login-bg"></div>
-  <div class="login-content">
-      <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.8 Pro</div>
-      
-      <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
-        <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:40px;">
-          <img src="16379.png" style="width:96px; height:96px; border-radius:24px; box-shadow:0 16px 36px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.1);">
-          <div style="font-family:var(--fs); font-size:38px; color:#fff; letter-spacing:-.5px; line-height:1;">Maaş Günü</div>
-          <div style="font-size:11px; color:rgba(255,255,255,0.5); font-weight:700; letter-spacing:1px; text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
-        </div>
-        <div style="width:100%; display:flex; flex-direction:column; gap:12px; margin-bottom:10vh;">
-          <button id="loginBtn" onclick="girisYap()" class="login-action-btn" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:none;">
-            <svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Google ile Giriş Yap
-          </button>
-          <button onclick="emailPanelAc('giris')" class="login-action-btn" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.12); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.2); backdrop-filter:blur(8px);">
-            ✉️ E-posta ile Giriş Yap
-          </button>
-          <button onclick="emailPanelAc('kayit')" class="login-action-btn" style="width:100%; padding:13px 16px; border-radius:16px; background:transparent; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; border:none;">
-            Hesabın yok mu? Kayıt ol →
-          </button>
-        </div>
-      </div>
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.5 Pro</div>
+  
+  <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:40px;">
+      <img src="16379.png" style="width:96px; height:96px; border-radius:24px; box-shadow:0 16px 36px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.1);">
+      <div style="font-family:var(--fs); font-size:38px; color:#fff; letter-spacing:-.5px; line-height:1;">Maaş Günü</div>
+      <div style="font-size:11px; color:rgba(255,255,255,0.5); font-weight:700; letter-spacing:1px; text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
+    </div>
+    <div style="width:100%; display:flex; flex-direction:column; gap:12px; margin-bottom:10vh;">
+      <button id="loginBtn" onclick="girisYap()" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:none; cursor:pointer;">
+        <svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Google ile Giriş Yap
+      </button>
+      <button onclick="emailPanelAc('giris')" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.12); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.2); cursor:pointer; backdrop-filter:blur(8px);">
+        ✉️ E-posta ile Giriş Yap
+      </button>
+      <button onclick="emailPanelAc('kayit')" style="width:100%; padding:13px 16px; border-radius:16px; background:transparent; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; border:none; cursor:pointer;">
+        Hesabın yok mu? Kayıt ol →
+      </button>
+    </div>
+  </div>
 
-      <div id="emailPanel" style="display:none; flex:1; flex-direction:column; width:100%; padding:0 32px;">
-        <button onclick="emailPanelKapat()" class="login-action-btn" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; backdrop-filter:blur(8px);">← Geri</button>
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; margin-bottom:10vh;">
-          <div id="emailPanelTtl" style="font-family:var(--fs); font-size:30px; color:#fff; letter-spacing:-.5px; text-align:center; margin-bottom:8px;">Giriş Yap</div>
-          <div id="emailHata" style="display:none; background:rgba(255,80,80,0.2); border:1px solid rgba(255,80,80,0.4); color:#ffb3b3; padding:10px 14px; border-radius:12px; font-size:13px; text-align:center;"></div>
-          <div id="emailAdSoyadRow" style="display:none;">
-            <input id="eAdSoyad" type="text" placeholder="Ad Soyad" autocomplete="name" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
-          </div>
-          <input id="eEmail" type="email" placeholder="E-posta adresi" autocomplete="email" inputmode="email" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
-          <input id="eSifre" type="password" placeholder="Şifre" autocomplete="current-password" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
-          <button id="emailGirisBtn" onclick="emailIslem()" class="login-action-btn" style="width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; border:none; box-shadow:0 8px 24px rgba(0,0,0,0.3);">Giriş Yap</button>
-          <button id="sifremiUnuttumBtn" onclick="sifremiUnuttum()" class="login-action-btn" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; padding:4px;">Şifremi unuttum</button>
-          <div id="emailAltLink" style="text-align:center;">
-            <button onclick="emailPanelAc('kayit')" id="kayitGecBtn" class="login-action-btn" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600;">Hesabın yok mu? Kayıt ol →</button>
-          </div>
-        </div>
+  <div id="emailPanel" style="display:none; flex:1; flex-direction:column; width:100%; padding:0 32px;">
+    <button onclick="emailPanelKapat()" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px);">← Geri</button>
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; margin-bottom:10vh;">
+      <div id="emailPanelTtl" style="font-family:var(--fs); font-size:30px; color:#fff; letter-spacing:-.5px; text-align:center; margin-bottom:8px;">Giriş Yap</div>
+      <div id="emailHata" style="display:none; background:rgba(255,80,80,0.2); border:1px solid rgba(255,80,80,0.4); color:#ffb3b3; padding:10px 14px; border-radius:12px; font-size:13px; text-align:center;"></div>
+      <div id="emailAdSoyadRow" style="display:none;">
+        <input id="eAdSoyad" type="text" placeholder="Ad Soyad" autocomplete="name" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
       </div>
-  </div> </div>
+      <input id="eEmail" type="email" placeholder="E-posta adresi" autocomplete="email" inputmode="email" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
+      <input id="eSifre" type="password" placeholder="Şifre" autocomplete="current-password" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
+      <button id="emailGirisBtn" onclick="emailIslem()" style="width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.3);">Giriş Yap</button>
+      <button id="sifremiUnuttumBtn" onclick="sifremiUnuttum()" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer; padding:4px;">Şifremi unuttum</button>
+      <div id="emailAltLink" style="text-align:center;">
+        <button onclick="emailPanelAc('kayit')" id="kayitGecBtn" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer;">Hesabın yok mu? Kayıt ol →</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <header class="topbar">
 <div class="logo">
@@ -860,7 +810,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mhandle"></div>
 <div class="mttl" style="display:flex; justify-content:space-between; align-items:center;">
    <span>🗑️ Çöp Kutusu</span>
-   <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:99px; border:none;">Tümünü Sil</button>
+   <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:999px; border:none;">Tümünü Sil</button>
 </div>
 <div style="font-size:12px; color:var(--txt2); margin-bottom:16px;">Silinen gelirler, giderler, varlıklar ve borçlar burada toplanır. Geri yükleyebilirsiniz.</div>
 <div id="copListesi" style="max-height:50vh; overflow-y:auto; margin-bottom:16px;"></div>
@@ -882,8 +832,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
   <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
-  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.8 Pro</div>
-  <div style="font-size:12px; color:var(--txt3);">Maaş Günü & Altın Hesabım Birleşimi</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.6 Pro</div>
+  <div style="font-size:12px; color:var(--txt3);">Tasarım &amp; Fikir ysfbey</div>
 </div>
 </div>
 </div>
@@ -936,54 +886,20 @@ function ozelOnayAc(mesaj, callback) {
 }
 
 /* ====================================================
-   2. AŞAMA: ONBOARDING (KARŞILAMA) MANTIĞI
-   ==================================================== */
-let obGecerli = 0;
-function obInit() {
-  if(!localStorage.getItem('masaygunu_onboard_v2')) {
-    document.getElementById('onboardingOverlay').classList.remove('hidden');
-    obRender();
-  }
-}
-function obRender() {
-  const slides = document.querySelectorAll('.ob-slide');
-  const dots = document.querySelectorAll('.ob-dot');
-  slides.forEach((s, i) => s.classList.toggle('active', i === obGecerli));
-  dots.forEach((d, i) => d.classList.toggle('active', i === obGecerli));
-  document.querySelector('.ob-btn-next').textContent = obGecerli === slides.length - 1 ? 'Başla ✨' : 'İleri';
-}
-function obIleri() {
-  const slides = document.querySelectorAll('.ob-slide');
-  if(obGecerli < slides.length - 1) {
-    obGecerli++; obRender(); Haptic.light();
-  } else {
-    obBitir();
-  }
-}
-function obBitir() {
-  Haptic.success();
-  localStorage.setItem('masaygunu_onboard_v2', 'true');
-  const ov = document.getElementById('onboardingOverlay');
-  ov.style.opacity = '0';
-  ov.style.transition = 'opacity 0.4s ease';
-  setTimeout(() => ov.classList.add('hidden'), 400);
-}
-
-/* ====================================================
    1. AŞAMA EKLENTİSİ: ANİMASYONLU SAYILAR (COUNTER)
    ==================================================== */
 function animTL(id, val, isNeg=false) {
     const el = document.getElementById(id); if(!el) return;
-    el.classList.remove('skel'); 
+    el.classList.remove('skel'); // Varsa skeleton'ı kaldır
     const old = parseFloat(el.dataset.v) || 0;
     const pfx = isNeg ? '-₺' : '₺';
     
     if(old === val) { el.innerHTML = pfx + (Math.round(val)||0).toLocaleString('tr-TR'); el.dataset.v = val; return; }
     el.dataset.v = val;
-    let start = null; const dur = 800; 
+    let start = null; const dur = 800; // 800ms sayma animasyonu
     const step = (ts) => {
         if(!start) start = ts; const p = Math.min((ts - start) / dur, 1);
-        const ease = 1 - Math.pow(1 - p, 4);
+        const ease = 1 - Math.pow(1 - p, 4); // Yavaşlayarak durma efekti
         const curr = old + (val - old) * ease;
         el.innerHTML = pfx + (Math.round(curr)||0).toLocaleString('tr-TR');
         if(p < 1) requestAnimationFrame(step); 
@@ -1497,7 +1413,7 @@ function render(){
   document.getElementById('ayLbl').textContent=ayYazi(aktifAy);
   const h=hesapla(aktifAy);
   
-  // 1. AŞAMA: ANIMASYONLU SAYILAR (hGelir, hGider, hKalan)
+  // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYILAR (hGelir, hGider, hKalan)
   animTL('hGelir', h.topGelir);
   animTL('hGider', h.topGider);
   animTL('hKalan', Math.abs(h.kalan), h.kalan < 0);
@@ -1677,7 +1593,7 @@ function portfoyRender() {
    veri.portfoy.forEach(v => { const vTotal = v.miktar * (v.sonFiyat || 0); const vCostTotal = v.miktar * (v.maliyet || 0); if(!isNaN(vTotal)) totalNetWorth += vTotal; if(v.tip !== 'bes' && !isNaN(vCostTotal)) totalCost += vCostTotal; chartData[v.tip] = (chartData[v.tip] || 0) + (isNaN(vTotal) ? 0 : vTotal); if(gruplar[v.tip]) gruplar[v.tip].varliklar.push({...v, vTotal, vCostTotal}); });
    let genelKz = totalNetWorth - totalCost; let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
    
-   // 1. AŞAMA: ANIMASYONLU SAYI
+   // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYI
    animTL('pToplam', totalNetWorth);
    
    document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKz >= 0 ? 'pl-pos' : 'pl-neg'}">${genelKz > 0 ? '+' : ''}${fTL(genelKz)} (${genelKz > 0 ? '+' : ''}%${genelKzPct.toFixed(2)})</span>` : '';
@@ -1688,7 +1604,7 @@ function portfoyRender() {
    let eTotal = eRate > 0 ? (totalNetWorth / eRate) : 0;
    document.getElementById('pDovizToplam').innerHTML = `≈ $${uTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} <span style="opacity:0.5; margin:0 4px;">|</span> €${eTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
    
-   // 1. AŞAMA: HEDEF KONTROLÜ VE CONFETTI
+   // 1. AŞAMA EKLENTİSİ: HEDEF KONTROLÜ VE CONFETTI
    const hdf = getPortfoyHedefi();
    if(hdf > 0 && totalNetWorth >= hdf && !veri.hedefKutlandi) {
        veri.hedefKutlandi = true;
@@ -1848,7 +1764,7 @@ function aiPortfoyOneriUret() {
     
     let dovizOran = total > 0 ? (tipToplam['doviz'] / total) * 100 : 0;
     if(dovizOran > 30) {
-        oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; bunu Eurobond (Yabancı Fon) veya ABD hisselerinde değerlendirmeyi düşünebilirsiniz.`);
+        oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; Eurobond (Yabancı Fon) veya ABD hisselerini düşünebilirsiniz.`);
     }
 
     let randomOneri = oneriler[Math.floor(Math.random() * oneriler.length)];
@@ -1917,7 +1833,7 @@ function renderBorcum() {
     if(k>0) adet++; map[b.tip] = (map[b.tip]||0) + k;
   });
 
-  // 1. AŞAMA: ANIMASYONLU SAYI
+  // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYI
   animTL('ozetTL', toplam);
   
   document.getElementById('ozetSub').textContent = adet ? `${adet} açık borç • ${fTL(odemeToplam)} ödeme kaydı` : 'Kalan açık borç bulunmuyor';
@@ -2061,4 +1977,82 @@ function odemeModalAc(id) {
   const sym = isAltin(b.tip)?tipAd(b.tip):({usd:'$',eur:'€',tl:'₺',kredi:'₺',kk:'₺'}[b.tip]);
   document.getElementById('odeLbl').textContent = 'Miktar (' + sym + ')'; document.getElementById('odePfx').textContent = sym;
   document.getElementById('odeMiktar').value=''; document.getElementById('odeNot').value='';
-  document.getElementById('mOdeme').classList.add('on'); Haptic
+  document.getElementById('mOdeme').classList.add('on'); Haptic.light();
+}
+async function odemeKaydet() {
+  const miktar = parseFloat(document.getElementById('odeMiktar').value)||0; const not = document.getElementById('odeNot').value.trim();
+  if (!miktar) return; const b = veri.borclar.find(x=>x.id===aktifOdemeBorcId); if (!b) return;
+  if (miktar > kalanB(b)) { Haptic.error(); toast('⚠️ Kalan borçtan fazla olamaz'); return; }
+  b.odemeler.push({id:uid(), tarih:new Date().toISOString(), miktar, not, kurTL:tlye(b.tip,miktar)});
+  document.getElementById('mOdeme').classList.remove('on'); 
+  renderBorcum(); 
+  await fbKaydet(); 
+  
+  Haptic.success(); 
+  // 1. AŞAMA EKLENTİSİ: CONFETTI (Borç bittiğinde)
+  if(kalanB(b) === 0) {
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 10000 });
+      toast('🎉 Borç tamamen bitti!');
+  } else {
+      toast('✅ Ödeme alındı');
+  }
+}
+
+/* ══ BAŞLAT ══ */
+async function init(){
+  // 1. AŞAMA EKLENTİSİ: SKELETON BAŞLATMA
+  ['hGelir','hGider','hKalan','pToplam','ozetTL'].forEach(id => {
+      let e = document.getElementById(id); 
+      if(e){ e.classList.add('skel'); e.textContent='00.000'; }
+  });
+
+  const tema=localStorage.getItem('masaygunu2Tema')||'light'; document.documentElement.dataset.theme=tema; document.getElementById('themeBtn').textContent=tema==='dark'?'☀️':'🌙';
+  const u=await fbBaslat();
+  if(!u){
+    document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
+    window._fb.onAuthStateChanged(auth,async kullanici=>{
+      if(kullanici){ 
+         user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
+         const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} 
+         lsYukle(); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
+         window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
+           if(snap.exists()) {
+             const uzak = JSON.parse(snap.data().json || '{}');
+             if((uzak.guncelleme || '2000') > (veri.guncelleme || '2000')){
+               veri = uzak; lsKaydet(); render();
+               if(navIdx === 1) portfoyRender(); if(navIdx === 2) renderBorcum();
+             }
+           } setSynk('ok');
+         }, (err) => { setSynk('off'); });
+      } else { 
+         user=null;veri={aylar:{}, portfoy:[], borclar:[], copKutusu:[], ayarlar:{maasGunu:15, portfoyHedef:0}, kurlar:{usd:32.5,eur:35.0,USD:32.5,EUR:35.0}, guncelleme:null}; 
+         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); 
+      }
+    });
+    return;
+  }
+  document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
+  const av=document.getElementById('avatar'); if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
+  lsYukle(); render(); await fbYukle(); 
+  kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); });
+  
+  window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
+    if(snap.exists()) {
+      const uzak = JSON.parse(snap.data().json || '{}');
+      if((uzak.guncelleme || '2000') > (veri.guncelleme || '2000')){
+        veri = uzak; lsKaydet(); render();
+        if(navIdx === 1) portfoyRender(); if(navIdx === 2) renderBorcum();
+      }
+    } setSynk('ok');
+  }, (err) => { setSynk('off'); });
+}
+
+document.addEventListener('DOMContentLoaded',init);
+function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
+document.addEventListener('DOMContentLoaded', function(){
+  const login=document.getElementById('login');
+  if(login){ const obs=new MutationObserver(function(){ uiLoginDurumuAyarla(getComputedStyle(login).display !== 'none'); }); obs.observe(login,{attributes:true,attributeFilter:['style','class']}); setTimeout(function(){ uiLoginDurumuAyarla(getComputedStyle(login).display !== 'none'); },250); }
+});
+</script>
+</body>
+</html>
