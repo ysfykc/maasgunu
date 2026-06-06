@@ -73,7 +73,7 @@
   --ios-ring:rgba(255,255,255,.08);
 }
 
-/* 1. AŞAMA EKLENTİSİ: SKELETON LOADING (SHIMMER) ANİMASYONU */
+/* 1. AŞAMA: SKELETON LOADING (SHIMMER) */
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .skel {
   color: transparent !important;
@@ -86,8 +86,26 @@
 .hcard.gelir .skel, .hcard.gider .skel { background: linear-gradient(90deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.05) 75%); }
 [data-theme=dark] .hcard.gelir .skel, [data-theme=dark] .hcard.gider .skel { background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%); }
 
+/* 2. AŞAMA: ONBOARDING CSS */
+.onboard-ov { position: fixed; inset: 0; z-index: 20000; background: var(--bg); display: flex; flex-direction: column; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+.onboard-ov.hidden { display: none !important; }
+.ob-slide { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 40px; animation: pop .4s cubic-bezier(0.34, 1.56, 0.64, 1); flex: 1; }
+.ob-slide.active { display: flex; }
+.ob-icon { font-size: 84px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.1)); }
+.ob-title { font-family: var(--fs); font-size: 38px; color: var(--txt); margin-bottom: 16px; line-height: 1.1; letter-spacing: -1px; }
+.ob-desc { font-size: 15px; color: var(--txt2); line-height: 1.6; font-weight: 500; }
+.ob-bot { margin-top: auto; width: 100%; }
+.ob-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; }
+.ob-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brd2); transition: .3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.ob-dot.active { background: var(--green); width: 28px; border-radius: 999px; }
+.ob-actions { display: flex; justify-content: space-between; align-items: center; padding: 0 32px; }
+.ob-btn-skip { color: var(--txt3); font-weight: 700; background: none; border: none; font-size: 15px; padding: 10px; cursor: pointer; }
+.ob-btn-next { background: linear-gradient(135deg, var(--green), var(--green2)); color: #fff; border: none; padding: 14px 28px; border-radius: 18px; font-weight: 800; font-size: 15px; box-shadow: 0 10px 24px rgba(26,122,66,.3); cursor: pointer; transition: transform 0.15s; }
+.ob-btn-next:active { transform: scale(0.92); }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{font-size:15px}
+html{font-size:15px; background-color: #000000;} 
 body{font-family:var(--fd);background: radial-gradient(circle at 12% -6%, rgba(42,173,98,.18), transparent 30%), radial-gradient(circle at 92% 6%, rgba(90,58,139,.16), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--txt);min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto}
 
 [data-theme=dark] body { background: radial-gradient(circle at 12% -6%, rgba(50,215,75,.15), transparent 30%), radial-gradient(circle at 92% 6%, rgba(191,90,242,.15), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); }
@@ -383,6 +401,35 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="vLoader"><div id="vLoaderBar"></div></div>
 
+<div id="onboardingOverlay" class="onboard-ov hidden">
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+      <div class="ob-slide active">
+        <div class="ob-icon">📊</div>
+        <div class="ob-title">Bütçeni Yönet</div>
+        <div class="ob-desc">Maaşını, gelirlerini ve sabit giderlerini kolayca takip et. Paranın nereye gittiğini gör, kontrolü eline al.</div>
+      </div>
+      <div class="ob-slide">
+        <div class="ob-icon">🥇</div>
+        <div class="ob-title">Altın Borçları</div>
+        <div class="ob-desc">Canlı piyasa verileriyle güncellenen altın ve döviz borçlarını tek ekrandan, kuruşu kuruşuna takip et.</div>
+      </div>
+      <div class="ob-slide">
+        <div class="ob-icon">💼</div>
+        <div class="ob-title">Portföyünü Büyüt</div>
+        <div class="ob-desc">Hisse senedi, fon ve döviz yatırımlarını ekle. Finansal hedeflerine doğru adım adım ilerle.</div>
+      </div>
+  </div>
+  <div class="ob-bot">
+      <div class="ob-dots">
+        <div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div>
+      </div>
+      <div class="ob-actions">
+         <button class="ob-btn-skip" onclick="obBitir()">Atla</button>
+         <button class="ob-btn-next" onclick="obIleri()">İleri</button>
+      </div>
+  </div>
+</div>
+
 <div id="undoToast"></div>
 
 <div id="mConfirm" class="exit-ov">
@@ -408,8 +455,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div id="login">
-  <div class="login-bg"></div>
-  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.5 Pro</div>
+  <img src="16379.png" class="login-bg" alt="Splash Background">
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.7 Pro</div>
   
   <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
     <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:40px;">
@@ -810,7 +857,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mhandle"></div>
 <div class="mttl" style="display:flex; justify-content:space-between; align-items:center;">
    <span>🗑️ Çöp Kutusu</span>
-   <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:999px; border:none;">Tümünü Sil</button>
+   <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:99px; border:none;">Tümünü Sil</button>
 </div>
 <div style="font-size:12px; color:var(--txt2); margin-bottom:16px;">Silinen gelirler, giderler, varlıklar ve borçlar burada toplanır. Geri yükleyebilirsiniz.</div>
 <div id="copListesi" style="max-height:50vh; overflow-y:auto; margin-bottom:16px;"></div>
@@ -832,8 +879,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
   <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
-  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.6 Pro</div>
-  <div style="font-size:12px; color:var(--txt3);">Tasarım &amp; Fikir ysfbey</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.7 Pro</div>
+  <div style="font-size:12px; color:var(--txt3);">Maaş Günü & Altın Hesabım Birleşimi</div>
 </div>
 </div>
 </div>
@@ -886,20 +933,54 @@ function ozelOnayAc(mesaj, callback) {
 }
 
 /* ====================================================
-   1. AŞAMA EKLENTİSİ: ANİMASYONLU SAYILAR (COUNTER)
+   2. AŞAMA: ONBOARDING (KARŞILAMA) MANTIĞI
+   ==================================================== */
+let obGecerli = 0;
+function obInit() {
+  if(!localStorage.getItem('masaygunu_onboard_v2')) {
+    document.getElementById('onboardingOverlay').classList.remove('hidden');
+    obRender();
+  }
+}
+function obRender() {
+  const slides = document.querySelectorAll('.ob-slide');
+  const dots = document.querySelectorAll('.ob-dot');
+  slides.forEach((s, i) => s.classList.toggle('active', i === obGecerli));
+  dots.forEach((d, i) => d.classList.toggle('active', i === obGecerli));
+  document.querySelector('.ob-btn-next').textContent = obGecerli === slides.length - 1 ? 'Başla ✨' : 'İleri';
+}
+function obIleri() {
+  const slides = document.querySelectorAll('.ob-slide');
+  if(obGecerli < slides.length - 1) {
+    obGecerli++; obRender(); Haptic.light();
+  } else {
+    obBitir();
+  }
+}
+function obBitir() {
+  Haptic.success();
+  localStorage.setItem('masaygunu_onboard_v2', 'true');
+  const ov = document.getElementById('onboardingOverlay');
+  ov.style.opacity = '0';
+  ov.style.transition = 'opacity 0.4s ease';
+  setTimeout(() => ov.classList.add('hidden'), 400);
+}
+
+/* ====================================================
+   1. AŞAMA: ANİMASYONLU SAYILAR (COUNTER)
    ==================================================== */
 function animTL(id, val, isNeg=false) {
     const el = document.getElementById(id); if(!el) return;
-    el.classList.remove('skel'); // Varsa skeleton'ı kaldır
+    el.classList.remove('skel'); 
     const old = parseFloat(el.dataset.v) || 0;
     const pfx = isNeg ? '-₺' : '₺';
     
     if(old === val) { el.innerHTML = pfx + (Math.round(val)||0).toLocaleString('tr-TR'); el.dataset.v = val; return; }
     el.dataset.v = val;
-    let start = null; const dur = 800; // 800ms sayma animasyonu
+    let start = null; const dur = 800; 
     const step = (ts) => {
         if(!start) start = ts; const p = Math.min((ts - start) / dur, 1);
-        const ease = 1 - Math.pow(1 - p, 4); // Yavaşlayarak durma efekti
+        const ease = 1 - Math.pow(1 - p, 4);
         const curr = old + (val - old) * ease;
         el.innerHTML = pfx + (Math.round(curr)||0).toLocaleString('tr-TR');
         if(p < 1) requestAnimationFrame(step); 
@@ -1413,7 +1494,7 @@ function render(){
   document.getElementById('ayLbl').textContent=ayYazi(aktifAy);
   const h=hesapla(aktifAy);
   
-  // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYILAR (hGelir, hGider, hKalan)
+  // 1. AŞAMA: ANIMASYONLU SAYILAR (hGelir, hGider, hKalan)
   animTL('hGelir', h.topGelir);
   animTL('hGider', h.topGider);
   animTL('hKalan', Math.abs(h.kalan), h.kalan < 0);
@@ -1593,7 +1674,7 @@ function portfoyRender() {
    veri.portfoy.forEach(v => { const vTotal = v.miktar * (v.sonFiyat || 0); const vCostTotal = v.miktar * (v.maliyet || 0); if(!isNaN(vTotal)) totalNetWorth += vTotal; if(v.tip !== 'bes' && !isNaN(vCostTotal)) totalCost += vCostTotal; chartData[v.tip] = (chartData[v.tip] || 0) + (isNaN(vTotal) ? 0 : vTotal); if(gruplar[v.tip]) gruplar[v.tip].varliklar.push({...v, vTotal, vCostTotal}); });
    let genelKz = totalNetWorth - totalCost; let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
    
-   // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYI
+   // 1. AŞAMA: ANIMASYONLU SAYI
    animTL('pToplam', totalNetWorth);
    
    document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKz >= 0 ? 'pl-pos' : 'pl-neg'}">${genelKz > 0 ? '+' : ''}${fTL(genelKz)} (${genelKz > 0 ? '+' : ''}%${genelKzPct.toFixed(2)})</span>` : '';
@@ -1604,7 +1685,7 @@ function portfoyRender() {
    let eTotal = eRate > 0 ? (totalNetWorth / eRate) : 0;
    document.getElementById('pDovizToplam').innerHTML = `≈ $${uTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} <span style="opacity:0.5; margin:0 4px;">|</span> €${eTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
    
-   // 1. AŞAMA EKLENTİSİ: HEDEF KONTROLÜ VE CONFETTI
+   // 1. AŞAMA: HEDEF KONTROLÜ VE CONFETTI
    const hdf = getPortfoyHedefi();
    if(hdf > 0 && totalNetWorth >= hdf && !veri.hedefKutlandi) {
        veri.hedefKutlandi = true;
@@ -1833,7 +1914,7 @@ function renderBorcum() {
     if(k>0) adet++; map[b.tip] = (map[b.tip]||0) + k;
   });
 
-  // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYI
+  // 1. AŞAMA: ANIMASYONLU SAYI
   animTL('ozetTL', toplam);
   
   document.getElementById('ozetSub').textContent = adet ? `${adet} açık borç • ${fTL(odemeToplam)} ödeme kaydı` : 'Kalan açık borç bulunmuyor';
@@ -1989,7 +2070,7 @@ async function odemeKaydet() {
   await fbKaydet(); 
   
   Haptic.success(); 
-  // 1. AŞAMA EKLENTİSİ: CONFETTI (Borç bittiğinde)
+  // 1. AŞAMA: CONFETTI (Borç bittiğinde)
   if(kalanB(b) === 0) {
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 10000 });
       toast('🎉 Borç tamamen bitti!');
@@ -2000,7 +2081,10 @@ async function odemeKaydet() {
 
 /* ══ BAŞLAT ══ */
 async function init(){
-  // 1. AŞAMA EKLENTİSİ: SKELETON BAŞLATMA
+  // 2. AŞAMA: ONBOARDING BAŞLATICI
+  obInit();
+
+  // 1. AŞAMA: SKELETON BAŞLATMA
   ['hGelir','hGider','hKalan','pToplam','ozetTL'].forEach(id => {
       let e = document.getElementById(id); 
       if(e){ e.classList.add('skel'); e.textContent='00.000'; }
