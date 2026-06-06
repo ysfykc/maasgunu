@@ -81,12 +81,14 @@ button{cursor:pointer;border:none;background:none;font-family:var(--fd)}
 input,select{font-family:var(--fd);font-size:inherit; color:var(--txt);}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 input[type=number]{-moz-appearance:textfield}
+#login input::placeholder { color: rgba(255,255,255,0.4); }
+#login input:focus { border-color: rgba(255,255,255,0.5) !important; background: rgba(255,255,255,0.18) !important; }
 
 /* TEMEL BİLEŞENLER */
-#login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 0 32px 14vh; background: #000; }
+#login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; }
 .login-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 35%, #1a7a42 0%, #0a1a0e 80%); }
 .login-badge { position: absolute; top: 24px; right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-#loginBtn { width: 100%; max-width: 250px; padding: 13px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #1a1814; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
+#loginBtn { width: 100%; padding: 15px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #1a1814; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: none; cursor: pointer; }
 
 .topbar{position:fixed;top:0;left:0;right:0;height:var(--top);background:var(--ios-surface);backdrop-filter:var(--ios-blur);-webkit-backdrop-filter:var(--ios-blur);border-bottom:.5px solid var(--brd2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200;border-color:rgba(0,0,0,.06)}
 [data-theme=dark] .topbar {border-color:rgba(255,255,255,.08)}
@@ -396,17 +398,46 @@ main { padding-top: calc(var(--top) + 46px + env(safe-area-inset-top)); padding-
 
 <div id="login">
   <div class="login-bg"></div>
-  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; margin-bottom:4vh;">
-    <img src="16379.png" style="width:100px; height:100px; border-radius:24px; box-shadow:0 16px 36px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.1);">
-    <div style="font-family:var(--fs); font-size:38px; color:#fff; letter-spacing:-.5px; line-height:1;">Maaş Günü</div>
-    <div style="font-size:12px; color:rgba(255,255,255,0.5); font-weight:700; letter-spacing:1px; text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
-  </div>
   <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.5 Pro</div>
-  <div style="text-align:center; width:100%; display:flex; justify-content:center; margin-bottom:10vh;">
-    <button id="loginBtn" onclick="girisYap()">
-      <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
-      Google ile Giriş Yap
-    </button>
+  
+  <!-- ANA GİRİŞ PANELİ -->
+  <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:40px;">
+      <img src="16379.png" style="width:96px; height:96px; border-radius:24px; box-shadow:0 16px 36px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.1);">
+      <div style="font-family:var(--fs); font-size:38px; color:#fff; letter-spacing:-.5px; line-height:1;">Maaş Günü</div>
+      <div style="font-size:11px; color:rgba(255,255,255,0.5); font-weight:700; letter-spacing:1px; text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
+    </div>
+    <div style="width:100%; display:flex; flex-direction:column; gap:12px; margin-bottom:10vh;">
+      <button id="loginBtn" onclick="girisYap()" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:none; cursor:pointer;">
+        <svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Google ile Giriş Yap
+      </button>
+      <button onclick="emailPanelAc('giris')" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.12); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.2); cursor:pointer; backdrop-filter:blur(8px);">
+        ✉️ E-posta ile Giriş Yap
+      </button>
+      <button onclick="emailPanelAc('kayit')" style="width:100%; padding:13px 16px; border-radius:16px; background:transparent; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; border:none; cursor:pointer;">
+        Hesabın yok mu? Kayıt ol →
+      </button>
+    </div>
+  </div>
+
+  <!-- E-POSTA GİRİŞ / KAYIT PANELİ -->
+  <div id="emailPanel" style="display:none; flex:1; flex-direction:column; width:100%; padding:0 32px;">
+    <button onclick="emailPanelKapat()" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px);">← Geri</button>
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; margin-bottom:10vh;">
+      <div id="emailPanelTtl" style="font-family:var(--fs); font-size:30px; color:#fff; letter-spacing:-.5px; text-align:center; margin-bottom:8px;">Giriş Yap</div>
+      <div id="emailHata" style="display:none; background:rgba(255,80,80,0.2); border:1px solid rgba(255,80,80,0.4); color:#ffb3b3; padding:10px 14px; border-radius:12px; font-size:13px; text-align:center;"></div>
+      <div id="emailAdSoyadRow" style="display:none;">
+        <input id="eAdSoyad" type="text" placeholder="Ad Soyad" autocomplete="name" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
+      </div>
+      <input id="eEmail" type="email" placeholder="E-posta adresi" autocomplete="email" inputmode="email" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
+      <input id="eSifre" type="password" placeholder="Şifre" autocomplete="current-password" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
+      <button id="emailGirisBtn" onclick="emailIslem()" style="width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.3);">Giriş Yap</button>
+      <button id="sifremiUnuttumBtn" onclick="sifremiUnuttum()" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer; padding:4px;">Şifremi unuttum</button>
+      <div id="emailAltLink" style="text-align:center;">
+        <button onclick="emailPanelAc('kayit')" id="kayitGecBtn" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer;">Hesabın yok mu? Kayıt ol →</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -973,9 +1004,9 @@ function renderAll() {
 async function fbBaslat(){
   const{initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
   const{getFirestore,doc,setDoc,getDoc,onSnapshot}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const{getAuth,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  const{getAuth,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updateProfile}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
   const app=initializeApp(CFG); db=getFirestore(app);auth=getAuth(app);
-  window._fb={doc,setDoc,getDoc,onSnapshot,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut};
+  window._fb={doc,setDoc,getDoc,onSnapshot,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updateProfile};
   return new Promise(res=>onAuthStateChanged(auth,u=>{user=u;res(u);}));
 }
 
@@ -1007,7 +1038,93 @@ async function fbYukle(){
 
 async function girisYap(){
   Haptic.light(); document.getElementById('loginBtn').textContent='⏳ Bekleyin...';
-  try { await window._fb.signInWithPopup(auth, new window._fb.GoogleAuthProvider()); } catch(e) { document.getElementById('loginBtn').textContent='⚠️ Tekrar Dene'; }
+  try { await window._fb.signInWithPopup(auth, new window._fb.GoogleAuthProvider()); } catch(e) { document.getElementById('loginBtn').innerHTML='<svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> ⚠️ Tekrar Dene'; }
+}
+
+let emailMod = 'giris'; // 'giris' veya 'kayit'
+
+function emailPanelAc(mod) {
+  emailMod = mod;
+  document.getElementById('loginPanel').style.display = 'none';
+  document.getElementById('emailPanel').style.display = 'flex';
+  document.getElementById('emailHata').style.display = 'none';
+  document.getElementById('eEmail').value = '';
+  document.getElementById('eSifre').value = '';
+  if(mod === 'kayit') {
+    document.getElementById('emailPanelTtl').textContent = 'Hesap Oluştur';
+    document.getElementById('emailGirisBtn').textContent = 'Kayıt Ol';
+    document.getElementById('emailAdSoyadRow').style.display = 'block';
+    document.getElementById('sifremiUnuttumBtn').style.display = 'none';
+    document.getElementById('kayitGecBtn').textContent = 'Zaten hesabın var mı? Giriş yap →';
+    document.getElementById('kayitGecBtn').onclick = () => emailPanelAc('giris');
+    document.getElementById('eSifre').placeholder = 'Şifre (en az 6 karakter)';
+    document.getElementById('eSifre').autocomplete = 'new-password';
+  } else {
+    document.getElementById('emailPanelTtl').textContent = 'Giriş Yap';
+    document.getElementById('emailGirisBtn').textContent = 'Giriş Yap';
+    document.getElementById('emailAdSoyadRow').style.display = 'none';
+    document.getElementById('sifremiUnuttumBtn').style.display = 'block';
+    document.getElementById('kayitGecBtn').textContent = 'Hesabın yok mu? Kayıt ol →';
+    document.getElementById('kayitGecBtn').onclick = () => emailPanelAc('kayit');
+    document.getElementById('eSifre').placeholder = 'Şifre';
+    document.getElementById('eSifre').autocomplete = 'current-password';
+  }
+}
+
+function emailPanelKapat() {
+  document.getElementById('emailPanel').style.display = 'none';
+  document.getElementById('loginPanel').style.display = 'flex';
+}
+
+function emailHataGoster(msg) {
+  const el = document.getElementById('emailHata');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+async function emailIslem() {
+  const email = document.getElementById('eEmail').value.trim();
+  const sifre = document.getElementById('eSifre').value;
+  const btn = document.getElementById('emailGirisBtn');
+  document.getElementById('emailHata').style.display = 'none';
+  if (!email || !sifre) { emailHataGoster('E-posta ve şifre gir'); return; }
+  btn.textContent = '⏳ Bekleyin...'; btn.disabled = true;
+  try {
+    if (emailMod === 'kayit') {
+      const adSoyad = document.getElementById('eAdSoyad').value.trim();
+      const cred = await window._fb.createUserWithEmailAndPassword(auth, email, sifre);
+      if (adSoyad && cred.user) {
+        await window._fb.updateProfile(cred.user, { displayName: adSoyad });
+      }
+    } else {
+      await window._fb.signInWithEmailAndPassword(auth, email, sifre);
+    }
+  } catch(e) {
+    btn.textContent = emailMod === 'kayit' ? 'Kayıt Ol' : 'Giriş Yap'; btn.disabled = false;
+    const mesajlar = {
+      'auth/email-already-in-use': 'Bu e-posta zaten kayıtlı. Giriş yapmayı dene.',
+      'auth/invalid-email': 'Geçersiz e-posta adresi.',
+      'auth/weak-password': 'Şifre en az 6 karakter olmalı.',
+      'auth/user-not-found': 'Bu e-posta ile kayıtlı hesap bulunamadı.',
+      'auth/wrong-password': 'Şifre yanlış.',
+      'auth/invalid-credential': 'E-posta veya şifre hatalı.',
+      'auth/too-many-requests': 'Çok fazla deneme. Lütfen bekle.'
+    };
+    emailHataGoster(mesajlar[e.code] || 'Bir hata oluştu. Tekrar dene.');
+  }
+}
+
+async function sifremiUnuttum() {
+  const email = document.getElementById('eEmail').value.trim();
+  if (!email) { emailHataGoster('Önce e-posta adresini gir'); return; }
+  try {
+    await window._fb.sendPasswordResetEmail(auth, email);
+    document.getElementById('emailHata').style.background = 'rgba(42,173,98,0.2)';
+    document.getElementById('emailHata').style.borderColor = 'rgba(42,173,98,0.4)';
+    document.getElementById('emailHata').style.color = '#a8f0c0';
+    emailHataGoster('Şifre sıfırlama bağlantısı gönderildi ✓');
+  } catch(e) {
+    emailHataGoster('E-posta gönderilemedi. Adresi kontrol et.');
+  }
 }
 
 function cikisOnayAc() { document.getElementById('exitModal').style.display = 'flex'; }
