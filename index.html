@@ -14,6 +14,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 :root {
@@ -71,8 +72,22 @@
   --ios-shadow-soft:0 8px 24px rgba(0,0,0,.3);
   --ios-ring:rgba(255,255,255,.08);
 }
+
+/* YENİ: SKELETON LOADING ANİMASYONU */
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skel {
+  color: transparent !important;
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 8px;
+  user-select: none;
+}
+.hcard.gelir .skel, .hcard.gider .skel { background: linear-gradient(90deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.05) 75%); }
+[data-theme=dark] .hcard.gelir .skel, [data-theme=dark] .hcard.gider .skel { background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%); }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{font-size:15px; background-color: #000000;} /* BURASI EKLENDI: WebView'in anlık beyazlığını engeller */
+html{font-size:15px}
 body{font-family:var(--fd);background: radial-gradient(circle at 12% -6%, rgba(42,173,98,.18), transparent 30%), radial-gradient(circle at 92% 6%, rgba(90,58,139,.16), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--txt);min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto}
 
 [data-theme=dark] body { background: radial-gradient(circle at 12% -6%, rgba(50,215,75,.15), transparent 30%), radial-gradient(circle at 92% 6%, rgba(191,90,242,.15), transparent 28%), linear-gradient(180deg,var(--bg),var(--bg2)); }
@@ -316,7 +331,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .toast{position:fixed;bottom:calc(var(--nav)+22px);left:50%;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:10px 20px;border-radius:var(--rp);font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none;box-shadow:var(--ios-shadow)}
 .toast.on{opacity:1}
 
-/* YENİ: GERİ AL TOAST'U */
 #undoToast { position:fixed; bottom:calc(var(--nav) + 22px); left:50%; transform:translateX(-50%); background:var(--txt); color:var(--bg); padding:10px 14px 10px 20px; border-radius:var(--rp); font-size:13px; font-weight:500; z-index:9999; opacity:0; transition:opacity .25s; white-space:nowrap; box-shadow:var(--ios-shadow); display:flex; align-items:center; gap:12px; pointer-events:none; }
 #undoToast.on { opacity:1; pointer-events:auto; }
 
@@ -397,7 +411,8 @@ main { padding-top: calc(var(--top) + 46px + env(safe-area-inset-top)); padding-
 </div>
 
 <div id="login">
-  <div class="login-bg"></div>
+  <img src="16379.png" class="login-bg" alt="Splash Background">
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.5 Pro</div>
   
   <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
     <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:40px;">
@@ -820,7 +835,7 @@ main { padding-top: calc(var(--top) + 46px + env(safe-area-inset-top)); padding-
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
   <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
-  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.5 Pro</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.6 Pro</div>
   <div style="font-size:12px; color:var(--txt3);">Maaş Günü & Altın Hesabım Birleşimi</div>
 </div>
 </div>
@@ -874,7 +889,30 @@ function ozelOnayAc(mesaj, callback) {
 }
 
 /* ====================================================
-   YENİ: HİBRİT ÇÖP KUTUSU (Geri Al + Arşiv)
+   YENİ STAGE 1: ANİMASYONLAR VE HİS EFEKTLERİ
+   ==================================================== */
+function animTL(id, val, isNeg=false) {
+    const el = document.getElementById(id); if(!el) return;
+    el.classList.remove('skel');
+    const old = parseFloat(el.dataset.v) || 0;
+    const pfx = isNeg ? '-₺' : '₺';
+    
+    if(old === val) { el.innerHTML = pfx + (Math.round(val)||0).toLocaleString('tr-TR'); el.dataset.v = val; return; }
+    el.dataset.v = val;
+    let start = null; const dur = 800; // 800ms sayma animasyonu
+    const step = (ts) => {
+        if(!start) start = ts; const p = Math.min((ts - start) / dur, 1);
+        const ease = 1 - Math.pow(1 - p, 4); // Yavaşlayarak durma efekti
+        const curr = old + (val - old) * ease;
+        el.innerHTML = pfx + (Math.round(curr)||0).toLocaleString('tr-TR');
+        if(p < 1) requestAnimationFrame(step); 
+        else el.innerHTML = pfx + (Math.round(val)||0).toLocaleString('tr-TR');
+    };
+    requestAnimationFrame(step);
+}
+
+/* ====================================================
+   HİBRİT ÇÖP KUTUSU (Geri Al + Arşiv)
    ==================================================== */
 let undoTimer = null;
 
@@ -1035,7 +1073,7 @@ async function fbYukle(){
 
 async function girisYap(){
   Haptic.light(); document.getElementById('loginBtn').textContent='⏳ Bekleyin...';
-  try { await window._fb.signInWithPopup(auth, new window._fb.GoogleAuthProvider()); } catch(e) { document.getElementById('loginBtn').innerHTML='<svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Google ile Giriş Yap'; }
+  try { await window._fb.signInWithPopup(auth, new window._fb.GoogleAuthProvider()); } catch(e) { document.getElementById('loginBtn').innerHTML='<svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> ⚠️ Tekrar Dene'; }
 }
 
 let emailMod = 'giris'; // 'giris' veya 'kayit'
@@ -1377,8 +1415,12 @@ function ayDegis(d){ Haptic.light(); aktifAy=ayEkleStr(aktifAy, d); tabIdx=0; do
 function render(){
   document.getElementById('ayLbl').textContent=ayYazi(aktifAy);
   const h=hesapla(aktifAy);
-  document.getElementById('hGelir').textContent=fTL(h.topGelir); document.getElementById('hGider').textContent=fTL(h.topGider);
-  document.getElementById('hKalan').textContent=(h.kalan<0?'-':'')+fTL(Math.abs(h.kalan));
+  
+  // YENİ: ANIMASYONLU SAYILAR (hGelir, hGider, hKalan)
+  animTL('hGelir', h.topGelir);
+  animTL('hGider', h.topGider);
+  animTL('hKalan', Math.abs(h.kalan), h.kalan < 0);
+  
   document.getElementById('hKalanCard').className='hcard '+(h.kalan>=0?'kalan-pos':'kalan-neg');
   paceHesapla(h); aiInsightGoster(h);
   const cls=h.oran<70?'ok':h.oran<90?'warn':'danger';
@@ -1553,7 +1595,10 @@ function portfoyRender() {
    veri.portfoy.forEach(v => { if(v.tip==='altin' && v.kod==='GRAM ALTIN') v.kod='gram-altin'; });
    veri.portfoy.forEach(v => { const vTotal = v.miktar * (v.sonFiyat || 0); const vCostTotal = v.miktar * (v.maliyet || 0); if(!isNaN(vTotal)) totalNetWorth += vTotal; if(v.tip !== 'bes' && !isNaN(vCostTotal)) totalCost += vCostTotal; chartData[v.tip] = (chartData[v.tip] || 0) + (isNaN(vTotal) ? 0 : vTotal); if(gruplar[v.tip]) gruplar[v.tip].varliklar.push({...v, vTotal, vCostTotal}); });
    let genelKz = totalNetWorth - totalCost; let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
-   document.getElementById('pToplam').textContent = fTL(totalNetWorth); 
+   
+   // YENİ: ANIMASYONLU SAYI
+   animTL('pToplam', totalNetWorth);
+   
    document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKz >= 0 ? 'pl-pos' : 'pl-neg'}">${genelKz > 0 ? '+' : ''}${fTL(genelKz)} (${genelKz > 0 ? '+' : ''}%${genelKzPct.toFixed(2)})</span>` : '';
    
    let uRate = parseFloat(veri.kurlar?.usd || veri.kurlar?.USD) || 33.0;
@@ -1562,6 +1607,15 @@ function portfoyRender() {
    let eTotal = eRate > 0 ? (totalNetWorth / eRate) : 0;
    document.getElementById('pDovizToplam').innerHTML = `≈ $${uTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} <span style="opacity:0.5; margin:0 4px;">|</span> €${eTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
    
+   // YENİ: HEDEF KONTROLÜ VE CONFETTI
+   const hdf = getPortfoyHedefi();
+   if(hdf > 0 && totalNetWorth >= hdf && !veri.hedefKutlandi) {
+       veri.hedefKutlandi = true;
+       setTimeout(() => { confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, zIndex: 10000 }); }, 500);
+   } else if (hdf > 0 && totalNetWorth < hdf) {
+       veri.hedefKutlandi = false;
+   }
+
    for (let gKey in gruplar) {
        let g = gruplar[gKey];
        if (g.varliklar.length > 0) {
@@ -1782,7 +1836,9 @@ function renderBorcum() {
     if(k>0) adet++; map[b.tip] = (map[b.tip]||0) + k;
   });
 
-  document.getElementById('ozetTL').textContent = fTL(toplam);
+  // YENİ: ANIMASYONLU SAYI
+  animTL('ozetTL', toplam);
+  
   document.getElementById('ozetSub').textContent = adet ? `${adet} açık borç • ${fTL(odemeToplam)} ödeme kaydı` : 'Kalan açık borç bulunmuyor';
   
   const risk = document.getElementById('ozetRisk');
@@ -1931,11 +1987,28 @@ async function odemeKaydet() {
   if (!miktar) return; const b = veri.borclar.find(x=>x.id===aktifOdemeBorcId); if (!b) return;
   if (miktar > kalanB(b)) { Haptic.error(); toast('⚠️ Kalan borçtan fazla olamaz'); return; }
   b.odemeler.push({id:uid(), tarih:new Date().toISOString(), miktar, not, kurTL:tlye(b.tip,miktar)});
-  document.getElementById('mOdeme').classList.remove('on'); renderBorcum(); await fbKaydet(); Haptic.success(); toast(kalanB(b)===0 ? '🎉 Borç bitti!' : '✅ Ödeme alındı');
+  document.getElementById('mOdeme').classList.remove('on'); 
+  renderBorcum(); 
+  await fbKaydet(); 
+  
+  Haptic.success(); 
+  // YENİ: CONFETTI (Borç bittiğinde)
+  if(kalanB(b) === 0) {
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 10000 });
+      toast('🎉 Borç tamamen bitti!');
+  } else {
+      toast('✅ Ödeme alındı');
+  }
 }
 
 /* ══ BAŞLAT ══ */
 async function init(){
+  // YENİ: SKELETON BAŞLATMA
+  ['hGelir','hGider','hKalan','pToplam','ozetTL'].forEach(id => {
+      let e = document.getElementById(id); 
+      if(e){ e.classList.add('skel'); e.textContent='00.000'; }
+  });
+
   const tema=localStorage.getItem('masaygunu2Tema')||'light'; document.documentElement.dataset.theme=tema; document.getElementById('themeBtn').textContent=tema==='dark'?'☀️':'🌙';
   const u=await fbBaslat();
   if(!u){
