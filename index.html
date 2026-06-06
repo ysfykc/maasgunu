@@ -352,11 +352,30 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .dekont-col { flex: 1; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; border: 1px solid rgba(255,255,255,0.05); }
 .dekont-col-val { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800; margin-top: 6px; letter-spacing: -0.5px; }
 .dekont-footer { text-align: center; margin-top: 36px; font-size: 11px; color: rgba(255,255,255,0.4); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;}
+
+/* SAFE AREA (ÇENTİK VE ALT ÇİZGİ) UYUMU */
+.topbar { padding-top: env(safe-area-inset-top); height: calc(var(--top) + env(safe-area-inset-top)); }
+.ay-bar { top: calc(var(--top) + env(safe-area-inset-top)); }
+main { padding-top: calc(var(--top) + 46px + env(safe-area-inset-top)); padding-bottom: calc(var(--nav) + 120px + env(safe-area-inset-bottom)); }
+.nav { padding-bottom: calc(12px + env(safe-area-inset-bottom)); height: calc(72px + env(safe-area-inset-bottom)); }
+#login { padding-bottom: calc(14vh + env(safe-area-inset-bottom)); }
+.ov { padding-bottom: env(safe-area-inset-bottom); padding-top: env(safe-area-inset-top); }
 </style>
 </head>
 <body>
 
 <div id="vLoader"><div id="vLoaderBar"></div></div>
+
+<div id="mConfirm" class="exit-ov">
+  <div class="exit-mod">
+    <div class="mttl" style="font-size:18px; margin-bottom:10px;">Emin misin?</div>
+    <div style="font-size:14px; color:var(--txt2); margin-bottom:24px;" id="confirmMsg">Silmek istediğinize emin misiniz?</div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <button class="exit-btn red" id="confirmYesBtn" onclick="if(confirmCallback) { confirmCallback(); confirmCallback=null; } document.getElementById('mConfirm').style.display='none';">Evet, Sil</button>
+      <button class="exit-btn gray" onclick="document.getElementById('mConfirm').style.display='none'">Vazgeç</button>
+    </div>
+  </div>
+</div>
 
 <div id="exitModal" class="exit-ov">
   <div class="exit-mod">
@@ -371,7 +390,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="login">
   <img src="16379.png" class="login-bg" alt="Splash Background">
-  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.2 Pro</div>
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.3 Pro</div>
   <div style="text-align:center; width:100%; display:flex; justify-content:center;">
     <button id="loginBtn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
@@ -566,8 +585,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" id="eAd" type="text"/></div>
-<div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="eTutar" min="0" step="any" type="number"/></div></div>
-<div class="igrp" id="taksitRow"><label class="ilbl">Taksit <span style="color:var(--txt3);font-weight:400">(Ay)</span></label><input class="inp" id="eTaksit" type="number" min="1" value="1" placeholder="1"/></div>
+<div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="eTutar" min="0" step="any" type="number" inputmode="decimal"/></div></div>
+<div class="igrp" id="taksitRow"><label class="ilbl">Taksit <span style="color:var(--txt3);font-weight:400">(Ay)</span></label><input class="inp" id="eTaksit" type="number" inputmode="decimal" min="1" value="1" placeholder="1"/></div>
 <div class="igrp"><label class="ilbl">Kategori</label><input class="inp" id="eKat" type="text"/></div>
 <div class="igrp"><label class="ilbl">Not</label><input class="inp" id="eNot" type="text"/></div>
 
@@ -590,7 +609,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mhandle"></div>
 <div class="mttl">Düzenle</div>
 <div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" id="dAd" type="text"/></div>
-<div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="dTutar" min="0" step="any" type="number"/></div></div>
+<div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="dTutar" min="0" step="any" type="number" inputmode="decimal"/></div></div>
 <div class="igrp"><label class="ilbl">Kategori</label><input class="inp" id="dKat" type="text"/></div>
 <div class="igrp"><label class="ilbl">Not</label><input class="inp" id="dNot" type="text"/></div>
 <div class="toggle-row" onclick="toggleTikla('dTekrar')" style="cursor:pointer">
@@ -627,8 +646,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <label class="ilbl">Döviz Cinsi</label>
   <select class="inp" id="vDovizTip" style="appearance:none; -webkit-appearance:none;"><option value="USD">Dolar (USD)</option><option value="EUR">Euro (EUR)</option><option value="GBP">Sterlin (GBP)</option></select>
 </div>
-<div class="igrp"><label class="ilbl" id="vMiktarLbl">Miktar</label><input class="inp" id="vMiktar" min="0" step="any" type="number"/></div>
-<div class="igrp" id="vMaliyetRow"><label class="ilbl">Ortalama Maliyet (Birim Alış Fiyatı)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vMaliyet" min="0" step="any" type="number"/></div></div>
+<div class="igrp"><label class="ilbl" id="vMiktarLbl">Miktar</label><input class="inp" id="vMiktar" min="0" step="any" type="number" inputmode="decimal"/></div>
+<div class="igrp" id="vMaliyetRow"><label class="ilbl">Ortalama Maliyet (Birim Alış Fiyatı)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vMaliyet" min="0" step="any" type="number" inputmode="decimal"/></div></div>
 <button class="sbtn a" onclick="varlikKaydet()">✓ Varlığı Kaydet</button>
 <button class="cancel-btn" onclick="document.getElementById('mPortfoy').classList.remove('on')">İptal</button>
 </div></div>
@@ -640,12 +659,12 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div class="igrp">
   <label class="ilbl" id="vdMiktarLbl">Miktar</label>
-  <input class="inp" id="vdMiktar" min="0" step="any" type="number"/>
+  <input class="inp" id="vdMiktar" min="0" step="any" type="number" inputmode="decimal"/>
 </div>
 
 <div class="igrp" id="vdMaliyetRow">
   <label class="ilbl">Ortalama Maliyet (Birim Fiyat)</label>
-  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vdMaliyet" min="0" step="any" type="number"/></div>
+  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vdMaliyet" min="0" step="any" type="number" inputmode="decimal"/></div>
 </div>
 
 <div class="toggle-row" onclick="toggleVdManuelFiyat()" style="cursor:pointer" id="vdOtoFiyatToggleWrap">
@@ -655,7 +674,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div class="igrp" id="vdFiyatRow" style="display:none;">
   <label class="ilbl">Sabit Fiyatı Girin</label>
-  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vdFiyat" min="0" step="any" type="number"/></div>
+  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vdFiyat" min="0" step="any" type="number" inputmode="decimal"/></div>
 </div>
 
 <button class="sbtn a" onclick="varlikDuzenleKaydet()">✓ Değişiklikleri Kaydet</button>
@@ -704,7 +723,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 </div>
 <div class="igrp"><label class="ilbl" id="adLbl">Borç Adı / Kişi</label><input class="inp" id="bAd" placeholder="örn. Ahmet amca" type="text"/></div>
-<div class="igrp"><label class="ilbl" id="miktarLbl">Miktar (gram)</label><div class="ipfx"><span class="pfx" id="pfx">gr</span><input class="inp" id="bMiktar" min="0" placeholder="0" step="0.01" type="number"/></div></div>
+<div class="igrp"><label class="ilbl" id="miktarLbl">Miktar (gram)</label><div class="ipfx"><span class="pfx" id="pfx">gr</span><input class="inp" id="bMiktar" min="0" placeholder="0" step="0.01" type="number" inputmode="decimal"/></div></div>
 <div class="igrp"><label class="ilbl">Not (isteğe bağlı)</label><input class="inp" id="bNot" placeholder="örn. 2024 borcu" type="text"/></div>
 <button class="sbtn" id="borcKaydetBtn" onclick="borcKaydet()" style="background:var(--txt); color:var(--bg);">✓ Kaydet</button>
 <button class="cancel-btn" onclick="document.getElementById('mBorc').classList.remove('on')">İptal</button>
@@ -715,7 +734,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="modal">
 <div class="mhandle"></div>
 <div class="mttl" id="odeTtl">Ödeme Yap</div>
-<div class="igrp"><label class="ilbl" id="odeLbl">Miktar</label><div class="ipfx"><span class="pfx" id="odePfx">gr</span><input class="inp" id="odeMiktar" min="0" placeholder="0" step="0.01" type="number"/></div></div>
+<div class="igrp"><label class="ilbl" id="odeLbl">Miktar</label><div class="ipfx"><span class="pfx" id="odePfx">gr</span><input class="inp" id="odeMiktar" min="0" placeholder="0" step="0.01" type="number" inputmode="decimal"/></div></div>
 <div class="igrp"><label class="ilbl">Not (isteğe bağlı)</label><input class="inp" id="odeNot" placeholder="örn. nakit" type="text"/></div>
 <button class="sbtn" onclick="odemeKaydet()" style="background:var(--green)">✓ Ödemeyi Kaydet</button>
 <button class="cancel-btn" onclick="document.getElementById('mOdeme').classList.remove('on')">İptal</button>
@@ -739,14 +758,14 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="modal">
 <div class="mhandle"></div>
 <div class="mttl">⚙️ Ayarlar</div>
-<div class="igrp"><label class="ilbl">Maaş Günü (Ayın kaçıncı günü?)</label><input class="inp" id="ayarMaasGunu" type="number" min="1" max="31" /></div>
-<div class="igrp"><label class="ilbl">Portföy Büyüme Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarHedef" type="number" min="0" /></div></div>
+<div class="igrp"><label class="ilbl">Maaş Günü (Ayın kaçıncı günü?)</label><input class="inp" id="ayarMaasGunu" type="number" inputmode="decimal" min="1" max="31" /></div>
+<div class="igrp"><label class="ilbl">Portföy Büyüme Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarHedef" type="number" inputmode="decimal" min="0" /></div></div>
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
   <div style="font-family:var(--fs); font-size:24px; color:var(--txt); margin-bottom:2px; letter-spacing:-.02em;">Maaş Günü</div>
-  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.2 Pro</div>
+  <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.3 Pro</div>
   <div style="font-size:12px; color:var(--txt3);">Maaş Günü & Altın Hesabım Birleşimi</div>
 </div>
 </div>
@@ -754,7 +773,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div class="toast" id="toast"></div>
 
-<!-- GÖRSEL RAPOR / DEKONT EKRANI (GİZLİ ALAN) -->
 <div id="dekontRenderArea"></div>
 
 <script>
@@ -790,6 +808,15 @@ function bugunAyId() {
   return `${y}-${String(m).padStart(2, '0')}`;
 }
 let aktifAy=bugunAyId();
+
+/* ══ ÖZEL ONAY MODALI FONKSİYONU ══ */
+let confirmCallback = null;
+function ozelOnayAc(mesaj, callback) {
+  Haptic.light();
+  document.getElementById('confirmMsg').textContent = mesaj;
+  confirmCallback = callback;
+  document.getElementById('mConfirm').style.display = 'flex';
+}
 
 async function fbBaslat(){
   const{initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
@@ -866,7 +893,7 @@ function lsYukle(){
   }catch(e){}
 }
 
-/* ══ KURLAR & API (BİRLEŞTİRİLMİŞ V4 MOTORU) ══ */
+/* ══ KURLAR & API ══ */
 async function fetchWithTimeout(url, options = {}, timeout = 4000) {
     const controller = new AbortController(); const id = setTimeout(() => controller.abort(), timeout);
     const response = await fetch(url, { ...options, signal: controller.signal }); clearTimeout(id); return response;
@@ -1020,14 +1047,16 @@ async function dekontOlustur() {
   }
   
   try {
-      await new Promise(r => setTimeout(r, 300)); 
+      await document.fonts.ready;
+      await new Promise(r => setTimeout(r, 400)); 
       
       const exportNode = document.getElementById('exportNode');
       const canvas = await html2canvas(exportNode, {
           scale: 3,
-          backgroundColor: null,
+          backgroundColor: '#111827',
           useCORS: true,
-          logging: false
+          logging: false,
+          allowTaint: true
       });
       
       const imgData = canvas.toDataURL('image/png');
@@ -1363,11 +1392,11 @@ async function varlikDuzenleKaydet() {
 }
 
 async function varlikSilButton() {
-    if(confirm('Bu varlığı portföyden silmek istediğinize emin misiniz?')) { 
+    ozelOnayAc('Bu varlığı portföyden silmek istediğinize emin misiniz?', async () => {
         veri.portfoy = veri.portfoy.filter(x => x.id !== aktifVarlikId);
         document.getElementById('mPortfoyDuzenle').classList.remove('on');
         portfoyRender(); await fbKaydet(); Haptic.heavy(); toast('Varlık silindi');
-    }
+    });
 }
 
 function aiPortfoyOneriUret() {
@@ -1624,7 +1653,11 @@ function aksiyonDuzenle(){
   borcMiktarUIGuncelle(); document.getElementById('mBorc').classList.add('on');
 }
 async function aksiyonSil(){
-  if(confirm('Silmek istediğine emin misin?')) { veri.borclar = veri.borclar.filter(b=>b.id!==aksiyonBorcId); document.getElementById('mAksiyon').classList.remove('on'); renderBorcum(); await fbKaydet(); Haptic.heavy(); toast('🗑 Silindi'); }
+  ozelOnayAc('Bu borcu silmek istediğinize emin misiniz?', async () => { 
+      veri.borclar = veri.borclar.filter(b=>b.id!==aksiyonBorcId); 
+      document.getElementById('mAksiyon').classList.remove('on'); 
+      renderBorcum(); await fbKaydet(); Haptic.heavy(); toast('🗑 Silindi'); 
+  });
 }
 
 function odemeModalAc(id) {
