@@ -136,7 +136,29 @@ input[type=number]{-moz-appearance:textfield}
 .login-badge { position: absolute; top: 24px; right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 #loginBtn { width: 100%; padding: 15px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #1a1814; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: none; cursor: pointer; }
 
-/* STABİL YERLEŞİM CSS BLOĞU */
+/* ══ HEDEF TASARRUFU ══ */
+.hedef-card { margin:0 16px 12px; background:linear-gradient(135deg,#1a3a8b,#5a3a8b); border-radius:20px; padding:16px; box-shadow:0 8px 24px rgba(26,58,139,.25); }
+.hedef-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.hedef-card-ttl { font-size:13px; font-weight:800; color:rgba(255,255,255,.8); text-transform:uppercase; letter-spacing:.06em; }
+.hedef-card-edit { background:rgba(255,255,255,.15); border:none; color:#fff; padding:5px 12px; border-radius:99px; font-size:11px; font-weight:700; cursor:pointer; }
+.hedef-card-val { font-family:var(--fs); font-size:28px; color:#fff; letter-spacing:-.5px; margin-bottom:4px; }
+.hedef-card-sub { font-size:12px; color:rgba(255,255,255,.65); margin-bottom:12px; }
+.hedef-prg-wrap { height:8px; background:rgba(255,255,255,.2); border-radius:99px; overflow:hidden; margin-bottom:8px; }
+.hedef-prg { height:100%; background:linear-gradient(90deg,#32d74b,#30d158); border-radius:99px; transition:width .6s cubic-bezier(.34,1.56,.64,1); }
+.hedef-card-bot { display:flex; justify-content:space-between; font-size:11px; color:rgba(255,255,255,.7); font-weight:600; }
+.hedef-bitti { background:linear-gradient(135deg,#1a7a42,#2aad62) !important; }
+
+/* ══ FATURA HATIRLATICI ══ */
+.fatura-item { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surf); border-radius:16px; border:1px solid var(--brd); margin-bottom:8px; box-shadow:var(--sh); }
+.fatura-ico { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--amber-bg); }
+.fatura-info { flex:1; }
+.fatura-ad { font-size:14px; font-weight:700; color:var(--txt); }
+.fatura-meta { font-size:11px; color:var(--txt3); margin-top:2px; }
+.fatura-gun { font-size:13px; font-weight:800; padding:4px 10px; border-radius:99px; }
+.fatura-gun.yakin { background:var(--red-bg); color:var(--red); }
+.fatura-gun.normal { background:var(--green-bg); color:var(--green); }
+.fatura-gun.bugun { background:var(--amber-bg); color:var(--amber); }
+.fatura-badge { position:absolute; top:-4px; right:-4px; width:16px; height:16px; border-radius:50%; background:var(--red); color:#fff; font-size:9px; font-weight:800; display:flex; align-items:center; justify-content:center; }
 .topbar{ position:fixed; top:0; left:0; right:0; height:calc(var(--top) + env(safe-area-inset-top)); background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-bottom:.5px solid var(--brd2); display:flex; align-items:center; justify-content:space-between; padding:env(safe-area-inset-top) 16px 0; z-index:200; border-color:rgba(0,0,0,.06); }
 [data-theme=dark] .topbar {border-color:rgba(255,255,255,.08)}
 .logo{font-family:var(--fd);font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:-.02em}
@@ -579,6 +601,30 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 </div>
 
+<!-- HEDEF TASARRUFU KARTI -->
+<div id="hedefCard" style="display:none;" class="hedef-card">
+  <div class="hedef-card-top">
+    <div class="hedef-card-ttl">🎯 Tasarruf Hedefin</div>
+    <button class="hedef-card-edit" onclick="hedefModalAc()">Düzenle</button>
+  </div>
+  <div class="hedef-card-val" id="hedefVal">₺0 / ₺0</div>
+  <div class="hedef-card-sub" id="hedefSub">Hedefe ulaşmak için devam et</div>
+  <div class="hedef-prg-wrap"><div class="hedef-prg" id="hedefPrg" style="width:0%"></div></div>
+  <div class="hedef-card-bot">
+    <span id="hedefPct">%0 tamamlandı</span>
+    <span id="hedefKalan"></span>
+  </div>
+</div>
+
+<!-- FATURA HATIRLATICI BUTONU (topbar yakını) -->
+<div id="faturaUyari" style="display:none; margin:0 16px 10px;">
+  <button onclick="faturaModalAc()" style="width:100%; padding:12px 16px; border-radius:16px; background:var(--amber-bg); color:var(--amber); font-size:13px; font-weight:700; border:1.5px solid rgba(184,96,16,.2); cursor:pointer; display:flex; align-items:center; gap:8px;">
+    <span style="font-size:18px;">🔔</span>
+    <span id="faturaUyariTxt">Yaklaşan ödemeler var</span>
+    <span style="margin-left:auto;">→</span>
+  </button>
+</div>
+
 <div id="compareBar" style="display:none;" class="compare-bar">
   <div class="compare-ico" id="compareIco">📊</div>
   <div class="compare-body">
@@ -910,10 +956,10 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mttl">⚙️ Ayarlar</div>
 <div class="igrp"><label class="ilbl">Maaş Günü (Ayın kaçıncı günü?)</label><input class="inp" id="ayarMaasGunu" type="number" inputmode="decimal" min="1" max="31" /></div>
 <div class="igrp"><label class="ilbl">Portföy Büyüme Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarHedef" type="number" inputmode="decimal" min="0" /></div></div>
+<div class="igrp"><label class="ilbl">🎯 Tasarruf Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarTasarrufHedef" type="number" inputmode="decimal" min="0" placeholder="Örn: 50000" /></div></div>
+<div class="igrp"><label class="ilbl">📅 Hedef Tarihi</label><input class="inp" id="ayarTasarrufTarih" type="month" /></div>
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
-
 <button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:10px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
-
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
@@ -925,6 +971,20 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- FATURA HATIRLATICI MODAL -->
+<div class="ov" id="mFatura" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+<div class="mhandle"></div>
+<div class="mttl">🔔 Fatura Hatırlatıcıları</div>
+<div style="font-size:12px; color:var(--txt3); margin-bottom:14px;">Giderlerindeki ödeme tarihlerine göre otomatik oluşturulur.</div>
+<div id="faturaListesi" style="max-height:55vh; overflow-y:auto;"></div>
+<div style="margin-top:14px; padding:12px; background:var(--blue-bg); border-radius:14px; font-size:12px; color:var(--blue); font-weight:600;">
+  💡 Gider eklerken "Not" alanına gün yazarsan (örn: "15") otomatik hatırlatıcı oluşur.
+</div>
+<button class="cancel-btn" onclick="document.getElementById('mFatura').classList.remove('on')">Kapat</button>
+</div>
+</div>
 
 <div id="dekontRenderArea"></div>
 
@@ -1059,6 +1119,126 @@ async function sablonEkle(idx) {
   else v.giderler.push(kalem);
   lsKaydet(); await fbKaydet(); render(); sablonRender();
   toast(`✅ ${s.ad} eklendi`);
+}
+
+/* ══ HEDEF TASARRUFU ══ */
+function hedefGoster() {
+  const kart = document.getElementById('hedefCard'); if(!kart) return;
+  const hedef = parseFloat(veri.ayarlar?.tasarrufHedef) || 0;
+  const tarih = veri.ayarlar?.tasarrufTarih || '';
+  if(!hedef) { kart.style.display = 'none'; return; }
+
+  // Tüm aylardaki yatırım toplamını hesapla
+  let toplamBirikim = 0;
+  Object.values(veri.aylar || {}).forEach(ay => {
+    (ay.giderler || []).filter(k => k.yatirim && k.odendi).forEach(k => toplamBirikim += k.tutar);
+  });
+
+  const pct = Math.min(100, Math.round((toplamBirikim / hedef) * 100));
+  const kalan = Math.max(0, hedef - toplamBirikim);
+  const bitti = toplamBirikim >= hedef;
+
+  kart.className = 'hedef-card' + (bitti ? ' hedef-bitti' : '');
+  document.getElementById('hedefVal').textContent = `${fTL(toplamBirikim)} / ${fTL(hedef)}`;
+  document.getElementById('hedefPrg').style.width = pct + '%';
+  document.getElementById('hedefPct').textContent = `%${pct} tamamlandı`;
+
+  if(bitti) {
+    document.getElementById('hedefSub').textContent = '🎉 Hedefe ulaştın, tebrikler!';
+    document.getElementById('hedefKalan').textContent = '';
+    confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 }, zIndex: 10000 });
+  } else {
+    let sub = `${fTL(kalan)} daha biriktirilmeli`;
+    if(tarih) {
+      const ayFark = aylarArasi(new Date(), new Date(tarih + '-01'));
+      if(ayFark > 0) sub += ` · Aylık ${fTL(Math.ceil(kalan / ayFark))} gerekiyor`;
+    }
+    document.getElementById('hedefSub').textContent = sub;
+    document.getElementById('hedefKalan').textContent = tarih ? `📅 ${tarihFmt(tarih)}` : '';
+  }
+  kart.style.display = 'block';
+}
+
+function aylarArasi(d1, d2) {
+  return Math.max(0, (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()));
+}
+
+function tarihFmt(ym) {
+  const AYLAR = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  const [y, m] = ym.split('-');
+  return `${AYLAR[parseInt(m)-1]} ${y}`;
+}
+
+function hedefModalAc() {
+  Haptic.light();
+  document.getElementById('ayarTasarrufHedef').value = veri.ayarlar?.tasarrufHedef || '';
+  document.getElementById('ayarTasarrufTarih').value = veri.ayarlar?.tasarrufTarih || '';
+  document.getElementById('mAyarlar').classList.add('on');
+}
+
+/* ══ FATURA HATIRLATICI ══ */
+function faturaHatirlaticiKontrol() {
+  const uyari = document.getElementById('faturaUyari'); if(!uyari) return;
+  const v = ayVerisi(aktifAy);
+  const bugun = new Date().getDate();
+  const yakinlar = [];
+
+  v.giderler.filter(k => !k.odendi).forEach(k => {
+    const gun = parseInt(k.not);
+    if(gun >= 1 && gun <= 31) {
+      const fark = gun - bugun;
+      if(fark >= 0 && fark <= 7) yakinlar.push({ ...k, gun, fark });
+    }
+  });
+
+  if(yakinlar.length === 0) { uyari.style.display = 'none'; return; }
+  uyari.style.display = 'block';
+  const bugunVar = yakinlar.filter(k => k.fark === 0).length;
+  if(bugunVar > 0) {
+    document.getElementById('faturaUyariTxt').textContent = `Bugün ${bugunVar} ödeme günü!`;
+  } else {
+    document.getElementById('faturaUyariTxt').textContent = `${yakinlar.length} ödeme yaklaşıyor (7 gün içinde)`;
+  }
+}
+
+function faturaModalAc() {
+  Haptic.light();
+  const v = ayVerisi(aktifAy);
+  const bugun = new Date().getDate();
+  const liste = [];
+
+  v.giderler.forEach(k => {
+    const gun = parseInt(k.not);
+    if(gun >= 1 && gun <= 31) {
+      const fark = gun - bugun;
+      liste.push({ ...k, gun, fark });
+    }
+  });
+
+  liste.sort((a, b) => {
+    const fa = a.fark < 0 ? a.fark + 31 : a.fark;
+    const fb = b.fark < 0 ? b.fark + 31 : b.fark;
+    return fa - fb;
+  });
+
+  const el = document.getElementById('faturaListesi');
+  if(liste.length === 0) {
+    el.innerHTML = '<div style="text-align:center; padding:24px; color:var(--txt3); font-size:14px;">Henüz fatura hatırlatıcısı yok.<br><br>Gider eklerken "Not" alanına ödeme gününü yaz.</div>';
+  } else {
+    el.innerHTML = liste.map(k => {
+      const cls = k.fark === 0 ? 'bugun' : k.fark > 0 && k.fark <= 3 ? 'yakin' : 'normal';
+      const etiket = k.fark === 0 ? 'Bugün!' : k.fark < 0 ? 'Geçti' : k.fark === 1 ? 'Yarın' : `${k.fark} gün`;
+      return `<div class="fatura-item">
+        <div class="fatura-ico">${k.odendi ? '✅' : '📄'}</div>
+        <div class="fatura-info">
+          <div class="fatura-ad">${escHtml(k.ad)}</div>
+          <div class="fatura-meta">${fTL(k.tutar)} · Her ayın ${k.gun}. günü${k.kategori ? ' · ' + k.kategori : ''}</div>
+        </div>
+        <span class="fatura-gun ${cls}">${etiket}</span>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('mFatura').classList.add('on');
 }
 
 /* ══ HAPTIC ENGINE ══ */
@@ -1637,7 +1817,7 @@ function render(){
   animTL('hKalan', Math.abs(h.kalan), h.kalan < 0);
   
   document.getElementById('hKalanCard').className='hcard '+(h.kalan>=0?'kalan-pos':'kalan-neg');
-  paceHesapla(h); aiInsightGoster(h); karsilastirmaGoster();
+  paceHesapla(h); aiInsightGoster(h); karsilastirmaGoster(); hedefGoster(); faturaHatirlaticiKontrol();
   const cls=h.oran<70?'ok':h.oran<90?'warn':'danger';
   document.getElementById('prgBar').className='prg-bar '+cls; document.getElementById('prgBar').style.width=h.oran+'%';
   document.getElementById('prgPct').textContent='%'+h.oran; document.getElementById('prgPct').style.color=h.oran<70?'var(--green)':h.oran<90?'var(--amber)':'var(--red)';
@@ -1738,11 +1918,19 @@ function maasModalAc(tip){
   document.querySelector('#tekrarRow .toggle-lbl').textContent = tip === 'gelir' ? '🔄 Sabit Gelir' : '🔄 Sabit Gider';
   document.getElementById('mEkle').classList.add('on'); setTimeout(()=>document.getElementById('eTutar').focus(),350);
 }
-function ayarlarAc() { Haptic.light(); document.getElementById('ayarMaasGunu').value = getMaasGunu(); document.getElementById('ayarHedef').value = getPortfoyHedefi() || ''; document.getElementById('mAyarlar').classList.add('on'); }
+function ayarlarAc() { Haptic.light(); document.getElementById('ayarMaasGunu').value = getMaasGunu(); document.getElementById('ayarHedef').value = getPortfoyHedefi() || ''; document.getElementById('ayarTasarrufHedef').value = veri.ayarlar?.tasarrufHedef || ''; document.getElementById('ayarTasarrufTarih').value = veri.ayarlar?.tasarrufTarih || ''; document.getElementById('mAyarlar').classList.add('on'); }
 async function ayarlarKaydet() {
-  let mg = parseInt(document.getElementById('ayarMaasGunu').value) || 15; if(mg < 1) mg = 1; if(mg > 31) mg = 31; let hedef = parseFloat(document.getElementById('ayarHedef').value) || 0;
-  if(!veri.ayarlar) veri.ayarlar = {}; veri.ayarlar.maasGunu = mg; veri.ayarlar.portfoyHedef = hedef;
-  aktifAy = bugunAyId(); document.getElementById('mAyarlar').classList.remove('on'); render(); if(navIdx === 1) portfoyRender(); await fbKaydet(); Haptic.success(); toast('Ayarlar kaydedildi');
+  let mg = parseInt(document.getElementById('ayarMaasGunu').value) || 15; if(mg < 1) mg = 1; if(mg > 31) mg = 31;
+  let hedef = parseFloat(document.getElementById('ayarHedef').value) || 0;
+  let tasarrufHedef = parseFloat(document.getElementById('ayarTasarrufHedef').value) || 0;
+  let tasarrufTarih = document.getElementById('ayarTasarrufTarih').value || '';
+  if(!veri.ayarlar) veri.ayarlar = {};
+  veri.ayarlar.maasGunu = mg;
+  veri.ayarlar.portfoyHedef = hedef;
+  veri.ayarlar.tasarrufHedef = tasarrufHedef;
+  veri.ayarlar.tasarrufTarih = tasarrufTarih;
+  aktifAy = bugunAyId(); document.getElementById('mAyarlar').classList.remove('on');
+  render(); if(navIdx === 1) portfoyRender(); await fbKaydet(); Haptic.success(); toast('Ayarlar kaydedildi');
 }
 async function kalemKaydet(){
   const ad=document.getElementById('eAd').value.trim(); const tutar=parseFloat(document.getElementById('eTutar').value)||0; const kat=document.getElementById('eKat').value.trim(); const not=document.getElementById('eNot').value.trim(); const taksit=parseInt(document.getElementById('eTaksit').value)||1;
