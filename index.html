@@ -117,10 +117,10 @@ input[type=number]{-moz-appearance:textfield}
 #login input::placeholder { color: rgba(255,255,255,0.4); }
 #login input:focus { border-color: rgba(255,255,255,0.5) !important; background: rgba(255,255,255,0.18) !important; }
 
-/* TEMEL BİLEŞENLER */
+/* DÜZELTİLMİŞ GİRİŞ EKRANI (LOGIN) CSS'İ */
 #login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; }
 .login-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 35%, #1a7a42 0%, #0a1a0e 80%); }
-.login-badge { position: absolute; top: 24px; right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.login-badge { position: absolute; top: calc(24px + env(safe-area-inset-top)); right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 #loginBtn { width: 100%; padding: 15px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #1a1814; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: none; cursor: pointer; }
 
 /* STABİL YERLEŞİM CSS BLOĞU */
@@ -455,7 +455,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div id="login">
-  <img src="16379.png" class="login-bg" alt="Splash Background">
+  <div class="login-bg"></div>
   <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.7 Pro</div>
   
   <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
@@ -857,9 +857,9 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="mhandle"></div>
 <div class="mttl" style="display:flex; justify-content:space-between; align-items:center;">
    <span>🗑️ Çöp Kutusu</span>
-   <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:99px; border:none;">Tümünü Sil</button>
+   <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:99px;">Tümünü Sil</button>
 </div>
-<div style="font-size:12px; color:var(--txt2); margin-bottom:16px;">Silinen gelirler, giderler, varlıklar ve borçlar burada toplanır. Geri yükleyebilirsiniz.</div>
+<div style="font-size:12px; color:var(--txt2); margin-bottom:16px;">Silinen gelirler, giderler, varlıklar ve borçlar burada toplanır. İstediğinizi geri yükleyebilirsiniz.</div>
 <div id="copListesi" style="max-height:50vh; overflow-y:auto; margin-bottom:16px;"></div>
 <button class="cancel-btn" onclick="document.getElementById('mCopKutusu').classList.remove('on')">Kapat</button>
 </div>
@@ -1494,7 +1494,7 @@ function render(){
   document.getElementById('ayLbl').textContent=ayYazi(aktifAy);
   const h=hesapla(aktifAy);
   
-  // 1. AŞAMA: ANIMASYONLU SAYILAR (hGelir, hGider, hKalan)
+  // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYILAR (hGelir, hGider, hKalan)
   animTL('hGelir', h.topGelir);
   animTL('hGider', h.topGider);
   animTL('hKalan', Math.abs(h.kalan), h.kalan < 0);
@@ -1674,7 +1674,7 @@ function portfoyRender() {
    veri.portfoy.forEach(v => { const vTotal = v.miktar * (v.sonFiyat || 0); const vCostTotal = v.miktar * (v.maliyet || 0); if(!isNaN(vTotal)) totalNetWorth += vTotal; if(v.tip !== 'bes' && !isNaN(vCostTotal)) totalCost += vCostTotal; chartData[v.tip] = (chartData[v.tip] || 0) + (isNaN(vTotal) ? 0 : vTotal); if(gruplar[v.tip]) gruplar[v.tip].varliklar.push({...v, vTotal, vCostTotal}); });
    let genelKz = totalNetWorth - totalCost; let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
    
-   // 1. AŞAMA: ANIMASYONLU SAYI
+   // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYI
    animTL('pToplam', totalNetWorth);
    
    document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKz >= 0 ? 'pl-pos' : 'pl-neg'}">${genelKz > 0 ? '+' : ''}${fTL(genelKz)} (${genelKz > 0 ? '+' : ''}%${genelKzPct.toFixed(2)})</span>` : '';
@@ -1685,7 +1685,7 @@ function portfoyRender() {
    let eTotal = eRate > 0 ? (totalNetWorth / eRate) : 0;
    document.getElementById('pDovizToplam').innerHTML = `≈ $${uTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} <span style="opacity:0.5; margin:0 4px;">|</span> €${eTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
    
-   // 1. AŞAMA: HEDEF KONTROLÜ VE CONFETTI
+   // 1. AŞAMA EKLENTİSİ: HEDEF KONTROLÜ VE CONFETTI
    const hdf = getPortfoyHedefi();
    if(hdf > 0 && totalNetWorth >= hdf && !veri.hedefKutlandi) {
        veri.hedefKutlandi = true;
@@ -1845,7 +1845,7 @@ function aiPortfoyOneriUret() {
     
     let dovizOran = total > 0 ? (tipToplam['doviz'] / total) * 100 : 0;
     if(dovizOran > 30) {
-        oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; Eurobond (Yabancı Fon) veya ABD hisselerini düşünebilirsiniz.`);
+        oneriler.push(`Nakit döviz (USD/EUR) oranınız (%${dovizOran.toFixed(0)}) oldukça yüksek. Nakit döviz enflasyona karşı tam koruma sağlamaz; bunu Eurobond (Yabancı Fon) veya ABD hisselerinde değerlendirmeyi düşünebilirsiniz.`);
     }
 
     let randomOneri = oneriler[Math.floor(Math.random() * oneriler.length)];
@@ -1914,7 +1914,7 @@ function renderBorcum() {
     if(k>0) adet++; map[b.tip] = (map[b.tip]||0) + k;
   });
 
-  // 1. AŞAMA: ANIMASYONLU SAYI
+  // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYI
   animTL('ozetTL', toplam);
   
   document.getElementById('ozetSub').textContent = adet ? `${adet} açık borç • ${fTL(odemeToplam)} ödeme kaydı` : 'Kalan açık borç bulunmuyor';
@@ -2018,125 +2018,4 @@ function katSec(btn) {
   Haptic.light(); secilenKat = btn.dataset.cat;
   document.querySelectorAll('[data-cat]').forEach(b=>b.className='tbx '+b.dataset.cat); btn.classList.add('on');
   const ag = document.getElementById('altinGrup');
-  if (secilenKat==='gold') { ag.style.display='block'; secilenTip='gram_altin'; document.querySelectorAll('[data-tip]').forEach(b=>b.classList.remove('on')); document.querySelector('[data-tip=gram_altin]').classList.add('on'); } else { ag.style.display='none'; secilenTip=secilenKat; }
-  borcMiktarUIGuncelle();
-}
-function tipSec(btn) { Haptic.light(); secilenTip = btn.dataset.tip; document.querySelectorAll('[data-tip]').forEach(b=>b.className='tbx gold'); btn.classList.add('on'); borcMiktarUIGuncelle(); }
-
-async function borcKaydet() {
-  const ad = document.getElementById('bAd').value.trim(); const miktar = parseFloat(document.getElementById('bMiktar').value)||0; const not = document.getElementById('bNot').value.trim();
-  if (!ad || !miktar) { Haptic.error(); toast('⚠️ Ad ve miktar gir'); return; }
-  if(duzenlenenBorcId){ const b=veri.borclar.find(x=>x.id===duzenlenenBorcId); if(b){ b.tip=secilenTip; b.ad=ad; b.not=not; b.miktar=miktar; } duzenlenenBorcId=null; }
-  else{ veri.borclar.push({id:uid(), tip:secilenTip, ad, not, miktar, odemeler:[]}); }
-  document.getElementById('mBorc').classList.remove('on'); renderBorcum(); await fbKaydet(); Haptic.success(); toast('✅ Kaydedildi');
-}
-
-function borcAksiyonAc(id) {
-  Haptic.light(); aksiyonBorcId = id; const b = veri.borclar.find(x=>x.id===id); if(!b) return;
-  document.getElementById('aksiyonTtl').textContent = b.ad + " İşlemleri";
-  document.getElementById('mAksiyon').classList.add('on');
-}
-function aksiyonOdeme(){ document.getElementById('mAksiyon').classList.remove('on'); odemeModalAc(aksiyonBorcId); }
-function aksiyonDuzenle(){
-  document.getElementById('mAksiyon').classList.remove('on');
-  const b=veri.borclar.find(x=>x.id===aksiyonBorcId); if(!b)return;
-  duzenlenenBorcId=b.id; secilenTip=b.tip; secilenKat=isAltin(b.tip)?'gold':b.tip;
-  document.getElementById('borcModalTtl').textContent='Borcu Düzenle'; document.getElementById('borcKaydetBtn').textContent='✓ Güncelle';
-  document.getElementById('bAd').value=b.ad||''; document.getElementById('bMiktar').value=b.miktar||0; document.getElementById('bNot').value=b.not||'';
-  document.querySelectorAll('[data-cat]').forEach(btn=>{ btn.className='tbx '+btn.dataset.cat; if(btn.dataset.cat===secilenKat)btn.classList.add('on'); });
-  const ag=document.getElementById('altinGrup'); if(secilenKat==='gold'){ ag.style.display='block'; document.querySelectorAll('[data-tip]').forEach(btn=>{ btn.className='tbx gold'; if(btn.dataset.tip===secilenTip)btn.classList.add('on'); }); } else { ag.style.display='none'; }
-  borcMiktarUIGuncelle(); document.getElementById('mBorc').classList.add('on');
-}
-async function aksiyonSil(){
-  ozelOnayAc('Bu borcu silmek istediğinize emin misiniz?', async () => { 
-      await copKutusunaAt('borc', aksiyonBorcId);
-  });
-}
-
-function odemeModalAc(id) {
-  aktifOdemeBorcId = id; const b = veri.borclar.find(x=>x.id===id); if (!b) return;
-  const sym = isAltin(b.tip)?tipAd(b.tip):({usd:'$',eur:'€',tl:'₺',kredi:'₺',kk:'₺'}[b.tip]);
-  document.getElementById('odeLbl').textContent = 'Miktar (' + sym + ')'; document.getElementById('odePfx').textContent = sym;
-  document.getElementById('odeMiktar').value=''; document.getElementById('odeNot').value='';
-  document.getElementById('mOdeme').classList.add('on'); Haptic.light();
-}
-async function odemeKaydet() {
-  const miktar = parseFloat(document.getElementById('odeMiktar').value)||0; const not = document.getElementById('odeNot').value.trim();
-  if (!miktar) return; const b = veri.borclar.find(x=>x.id===aktifOdemeBorcId); if (!b) return;
-  if (miktar > kalanB(b)) { Haptic.error(); toast('⚠️ Kalan borçtan fazla olamaz'); return; }
-  b.odemeler.push({id:uid(), tarih:new Date().toISOString(), miktar, not, kurTL:tlye(b.tip,miktar)});
-  document.getElementById('mOdeme').classList.remove('on'); 
-  renderBorcum(); 
-  await fbKaydet(); 
-  
-  Haptic.success(); 
-  // 1. AŞAMA: CONFETTI (Borç bittiğinde)
-  if(kalanB(b) === 0) {
-      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 10000 });
-      toast('🎉 Borç tamamen bitti!');
-  } else {
-      toast('✅ Ödeme alındı');
-  }
-}
-
-/* ══ BAŞLAT ══ */
-async function init(){
-  // 2. AŞAMA: ONBOARDING BAŞLATICI
-  obInit();
-
-  // 1. AŞAMA: SKELETON BAŞLATMA
-  ['hGelir','hGider','hKalan','pToplam','ozetTL'].forEach(id => {
-      let e = document.getElementById(id); 
-      if(e){ e.classList.add('skel'); e.textContent='00.000'; }
-  });
-
-  const tema=localStorage.getItem('masaygunu2Tema')||'light'; document.documentElement.dataset.theme=tema; document.getElementById('themeBtn').textContent=tema==='dark'?'☀️':'🌙';
-  const u=await fbBaslat();
-  if(!u){
-    document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
-    window._fb.onAuthStateChanged(auth,async kullanici=>{
-      if(kullanici){ 
-         user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
-         const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} 
-         lsYukle(); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
-         window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
-           if(snap.exists()) {
-             const uzak = JSON.parse(snap.data().json || '{}');
-             if((uzak.guncelleme || '2000') > (veri.guncelleme || '2000')){
-               veri = uzak; lsKaydet(); render();
-               if(navIdx === 1) portfoyRender(); if(navIdx === 2) renderBorcum();
-             }
-           } setSynk('ok');
-         }, (err) => { setSynk('off'); });
-      } else { 
-         user=null;veri={aylar:{}, portfoy:[], borclar:[], copKutusu:[], ayarlar:{maasGunu:15, portfoyHedef:0}, kurlar:{usd:32.5,eur:35.0,USD:32.5,EUR:35.0}, guncelleme:null}; 
-         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); 
-      }
-    });
-    return;
-  }
-  document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
-  const av=document.getElementById('avatar'); if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
-  lsYukle(); render(); await fbYukle(); 
-  kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); });
-  
-  window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
-    if(snap.exists()) {
-      const uzak = JSON.parse(snap.data().json || '{}');
-      if((uzak.guncelleme || '2000') > (veri.guncelleme || '2000')){
-        veri = uzak; lsKaydet(); render();
-        if(navIdx === 1) portfoyRender(); if(navIdx === 2) renderBorcum();
-      }
-    } setSynk('ok');
-  }, (err) => { setSynk('off'); });
-}
-
-document.addEventListener('DOMContentLoaded',init);
-function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
-document.addEventListener('DOMContentLoaded', function(){
-  const login=document.getElementById('login');
-  if(login){ const obs=new MutationObserver(function(){ uiLoginDurumuAyarla(getComputedStyle(login).display !== 'none'); }); obs.observe(login,{attributes:true,attributeFilter:['style','class']}); setTimeout(function(){ uiLoginDurumuAyarla(getComputedStyle(login).display !== 'none'); },250); }
-});
-</script>
-</body>
-</html>
+  if (secilenKat==='gold') { ag.style.display='block'; secilenTip='gram_altin'; document.querySelectorAll('[data-tip]').forEach
