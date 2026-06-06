@@ -99,8 +99,38 @@ input[type=number]{-moz-appearance:textfield}
 #login input::placeholder { color: rgba(255,255,255,0.4); }
 #login input:focus { border-color: rgba(255,255,255,0.5) !important; background: rgba(255,255,255,0.18) !important; }
 
-/* TEMEL BİLEŞENLER */
-#login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; }
+/* ══ ONBOARDING ══ */
+#onboarding { position:fixed; inset:0; z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(160deg,#0a1a0e 0%,#1a3a8b 100%); padding:32px; }
+.ob-step { display:none; flex-direction:column; align-items:center; text-align:center; width:100%; max-width:340px; }
+.ob-step.on { display:flex; }
+.ob-emoji { font-size:64px; margin-bottom:24px; }
+.ob-title { font-family:var(--fs); font-size:32px; color:#fff; margin-bottom:10px; letter-spacing:-.5px; }
+.ob-sub { font-size:14px; color:rgba(255,255,255,.65); line-height:1.6; margin-bottom:32px; }
+.ob-dots { display:flex; gap:6px; margin-bottom:32px; }
+.ob-dot { width:8px; height:8px; border-radius:99px; background:rgba(255,255,255,.3); transition:.3s; }
+.ob-dot.on { background:#fff; width:24px; }
+.ob-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; width:100%; margin-bottom:28px; }
+.ob-day { padding:12px 0; border-radius:14px; background:rgba(255,255,255,.1); color:#fff; font-size:15px; font-weight:700; cursor:pointer; border:2px solid transparent; transition:.2s; }
+.ob-day.on { background:rgba(255,255,255,.95); color:#1a1814; border-color:transparent; }
+.ob-next { width:100%; padding:16px; border-radius:18px; background:rgba(255,255,255,.95); color:#1a1814; font-size:15px; font-weight:800; border:none; cursor:pointer; }
+.ob-skip { background:none; border:none; color:rgba(255,255,255,.5); font-size:13px; margin-top:16px; cursor:pointer; }
+
+/* ══ AYLIK KARŞILAŞTIRMA ══ */
+.compare-bar { margin:0 16px 12px; padding:14px 16px; background:var(--surf); border-radius:16px; border:1px solid var(--brd); display:flex; align-items:center; gap:12px; box-shadow:var(--sh); }
+.compare-ico { font-size:24px; }
+.compare-body { flex:1; }
+.compare-txt { font-size:13px; font-weight:700; color:var(--txt); }
+.compare-sub { font-size:11px; color:var(--txt3); margin-top:2px; }
+
+/* ══ ŞABLONLAR ══ */
+#mSablon .sablon-liste { display:flex; flex-direction:column; gap:10px; max-height:55vh; overflow-y:auto; }
+.sablon-item { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--bg2); border-radius:14px; }
+.sablon-ico { font-size:22px; }
+.sablon-info { flex:1; }
+.sablon-ad { font-size:14px; font-weight:700; color:var(--txt); }
+.sablon-meta { font-size:11px; color:var(--txt3); margin-top:2px; }
+.sablon-ekle { padding:6px 14px; border-radius:99px; background:var(--green); color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; }
+.sablon-ekle.r { background:var(--red); } position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; }
 .login-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 35%, #1a7a42 0%, #0a1a0e 80%); }
 .login-badge { position: absolute; top: 24px; right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 #loginBtn { width: 100%; padding: 15px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #1a1814; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: none; cursor: pointer; }
@@ -407,6 +437,49 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   </div>
 </div>
 
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-dots">
+    <div class="ob-dot on" id="obDot0"></div>
+    <div class="ob-dot" id="obDot1"></div>
+    <div class="ob-dot" id="obDot2"></div>
+  </div>
+  <div class="ob-step on" id="obStep0">
+    <div class="ob-emoji">👋</div>
+    <div class="ob-title">Hoş Geldin!</div>
+    <div class="ob-sub">Maaş Günü ile aylık bütçeni kolayca yönet, harcamalarını takip et ve birikimini artır.</div>
+    <button class="ob-next" onclick="obIleri()">Başlayalım →</button>
+    <button class="ob-skip" onclick="obAtla()">Atla</button>
+  </div>
+  <div class="ob-step" id="obStep1">
+    <div class="ob-emoji">📅</div>
+    <div class="ob-title">Maaş Günün?</div>
+    <div class="ob-sub">Her ay maaşının yattığı günü seç. Günlük harcama limitin buna göre hesaplanacak.</div>
+    <div class="ob-grid" id="obDayGrid"></div>
+    <button class="ob-next" onclick="obIleri()">Devam →</button>
+  </div>
+  <div class="ob-step" id="obStep2">
+    <div class="ob-emoji">🎯</div>
+    <div class="ob-title">Hazırsın!</div>
+    <div class="ob-sub">Gelirlerini ve giderlerini ekleyerek başla. Uygulama otomatik olarak sana önerilerde bulunacak.</div>
+    <button class="ob-next" onclick="obBitir()">Uygulamayı Aç 🚀</button>
+  </div>
+</div>
+
+<!-- ŞABLON MODAL -->
+<div class="ov" id="mSablon" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+<div class="mhandle"></div>
+<div class="mttl">📋 Hızlı Şablonlar</div>
+<div style="display:flex; gap:8px; margin-bottom:14px;">
+  <button onclick="sablonTab('gelir')" id="sTabG" style="flex:1; padding:8px; border-radius:99px; background:var(--green-bg); color:var(--green); font-size:13px; font-weight:700; border:none; cursor:pointer;">🟢 Gelirler</button>
+  <button onclick="sablonTab('gider')" id="sTabD" style="flex:1; padding:8px; border-radius:99px; background:var(--bg2); color:var(--txt2); font-size:13px; font-weight:700; border:none; cursor:pointer;">🔴 Giderler</button>
+</div>
+<div class="sablon-liste" id="sablonListe"></div>
+<button class="cancel-btn" onclick="document.getElementById('mSablon').classList.remove('on')">Kapat</button>
+</div>
+</div>
+
 <div id="login">
   <div class="login-bg"></div>
   <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong> • Maaş Günü v4.5 Pro</div>
@@ -503,6 +576,18 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <button class="ai-mini-btn" onclick="tabSec(3)">Grafiğe bak</button>
 </div>
 </div>
+</div>
+
+<div id="compareBar" style="display:none;" class="compare-bar">
+  <div class="compare-ico" id="compareIco">📊</div>
+  <div class="compare-body">
+    <div class="compare-txt" id="compareTxt">Geçen aya göre</div>
+    <div class="compare-sub" id="compareSub"></div>
+  </div>
+</div>
+
+<div style="margin:0 16px 10px; display:flex; gap:8px;">
+  <button onclick="sablonModalAc()" style="flex:1; padding:10px 14px; border-radius:14px; background:var(--blue-bg); color:var(--blue); font-size:12px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">📋 Şablonlardan Ekle</button>
 </div>
 
 <div class="prg-sec">
@@ -843,6 +928,138 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div id="dekontRenderArea"></div>
 
 <script>
+/* ══ ONBOARDING ══ */
+let obAdim = 0, obSeciliGun = 15;
+
+function obBaslat() {
+  // Grid oluştur
+  const grid = document.getElementById('obDayGrid');
+  if(grid) {
+    grid.innerHTML = '';
+    for(let i=1; i<=31; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'ob-day' + (i === obSeciliGun ? ' on' : '');
+      btn.textContent = i;
+      btn.onclick = () => { obSeciliGun = i; grid.querySelectorAll('.ob-day').forEach((b,idx)=>b.classList.toggle('on', idx+1===i)); };
+      grid.appendChild(btn);
+    }
+  }
+  document.getElementById('onboarding').style.display = 'flex';
+}
+
+function obIleri() {
+  Haptic.light();
+  obAdim = Math.min(2, obAdim + 1);
+  document.querySelectorAll('.ob-step').forEach((s,i)=>s.classList.toggle('on', i===obAdim));
+  document.querySelectorAll('.ob-dot').forEach((d,i)=>d.classList.toggle('on', i===obAdim));
+}
+
+function obAtla() { obBitir(); }
+
+function obBitir() {
+  Haptic.success();
+  if(!veri.ayarlar) veri.ayarlar = {};
+  veri.ayarlar.maasGunu = obSeciliGun;
+  veri.ayarlar.onboardingDone = true;
+  lsKaydet(); fbKaydet();
+  document.getElementById('onboarding').style.display = 'none';
+  aktifAy = bugunAyId(); render();
+  toast('🎉 Hoş geldin! Gelirlerini eklemeye başla.');
+}
+
+/* ══ AYLIK KARŞILAŞTIRMA ══ */
+function karsilastirmaGoster() {
+  const bar = document.getElementById('compareBar'); if(!bar) return;
+  const oncekiAy = ayEkleStr(aktifAy, -1);
+  const h = hesapla(aktifAy);
+  const ho = hesapla(oncekiAy);
+  if(h.topGider === 0 || ho.topGider === 0) { bar.style.display = 'none'; return; }
+  const fark = h.topGider - ho.topGider;
+  const pct = Math.abs(Math.round((fark / ho.topGider) * 100));
+  const artis = fark > 0;
+  document.getElementById('compareIco').textContent = artis ? '📈' : '📉';
+  document.getElementById('compareTxt').textContent = artis
+    ? `Geçen aya göre %${pct} daha fazla harcadın`
+    : `Geçen aya göre %${pct} daha az harcadın`;
+  document.getElementById('compareSub').textContent = artis
+    ? `Bu ay ${fTL(h.topGider)}, geçen ay ${fTL(ho.topGider)} harcandı`
+    : `Bu ay ${fTL(h.topGider)}, geçen ay ${fTL(ho.topGider)} harcandı`;
+  document.getElementById('compareBar').style.display = 'flex';
+}
+
+/* ══ ŞABLONLAR ══ */
+const SABLONLAR = {
+  gelir: [
+    { ico:'💵', ad:'Maaş', kat:'Maaş', tutar:0, tekrar:true },
+    { ico:'🎖', ad:'Taltif', kat:'Taltif', tutar:0, tekrar:false },
+    { ico:'🛡️', ad:'Ek Görev', kat:'Ek Görev', tutar:0, tekrar:false },
+    { ico:'💼', ad:'Operasyon Tazminatı', kat:'Tazminat', tutar:0, tekrar:false },
+    { ico:'🏠', ad:'Kira Getirisi', kat:'Kira', tutar:0, tekrar:true },
+    { ico:'📈', ad:'Temettü', kat:'Yatırım', tutar:0, tekrar:false },
+  ],
+  gider: [
+    { ico:'💳', ad:'Kredi Kartı', kat:'Kredi Kartı', tutar:0, tekrar:true },
+    { ico:'🏦', ad:'Kredi Taksiti', kat:'Kredi', tutar:0, tekrar:true },
+    { ico:'🛒', ad:'Market Bütçesi', kat:'Market', tutar:0, tekrar:true },
+    { ico:'🧾', ad:'Faturalar', kat:'Fatura', tutar:0, tekrar:true },
+    { ico:'🚗', ad:'Yakıt', kat:'Ulaşım', tutar:0, tekrar:true },
+    { ico:'🏠', ad:'Kira', kat:'Kira', tutar:0, tekrar:true },
+    { ico:'📱', ad:'Telefon Faturası', kat:'Fatura', tutar:0, tekrar:true },
+    { ico:'🎬', ad:'Eğlence & Abonelik', kat:'Eğlence', tutar:0, tekrar:true },
+    { ico:'💊', ad:'Sağlık & İlaç', kat:'Sağlık', tutar:0, tekrar:false },
+    { ico:'👕', ad:'Giyim', kat:'Giyim', tutar:0, tekrar:false },
+  ]
+};
+
+let sablonTip = 'gelir';
+
+function sablonModalAc() {
+  Haptic.light();
+  sablonTip = 'gelir';
+  sablonRender();
+  document.getElementById('mSablon').classList.add('on');
+}
+
+function sablonTab(tip) {
+  sablonTip = tip;
+  document.getElementById('sTabG').style.background = tip==='gelir' ? 'var(--green-bg)' : 'var(--bg2)';
+  document.getElementById('sTabG').style.color = tip==='gelir' ? 'var(--green)' : 'var(--txt2)';
+  document.getElementById('sTabD').style.background = tip==='gider' ? 'var(--red-bg)' : 'var(--bg2)';
+  document.getElementById('sTabD').style.color = tip==='gider' ? 'var(--red)' : 'var(--txt2)';
+  sablonRender();
+}
+
+function sablonRender() {
+  const liste = SABLONLAR[sablonTip];
+  const v = ayVerisi(aktifAy);
+  const mevcutlar = (sablonTip==='gelir' ? v.gelirler : v.giderler).map(k=>k.ad.toLowerCase());
+  document.getElementById('sablonListe').innerHTML = liste.map((s,i) => {
+    const zatenVar = mevcutlar.includes(s.ad.toLowerCase());
+    return `<div class="sablon-item">
+      <div class="sablon-ico">${s.ico}</div>
+      <div class="sablon-info">
+        <div class="sablon-ad">${s.ad}</div>
+        <div class="sablon-meta">${s.kat}${s.tekrar ? ' · Sabit' : ''}</div>
+      </div>
+      ${zatenVar
+        ? `<span style="font-size:11px; color:var(--txt3); font-weight:700;">✓ Eklendi</span>`
+        : `<button class="sablon-ekle ${sablonTip==='gider'?'r':''}" onclick="sablonEkle(${i})">+ Ekle</button>`
+      }
+    </div>`;
+  }).join('');
+}
+
+async function sablonEkle(idx) {
+  Haptic.light();
+  const s = SABLONLAR[sablonTip][idx];
+  const v = ayVerisi(aktifAy);
+  const kalem = { id:uid(), ad:s.ad, tutar:0, kategori:s.kat, not:'', tekrar:s.tekrar, odendi:false, yatirim:false };
+  if(sablonTip==='gelir') v.gelirler.push(kalem);
+  else v.giderler.push(kalem);
+  lsKaydet(); await fbKaydet(); render(); sablonRender();
+  toast(`✅ ${s.ad} eklendi`);
+}
+
 /* ══ HAPTIC ENGINE ══ */
 const Haptic = {
   light: () => { if(navigator.vibrate) navigator.vibrate(10); },
@@ -1419,7 +1636,7 @@ function render(){
   animTL('hKalan', Math.abs(h.kalan), h.kalan < 0);
   
   document.getElementById('hKalanCard').className='hcard '+(h.kalan>=0?'kalan-pos':'kalan-neg');
-  paceHesapla(h); aiInsightGoster(h);
+  paceHesapla(h); aiInsightGoster(h); karsilastirmaGoster();
   const cls=h.oran<70?'ok':h.oran<90?'warn':'danger';
   document.getElementById('prgBar').className='prg-bar '+cls; document.getElementById('prgBar').style.width=h.oran+'%';
   document.getElementById('prgPct').textContent='%'+h.oran; document.getElementById('prgPct').style.color=h.oran<70?'var(--green)':h.oran<90?'var(--amber)':'var(--red)';
@@ -2015,6 +2232,8 @@ async function init(){
          user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
          const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} 
          lsYukle(); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
+         // Onboarding kontrolü
+         if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
          window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
            if(snap.exists()) {
              const uzak = JSON.parse(snap.data().json || '{}');
@@ -2035,6 +2254,8 @@ async function init(){
   const av=document.getElementById('avatar'); if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
   lsYukle(); render(); await fbYukle(); 
   kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); });
+  // Onboarding kontrolü
+  if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
   
   window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
     if(snap.exists()) {
