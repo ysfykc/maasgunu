@@ -73,7 +73,28 @@
   --ios-ring:rgba(255,255,255,.08);
 }
 
-/* 1. AŞAMA EKLENTİSİ: SKELETON LOADING (SHIMMER) ANİMASYONU */
+/* ══ ADMİN PANELİ ══ */
+#adminPanel { display:none; position:fixed; inset:0; z-index:9998; background:var(--bg); overflow-y:auto; padding-bottom:40px; }
+.admin-topbar { position:sticky; top:0; background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-bottom:.5px solid var(--brd2); padding:calc(env(safe-area-inset-top) + 12px) 16px 12px; display:flex; align-items:center; gap:12px; z-index:10; }
+.admin-topbar h2 { font-size:17px; font-weight:800; flex:1; }
+.admin-close { font-size:22px; background:none; border:none; cursor:pointer; color:var(--txt2); }
+.admin-section { margin:16px; }
+.admin-section-ttl { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--txt3); margin-bottom:10px; }
+.admin-card { background:var(--surf); border-radius:18px; border:1px solid var(--brd); overflow:hidden; box-shadow:var(--sh); }
+.admin-row { padding:13px 16px; border-bottom:.5px solid var(--brd); display:flex; flex-direction:column; gap:4px; }
+.admin-row:last-child { border-bottom:none; }
+.admin-row-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.admin-row-name { font-size:14px; font-weight:700; color:var(--txt); }
+.admin-row-meta { font-size:11px; color:var(--txt3); }
+.admin-row-body { font-size:13px; color:var(--txt2); line-height:1.5; margin-top:4px; background:var(--bg2); border-radius:10px; padding:10px; }
+.admin-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:99px; background:var(--blue-bg); color:var(--blue); white-space:nowrap; }
+.admin-badge.new { background:var(--red-bg); color:var(--red); }
+.admin-stat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.admin-stat { background:var(--surf); border-radius:16px; border:1px solid var(--brd); padding:14px; text-align:center; box-shadow:var(--sh); }
+.admin-stat-val { font-family:var(--fs); font-size:28px; color:var(--txt); margin-bottom:2px; }
+.admin-stat-lbl { font-size:11px; color:var(--txt3); font-weight:600; }
+.admin-empty { text-align:center; padding:28px 16px; color:var(--txt3); font-size:13px; }
+
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .skel {
   color: transparent !important;
@@ -764,9 +785,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div class="quick-chips" id="quickChipsGelir" style="display:none;">
    <button class="q-chip" onclick="hizliDoldur('💵 Maaş', 'Maaş', event)">💵 Maaş</button>
-   <button class="q-chip" onclick="hizliDoldur('🎖 Taltif', 'Taltif', event)">🎖 Taltif</button>
-   <button class="q-chip" onclick="hizliDoldur('🛡️ Ek Görev', 'Ek Görev', event)">🛡️ Ek Görev</button>
-   <button class="q-chip" onclick="hizliDoldur('💼 Operasyon Tazminatı', 'Tazminat', event)">💼 Op. Tazminatı</button>
+   <button class="q-chip" onclick="hizliDoldur('💼 Ek İş Geliri', 'Ek Gelir', event)">💼 Ek İş</button>
+   <button class="q-chip" onclick="hizliDoldur('🎁 Prim / İkramiye', 'İkramiye', event)">🎁 Prim</button>
    <button class="q-chip" onclick="hizliDoldur('🏠 Kira Getirisi', 'Kira', event)">🏠 Kira</button>
 </div>
 
@@ -963,6 +983,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl">📅 Hedef Tarihi</label><input class="inp" id="ayarTasarrufTarih" type="month" /></div>
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
 <button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>document.getElementById('mDestek').classList.add('on'),200)" style="margin-top:6px; justify-content:center; background:var(--blue-bg); color:var(--blue);">💬 Destek & İletişim</button>
+<button class="action-item-btn" id="adminBtn" onclick="adminAc()" style="display:none; margin-top:6px; justify-content:center; background:var(--purple-bg); color:var(--purple);">🛡️ Yönetici Paneli</button>
 <button class="action-item-btn" onclick="bildirimIzniAc()" id="bildirimIzniBtn" style="margin-top:6px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Fatura Bildirimleri</button>
 <button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:6px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
@@ -973,6 +994,37 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <div style="font-size:12px; color:var(--txt3);">Tasarım &amp; Fikir ysfykc</div>
 </div>
 </div>
+</div>
+
+<!-- YÖNETİCİ PANELİ -->
+<div id="adminPanel">
+  <div class="admin-topbar">
+    <span style="font-size:22px;">🛡️</span>
+    <h2>Yönetici Paneli</h2>
+    <button class="admin-close" onclick="adminKapat()">✕</button>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-ttl">📊 Genel İstatistikler</div>
+    <div class="admin-stat-grid" id="adminStats">
+      <div class="admin-stat"><div class="admin-stat-val" id="aStatKullanici">—</div><div class="admin-stat-lbl">Kullanıcı</div></div>
+      <div class="admin-stat"><div class="admin-stat-val" id="aStatMesaj">—</div><div class="admin-stat-lbl">Destek Mesajı</div></div>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-ttl">💬 Gelen Destek Mesajları</div>
+    <div class="admin-card" id="adminMesajListesi">
+      <div class="admin-empty">Yükleniyor...</div>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-ttl">👥 Kayıtlı Kullanıcılar</div>
+    <div class="admin-card" id="adminKullaniciListesi">
+      <div class="admin-empty">Yükleniyor...</div>
+    </div>
+  </div>
 </div>
 
 <!-- DESTEK MODAL -->
@@ -1092,11 +1144,11 @@ function karsilastirmaGoster() {
 const SABLONLAR = {
   gelir: [
     { ico:'💵', ad:'Maaş', kat:'Maaş', tutar:0, tekrar:true },
-    { ico:'🎖', ad:'Taltif', kat:'Taltif', tutar:0, tekrar:false },
-    { ico:'🛡️', ad:'Ek Görev', kat:'Ek Görev', tutar:0, tekrar:false },
-    { ico:'💼', ad:'Operasyon Tazminatı', kat:'Tazminat', tutar:0, tekrar:false },
+    { ico:'💼', ad:'Ek İş Geliri', kat:'Ek Gelir', tutar:0, tekrar:false },
+    { ico:'🎁', ad:'Prim / İkramiye', kat:'İkramiye', tutar:0, tekrar:false },
     { ico:'🏠', ad:'Kira Getirisi', kat:'Kira', tutar:0, tekrar:true },
     { ico:'📈', ad:'Temettü', kat:'Yatırım', tutar:0, tekrar:false },
+    { ico:'🤝', ad:'Serbest Çalışma', kat:'Freelance', tutar:0, tekrar:false },
   ],
   gider: [
     { ico:'💳', ad:'Kredi Kartı', kat:'Kredi Kartı', tutar:0, tekrar:true },
@@ -1437,7 +1489,98 @@ function dragTouchBasla(e, handle) {
   document.addEventListener('touchend', onEnd);
 }
 
-/* ══ DESTEK & İLETİŞİM ══ */
+/* ══ DESTEK GÖNDER ══ */
+
+/* ══ YÖNETİCİ PANELİ ══ */
+const ADMIN_UID = 'YOUR_UID_HERE'; // Senin Firebase UID'in buraya gelecek — init'te otomatik ayarlanır
+
+function adminKontrolEt() {
+  if(!user) return;
+  const adminBtn = document.getElementById('adminBtn');
+  if(!adminBtn) return;
+  // Admins koleksiyonunda bu kullanıcı var mı kontrol et
+  if(!db || !window._fb) return;
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({getDoc, doc}) => {
+    getDoc(doc(db, 'admins', user.uid)).then(snap => {
+      if(snap.exists()) adminBtn.style.display = 'flex';
+    }).catch(() => {});
+  });
+}
+
+async function adminAc() {
+  Haptic.light();
+  document.getElementById('mAyarlar').classList.remove('on');
+  document.getElementById('adminPanel').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  await adminVerileriYukle();
+}
+
+function adminKapat() {
+  document.getElementById('adminPanel').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function adminVerileriYukle() {
+  if(!db || !window._fb) return;
+  try {
+    const {collection, getDocs, query, orderBy, limit} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+    // Destek mesajları
+    const destekSnap = await getDocs(query(collection(db, 'destek'), orderBy('tarih', 'desc'), limit(50)));
+    const mesajlar = [];
+    destekSnap.forEach(d => mesajlar.push({id: d.id, ...d.data()}));
+
+    // Kullanıcı profilleri (users koleksiyonu)
+    const usersSnap = await getDocs(collection(db, 'users'));
+    const kullanicilar = [];
+    for(const ud of usersSnap.docs) {
+      kullanicilar.push({ uid: ud.id });
+    }
+
+    document.getElementById('aStatKullanici').textContent = kullanicilar.length;
+    document.getElementById('aStatMesaj').textContent = mesajlar.length;
+
+    // Mesajlar render
+    const mEl = document.getElementById('adminMesajListesi');
+    if(mesajlar.length === 0) {
+      mEl.innerHTML = '<div class="admin-empty">Henüz destek mesajı yok.</div>';
+    } else {
+      mEl.innerHTML = mesajlar.map(m => {
+        const tarih = m.tarih ? new Date(m.tarih).toLocaleString('tr-TR') : '—';
+        const isNew = m.tarih && (Date.now() - new Date(m.tarih).getTime()) < 48*3600*1000;
+        return `<div class="admin-row">
+          <div class="admin-row-top">
+            <span class="admin-row-name">${escHtml(m.kullanici || '?')}</span>
+            <span class="admin-badge${isNew?' new':''}">${escHtml(m.konu || '—')}</span>
+          </div>
+          <div class="admin-row-meta">${escHtml(m.email || '')} · ${tarih}</div>
+          <div class="admin-row-body">${escHtml(m.mesaj || '')}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Kullanıcılar render
+    const kEl = document.getElementById('adminKullaniciListesi');
+    if(kullanicilar.length === 0) {
+      kEl.innerHTML = '<div class="admin-empty">Kullanıcı bulunamadı.</div>';
+    } else {
+      kEl.innerHTML = kullanicilar.map((u, i) =>
+        `<div class="admin-row">
+          <div class="admin-row-top">
+            <span class="admin-row-name">Kullanıcı ${i+1}</span>
+          </div>
+          <div class="admin-row-meta">${escHtml(u.uid)}</div>
+        </div>`
+      ).join('');
+    }
+
+  } catch(e) {
+    console.warn('Admin yükleme hatası:', e);
+    document.getElementById('adminMesajListesi').innerHTML = '<div class="admin-empty">Veri yüklenemedi. Yetki hatası olabilir.</div>';
+    document.getElementById('adminKullaniciListesi').innerHTML = '<div class="admin-empty">Veri yüklenemedi.</div>';
+  }
+}
+
 async function destekGonder() {
   const konu = document.getElementById('destekKonu').value;
   const mesaj = document.getElementById('destekMesaj').value.trim();
@@ -1447,18 +1590,29 @@ async function destekGonder() {
   btn.textContent = '⏳ Gönderiliyor...'; btn.disabled = true;
   const kullanici = user ? (user.displayName || user.email || 'Anonim') : 'Giriş yapılmamış';
   const email = user?.email || '';
-  const subject = encodeURIComponent(`Maaş Günü — ${konu}`);
-  const body = encodeURIComponent(`Konu: ${konu}\n\nMesaj:\n${mesaj}\n\n---\nKullanıcı: ${kullanici}\nE-posta: ${email}\nTarih: ${new Date().toLocaleString('tr-TR')}\nSürüm: v4.6 Pro`);
   try {
-    window.location.href = `mailto:yusuf.aykac@gmail.com?subject=${subject}&body=${body}`;
     if(db && user && window._fb) {
-      const {doc,setDoc} = window._fb;
-      await setDoc(doc(db,'destek',`${user.uid}_${Date.now()}`),{konu,mesaj,kullanici,email,tarih:new Date().toISOString(),surum:'v4.6 Pro'});
+      const {doc, setDoc, collection} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await setDoc(doc(collection(db, 'destek')), {
+        konu, mesaj, kullanici, email,
+        uid: user.uid,
+        tarih: new Date().toISOString(),
+        surum: 'v4.6 Pro',
+        okundu: false
+      });
+      sonuc.style.cssText='background:var(--green-bg);color:var(--green);border:1px solid rgba(42,173,98,.2);padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:10px;';
+      sonuc.textContent='✅ Mesajın iletildi! En kısa sürede dönüş yapacağım.';
+      sonuc.style.display='block';
+      document.getElementById('destekMesaj').value='';
+    } else {
+      // Giriş yapılmamışsa mail'e yönlendir
+      const subject = encodeURIComponent(`Maaş Günü — ${konu}`);
+      const body = encodeURIComponent(`Konu: ${konu}\n\nMesaj:\n${mesaj}\n\n---\nTarih: ${new Date().toLocaleString('tr-TR')}`);
+      window.location.href = `mailto:yusuf.aykac@gmail.com?subject=${subject}&body=${body}`;
+      sonuc.style.cssText='background:var(--green-bg);color:var(--green);border:1px solid rgba(42,173,98,.2);padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:10px;';
+      sonuc.textContent='✅ Mail uygulaması açıldı! Göndermek için "Gönder" butonuna bas.';
+      sonuc.style.display='block';
     }
-    sonuc.style.cssText='background:var(--green-bg);color:var(--green);border:1px solid rgba(42,173,98,.2);padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:10px;';
-    sonuc.textContent='✅ Mail uygulaması açıldı! Göndermek için "Gönder" butonuna bas.';
-    sonuc.style.display='block';
-    document.getElementById('destekMesaj').value='';
   } catch(e) {
     sonuc.style.cssText='background:var(--red-bg);color:var(--red);padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:10px;';
     sonuc.textContent='❌ Bir hata oluştu. Doğrudan yusuf.aykac@gmail.com adresine yazabilirsin.';
@@ -1544,7 +1698,20 @@ async function copKutusunaAt(tur, id) {
        const v = ayVerisi(aktifAy);
        const arr = tur === 'gelir' ? v.gelirler : v.giderler;
        const idx = arr.findIndex(x => x.id === id);
-       if (idx > -1) { silinenItem = arr.splice(idx, 1)[0]; }
+       if (idx > -1) {
+           silinenItem = arr.splice(idx, 1)[0];
+           // Tekrarlayan ise silinen listeye ekle ki ileriki aylarda yeniden çıkmasın
+           if(silinenItem && silinenItem.tekrar) {
+               const silinenRef = { kaynakId: silinenItem.kaynakId || silinenItem.id, ad: silinenItem.ad };
+               if(tur === 'gelir') {
+                   if(!v.silinenGelirler) v.silinenGelirler = [];
+                   v.silinenGelirler.push(silinenRef);
+               } else {
+                   if(!v.silinenGiderler) v.silinenGiderler = [];
+                   v.silinenGiderler.push(silinenRef);
+               }
+           }
+       }
    } else if (tur === 'borc') {
        const idx = veri.borclar.findIndex(x => x.id === id);
        if (idx > -1) { silinenItem = veri.borclar.splice(idx, 1)[0]; }
@@ -1884,8 +2051,20 @@ function tekrarlayanlariUygula(ay){
   const pk = ayEkleStr(ay, -1); if(!veri.aylar[pk])return;
   const pv=veri.aylar[pk],cv=veri.aylar[ay];
   const sg = cv.silinenGelirler || []; const sd = cv.silinenGiderler || [];
+  
+  // Önceki ayın silinenlerini de devral — böylece daha önce kapatılan tekrarlayanlar
+  // ilerideki aylarda yeniden çıkmaz
+  const psg = pv.silinenGelirler || []; const psd = pv.silinenGiderler || [];
+  const tumSilinenGelirler = [...new Map([...psg, ...sg].map(x => [x.kaynakId || x.ad, x])).values()];
+  const tumSilinenGiderler = [...new Map([...psd, ...sd].map(x => [x.kaynakId || x.ad, x])).values()];
+  
+  // Güncel ayın silinen listesini kalıcı devralınanlarla güncelle
+  cv.silinenGelirler = tumSilinenGelirler;
+  cv.silinenGiderler = tumSilinenGiderler;
+
   [...pv.gelirler,...pv.giderler].filter(k=>k.tekrar).forEach(k=>{
-    const isGelir = pv.gelirler.includes(k); const tip = isGelir ? 'gelirler' : 'giderler'; const silinenListe = isGelir ? sg : sd;
+    const isGelir = pv.gelirler.includes(k); const tip = isGelir ? 'gelirler' : 'giderler';
+    const silinenListe = isGelir ? tumSilinenGelirler : tumSilinenGiderler;
     const zatenVar = (cv[tip]||[]).some(x=>x.kaynakId===k.id||x.ad===k.ad);
     const dahaOnceSilinmis = silinenListe.some(x=>x.kaynakId===k.id||x.ad===k.ad);
     if(!zatenVar && !dahaOnceSilinmis){ cv[tip]=cv[tip]||[]; cv[tip].push({...k,id:uid(),odendi:false,kaynakId:k.id}); }
@@ -2652,6 +2831,8 @@ async function init(){
       if(kullanici){ 
          user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
          const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} 
+         // Admin kontrolü
+         adminKontrolEt();
          lsYukle(); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
          // Onboarding kontrolü
          if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
@@ -2673,6 +2854,8 @@ async function init(){
   }
   document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
   const av=document.getElementById('avatar'); if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
+  // Admin kontrolü — Firestore admins koleksiyonunu kontrol et
+  adminKontrolEt();
   lsYukle(); render(); await fbYukle(); 
   kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); });
   // Onboarding kontrolü
