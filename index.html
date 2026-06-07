@@ -293,7 +293,10 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .empty-sec{ text-align:center; padding:24px 16px; color:var(--txt3); font-size:12.5px; line-height:1.6; background:var(--ios-surface-strong); border-radius:22px; box-shadow:var(--ios-shadow-soft); margin-bottom:10px; }
 .empty-ico{font-size:32px;opacity:.4;margin-bottom:8px}
 
-.kalem-wrap{position:relative;margin-bottom:10px;border-radius:20px;overflow:hidden}
+.kalem-wrap{position:relative;margin-bottom:10px;border-radius:20px;overflow:hidden;transition:opacity .2s,border .15s}
+.kalem-wrap.dragging{opacity:0.35;border:2px dashed var(--blue)!important}
+.kalem-wrap.drag-over{border-top:3px solid var(--blue)}
+.kalem-drag-handle{width:22px;display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:14px;cursor:grab;flex-shrink:0;padding-right:2px;user-select:none}
 .kalem-bg{position:absolute;inset:0;z-index:0;background:var(--bg2);opacity:0;transition:opacity .25s ease}
 .kalem-bg-l, .kalem-bg-r{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;opacity:0}
 .kalem-bg-l{left:24px;color:var(--green)}
@@ -771,7 +774,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="eTutar" min="0" step="any" type="number" inputmode="decimal"/></div></div>
 <div class="igrp" id="taksitRow"><label class="ilbl">Taksit <span style="color:var(--txt3);font-weight:400">(Ay)</span></label><input class="inp" id="eTaksit" type="number" inputmode="decimal" min="1" value="1" placeholder="1"/></div>
 <div class="igrp"><label class="ilbl">Kategori</label><input class="inp" id="eKat" type="text"/></div>
-<div class="igrp"><label class="ilbl">Not</label><input class="inp" id="eNot" type="text"/></div>
+<div class="igrp"><label class="ilbl">Ödeme Günü <span style="font-weight:400;color:var(--txt3)">(fatura tarihi, örn: 15)</span></label><input class="inp" id="eNot" type="number" inputmode="numeric" min="1" max="31" placeholder="Gün sayısı girin"/></div>
 
 <div class="toggle-row" id="tekrarRow" onclick="toggleTikla('tekrar')" style="cursor:pointer">
 <div><div class="toggle-lbl">🔄 Sabit Gider</div><div class="toggle-sub">Her ay otomatik eklensin</div></div>
@@ -794,7 +797,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl">Açıklama</label><input class="inp" id="dAd" type="text"/></div>
 <div class="igrp"><label class="ilbl">Tutar</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="dTutar" min="0" step="any" type="number" inputmode="decimal"/></div></div>
 <div class="igrp"><label class="ilbl">Kategori</label><input class="inp" id="dKat" type="text"/></div>
-<div class="igrp"><label class="ilbl">Not</label><input class="inp" id="dNot" type="text"/></div>
+<div class="igrp"><label class="ilbl">Ödeme Günü <span style="font-weight:400;color:var(--txt3)">(fatura tarihi, örn: 15)</span></label><input class="inp" id="dNot" type="number" inputmode="numeric" min="1" max="31" placeholder="Gün sayısı girin"/></div>
 <div class="toggle-row" onclick="toggleTikla('dTekrar')" style="cursor:pointer">
 <div><div class="toggle-lbl">🔄 Tekrarlayan</div></div>
 <div class="toggle" id="dTekrar"></div>
@@ -959,7 +962,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl">🎯 Tasarruf Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarTasarrufHedef" type="number" inputmode="decimal" min="0" placeholder="Örn: 50000" /></div></div>
 <div class="igrp"><label class="ilbl">📅 Hedef Tarihi</label><input class="inp" id="ayarTasarrufTarih" type="month" /></div>
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
-<button class="action-item-btn" onclick="bildirimIzniAc()" id="bildirimIzniBtn" style="margin-top:10px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Fatura Bildirimleri</button>
+<button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>document.getElementById('mDestek').classList.add('on'),200)" style="margin-top:6px; justify-content:center; background:var(--blue-bg); color:var(--blue);">💬 Destek & İletişim</button>
+<button class="action-item-btn" onclick="bildirimIzniAc()" id="bildirimIzniBtn" style="margin-top:6px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Fatura Bildirimleri</button>
 <button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:6px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
@@ -968,6 +972,26 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--blue); margin-bottom:8px;">v4.6 Pro</div>
   <div style="font-size:12px; color:var(--txt3);">Tasarım &amp; Fikir ysfykc</div>
 </div>
+</div>
+</div>
+
+<!-- DESTEK MODAL -->
+<div class="ov" id="mDestek" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+<div class="mhandle"></div>
+<div class="mttl">💬 Destek & İletişim</div>
+<div style="font-size:13px; color:var(--txt2); margin-bottom:16px; line-height:1.6;">Sorun mu var? Öneri mi? Merak ettiğin bir şey mi? Yazıver, en kısa sürede döneyim.</div>
+<div class="igrp"><label class="ilbl">Konu</label>
+<select class="inp" id="destekKonu" style="appearance:none;">
+  <option value="Hata Bildirimi">🐛 Hata Bildirimi</option>
+  <option value="Öneri">💡 Öneri</option>
+  <option value="Soru">❓ Soru</option>
+  <option value="Diğer">📝 Diğer</option>
+</select></div>
+<div class="igrp"><label class="ilbl">Mesajın</label><textarea class="inp" id="destekMesaj" rows="4" placeholder="Ne oldu, ne yapmak istedin, nasıl bir sorunla karşılaştın..." style="resize:none; height:100px;"></textarea></div>
+<div id="destekSonuc" style="display:none; padding:10px 14px; border-radius:12px; font-size:13px; margin-bottom:10px;"></div>
+<button class="sbtn g" onclick="destekGonder()">📨 Gönder</button>
+<button class="cancel-btn" onclick="document.getElementById('mDestek').classList.remove('on')">Kapat</button>
 </div>
 </div>
 
@@ -1027,6 +1051,21 @@ function obBitir() {
   document.getElementById('onboarding').style.display = 'none';
   aktifAy = bugunAyId(); render();
   toast('🎉 Hoş geldin! Gelirlerini eklemeye başla.');
+}
+
+async function portfoyGuncelle() {
+  const btn = document.querySelector('[onclick="portfoyGuncelle()"]');
+  if(btn) { btn.textContent = '⏳ Güncelleniyor...'; btn.disabled = true; }
+  try {
+    const basari = await kurlariGuncelle();
+    portfoyRender(); render();
+    if(basari) { toast('✅ Fiyatlar güncellendi'); }
+    else { toast('⚠️ Güncelleme başarısız, bağlantını kontrol et'); }
+  } catch(e) {
+    toast('❌ Hata: ' + e.message);
+  } finally {
+    if(btn) { btn.textContent = '🔄 Canlı Fiyatları Çek'; btn.disabled = false; }
+  }
 }
 
 /* ══ AYLIK KARŞILAŞTIRMA ══ */
@@ -1335,7 +1374,100 @@ function faturaModalAc() {
   document.getElementById('mFatura').classList.add('on');
 }
 
-/* ══ HAPTIC ENGINE ══ */
+/* ══ DRAG TO REORDER ══ */
+let dragState = null;
+
+function dragTouchBasla(e, handle) {
+  e.stopPropagation();
+  const wrap = handle.closest('.kalem-wrap');
+  const tip = handle.dataset.tip;
+  const id = handle.dataset.drag;
+  const startY = e.touches[0].clientY;
+  const rect = wrap.getBoundingClientRect();
+
+  Haptic.medium();
+  wrap.classList.add('dragging');
+
+  dragState = { wrap, tip, id, startY, origIdx: parseInt(wrap.dataset.idx) };
+
+  function onMove(ev) {
+    if(!dragState) return;
+    ev.preventDefault();
+    const y = ev.touches[0].clientY;
+    const section = document.getElementById(`sec-${tip}`);
+    if(!section) return;
+    const wraps = [...section.querySelectorAll('.kalem-wrap:not(.dragging)')];
+    let target = null;
+    wraps.forEach(w => {
+      const wr = w.getBoundingClientRect();
+      const mid = wr.top + wr.height / 2;
+      w.classList.remove('drag-over');
+      if(y < mid && !target) { target = w; w.classList.add('drag-over'); }
+    });
+    dragState.targetWrap = target || null;
+  }
+
+  function onEnd() {
+    if(!dragState) return;
+    wrap.classList.remove('dragging');
+    document.querySelectorAll('.drag-over').forEach(w => w.classList.remove('drag-over'));
+
+    const v = ayVerisi(aktifAy);
+    const liste = tip === 'gelir' ? v.gelirler : v.giderler;
+    const fromIdx = liste.findIndex(k => k.id === dragState.id);
+
+    if(fromIdx !== -1 && dragState.targetWrap) {
+      const toId = dragState.targetWrap.dataset.id;
+      const toIdx = liste.findIndex(k => k.id === toId);
+      if(toIdx !== -1 && fromIdx !== toIdx) {
+        const [item] = liste.splice(fromIdx, 1);
+        liste.splice(toIdx, 0, item);
+        Haptic.success();
+        lsKaydet(); fbKaydet();
+      }
+    }
+
+    dragState = null;
+    icerikRender();
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+  }
+
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+}
+
+/* ══ DESTEK & İLETİŞİM ══ */
+async function destekGonder() {
+  const konu = document.getElementById('destekKonu').value;
+  const mesaj = document.getElementById('destekMesaj').value.trim();
+  const sonuc = document.getElementById('destekSonuc');
+  if(!mesaj) { toast('❌ Lütfen mesajını yaz'); return; }
+  const btn = document.querySelector('#mDestek .sbtn');
+  btn.textContent = '⏳ Gönderiliyor...'; btn.disabled = true;
+  const kullanici = user ? (user.displayName || user.email || 'Anonim') : 'Giriş yapılmamış';
+  const email = user?.email || '';
+  const subject = encodeURIComponent(`Maaş Günü — ${konu}`);
+  const body = encodeURIComponent(`Konu: ${konu}\n\nMesaj:\n${mesaj}\n\n---\nKullanıcı: ${kullanici}\nE-posta: ${email}\nTarih: ${new Date().toLocaleString('tr-TR')}\nSürüm: v4.6 Pro`);
+  try {
+    window.location.href = `mailto:yusuf.aykac@gmail.com?subject=${subject}&body=${body}`;
+    if(db && user && window._fb) {
+      const {doc,setDoc} = window._fb;
+      await setDoc(doc(db,'destek',`${user.uid}_${Date.now()}`),{konu,mesaj,kullanici,email,tarih:new Date().toISOString(),surum:'v4.6 Pro'});
+    }
+    sonuc.style.cssText='background:var(--green-bg);color:var(--green);border:1px solid rgba(42,173,98,.2);padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:10px;';
+    sonuc.textContent='✅ Mail uygulaması açıldı! Göndermek için "Gönder" butonuna bas.';
+    sonuc.style.display='block';
+    document.getElementById('destekMesaj').value='';
+  } catch(e) {
+    sonuc.style.cssText='background:var(--red-bg);color:var(--red);padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:10px;';
+    sonuc.textContent='❌ Bir hata oluştu. Doğrudan yusuf.aykac@gmail.com adresine yazabilirsin.';
+    sonuc.style.display='block';
+  } finally {
+    btn.textContent='📨 Gönder'; btn.disabled=false;
+  }
+}
+
 const Haptic = {
   light: () => { if(navigator.vibrate) navigator.vibrate(10); },
   medium: () => { if(navigator.vibrate) navigator.vibrate(20); },
@@ -1695,16 +1827,19 @@ async function fetchWithTimeout(url, options = {}, timeout = 4000) {
 
 async function kurlariGuncelle() {
    try { 
-       let r;
-       try { 
-           r = await fetchWithTimeout('https://finans.truncgil.com/v4/today.json', {cache:'no-store'}, 3000); 
-           if(!r.ok) throw new Error(); 
+       let d = null;
+       const URLS = [
+         'https://finans.truncgil.com/v4/today.json',
+         'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://finans.truncgil.com/v4/today.json'),
+         'https://corsproxy.io/?' + encodeURIComponent('https://finans.truncgil.com/v4/today.json'),
+       ];
+       for(const url of URLS) {
+         try {
+           const r = await fetchWithTimeout(url, {cache:'no-store'}, 5000);
+           if(r.ok) { d = await r.json(); break; }
+         } catch(e) { continue; }
        }
-       catch(e) { 
-           r = await fetchWithTimeout('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://finans.truncgil.com/v4/today.json'), {cache:'no-store'}, 4000); 
-       }
-       
-       const d = await r.json(); 
+       if(!d) throw new Error('Tüm kaynaklar başarısız');
        
        const s = (k) => {
            let val = d[k]?.Selling;
@@ -1731,8 +1866,10 @@ async function kurlariGuncelle() {
            veri.kurlar['14_ayar'] = g * 14 / 24;
            veri.kurlar.zaman = new Date().toISOString();
            await fbKaydet();
+           return true;
        }
    } catch (e) { console.warn("Kur Hatası", e); }
+   return false;
 }
 
 /* ══ MAAŞ GÜNÜ TEMEL FONKSİYONLARI ══ */
@@ -1936,10 +2073,11 @@ function kalemHtml(k,tip,idx){
   return`<div class="kalem-wrap" id="kw-${k.id}" data-id="${k.id}" data-tip="${tip}" data-idx="${idx}">
     <div class="kalem-bg"><div class="kalem-bg-l"><span>✓ İşaretle</span></div><div class="kalem-bg-r"><span>Sil 🗑</span></div></div>
     <div class="kalem" id="k-${k.id}" onclick="kalemDuzenleAc('${tip}','${k.id}')">
+      <div class="kalem-drag-handle" data-drag="${k.id}" data-tip="${tip}" ontouchstart="dragTouchBasla(event,this)" onclick="event.stopPropagation()">⠿</div>
       <div class="kalem-check ${k.odendi?'on':''}" onclick="event.stopPropagation();toggleOdendi('${tip}','${k.id}')"></div>
       <div class="kalem-info">
         <div class="kalem-ad ${k.odendi?'done':''}">${escHtml(k.ad)}</div>
-        <div class="kalem-meta">${k.kategori?`<span class="kalem-not">${escHtml(k.kategori)}</span>`:''} ${k.not?`<span class="kalem-not">${escHtml(k.not)}</span>`:''} ${badges.join('')}</div>
+        <div class="kalem-meta">${k.kategori?`<span class="kalem-not">${escHtml(k.kategori)}</span>`:''} ${k.not?`<span class="kalem-not">📅 Her ayın ${escHtml(k.not)}. günü</span>`:''} ${badges.join('')}</div>
       </div>
       <div class="kalem-tutar ${renk}">${fTL(k.tutar)}</div>
     </div>
