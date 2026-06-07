@@ -1524,14 +1524,18 @@ async function profilKaydet(kullanici) {
   if(!db || !kullanici) return;
   try {
     const {doc, setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await setDoc(doc(db, 'users', kullanici.uid, 'profil', 'bilgi'), {
+    const profil = {
       ad: kullanici.displayName || '',
       email: kullanici.email || '',
       fotograf: kullanici.photoURL || '',
       sonGiris: new Date().toISOString(),
       uid: kullanici.uid
-    }, { merge: true });
-  } catch(e) { /* sessizce geç */ }
+    };
+    // Üst seviye dökümanı yaz — admin paneli list sorgusu için şart
+    await setDoc(doc(db, 'users', kullanici.uid), profil, { merge: true });
+    // Alt koleksiyona da yaz (geriye dönük uyumluluk)
+    await setDoc(doc(db, 'users', kullanici.uid, 'profil', 'bilgi'), profil, { merge: true });
+  } catch(e) { console.warn('Profil kaydedilemedi:', e); }
 }
 
 async function adminVerileriYukle() {
@@ -1544,21 +1548,16 @@ async function adminVerileriYukle() {
     const mesajlar = [];
     destekSnap.forEach(d => mesajlar.push({id: d.id, ...d.data()}));
 
-    // Kullanıcı profilleri — users/{uid}/profil/bilgi
+    // Kullanıcı profilleri — doğrudan users/{uid} üst dökümanından oku
     const usersSnap = await getDocs(collection(db, 'users'));
     const kullanicilar = [];
-    for(const ud of usersSnap.docs) {
-      try {
-        const profilSnap = await getDoc(doc(db, 'users', ud.id, 'profil', 'bilgi'));
-        if(profilSnap.exists()) {
-          kullanicilar.push({ uid: ud.id, ...profilSnap.data() });
-        } else {
-          kullanicilar.push({ uid: ud.id, ad: '', email: '' });
-        }
-      } catch(e) {
-        kullanicilar.push({ uid: ud.id, ad: '', email: '' });
+    usersSnap.forEach(ud => {
+      const d = ud.data();
+      // Sadece profil verisi olan dökümanları al (masaygunu2 alt koleksiyonu olanları değil)
+      if(d.email || d.ad || d.sonGiris) {
+        kullanicilar.push({ uid: ud.id, ...d });
       }
-    }
+    });
 
     document.getElementById('aStatKullanici').textContent = kullanicilar.length;
     document.getElementById('aStatMesaj').textContent = mesajlar.length;
