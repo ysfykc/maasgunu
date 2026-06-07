@@ -959,7 +959,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl">🎯 Tasarruf Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarTasarrufHedef" type="number" inputmode="decimal" min="0" placeholder="Örn: 50000" /></div></div>
 <div class="igrp"><label class="ilbl">📅 Hedef Tarihi</label><input class="inp" id="ayarTasarrufTarih" type="month" /></div>
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
-<button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:10px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
+<button class="action-item-btn" onclick="bildirimIzniAc()" id="bildirimIzniBtn" style="margin-top:10px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Fatura Bildirimleri</button>
+<button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:6px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
 <div style="margin-top:24px; padding-top:20px; border-top:.5px solid var(--brd); text-align:center;">
   <img src="16379.png" style="width:48px; height:48px; border-radius:14px; margin-bottom:8px; box-shadow:var(--ios-shadow-soft);">
@@ -1177,6 +1178,96 @@ function hedefModalAc() {
 }
 
 /* ══ FATURA HATIRLATICI ══ */
+/* ══ BİLDİRİM SİSTEMİ ══ */
+const BILDIRIM_KEY = 'mg_bildirim_son';
+
+async function bildirimIzniAc() {
+  if(!('Notification' in window)) { toast('❌ Tarayıcın bildirim desteklemiyor'); return; }
+  if(Notification.permission === 'granted') { 
+    toast('✅ Bildirimler zaten açık'); 
+    bildirimGonder('Maaş Günü', '🔔 Test bildirimi — Her şey çalışıyor!');
+    return; 
+  }
+  if(Notification.permission === 'denied') { 
+    toast('❌ Bildirimler engellendi. Tarayıcı ayarlarından izin ver.'); 
+    return; 
+  }
+  const izin = await Notification.requestPermission();
+  if(izin === 'granted') {
+    toast('✅ Bildirimler açıldı!');
+    bildirimGonder('Maaş Günü', '🎉 Fatura hatırlatıcıları aktif! Yaklaşan ödemeler için bildirim alacaksın.');
+    document.getElementById('bildirimIzniBtn').textContent = '🔔 Bildirimler Açık ✓';
+  } else {
+    toast('❌ Bildirim izni verilmedi');
+  }
+}
+
+function bildirimIzniBtnGuncelle() {
+  const btn = document.getElementById('bildirimIzniBtn'); if(!btn) return;
+  if(!('Notification' in window)) { btn.style.display = 'none'; return; }
+  if(Notification.permission === 'granted') btn.textContent = '🔔 Bildirimler Açık ✓';
+  else if(Notification.permission === 'denied') { btn.textContent = '🔕 Bildirimler Engellendi'; btn.style.opacity = '0.5'; }
+  else btn.textContent = '🔔 Fatura Bildirimleri — İzin Ver';
+}
+
+async function bildirimIzniIste() {
+  if(!('Notification' in window)) return false;
+  if(Notification.permission === 'granted') return true;
+  if(Notification.permission === 'denied') return false;
+  const izin = await Notification.requestPermission();
+  return izin === 'granted';
+}
+
+function bildirimGonder(baslik, govde, ico) {
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    new Notification(baslik, {
+      body: govde,
+      icon: ico || 'https://ysfykc.github.io/16379.png',
+      badge: 'https://ysfykc.github.io/16379.png',
+      tag: 'maas-gunu-fatura',
+      renotify: true
+    });
+  } catch(e) { console.warn('Bildirim gönderilemedi:', e); }
+}
+
+async function faturabildirimleriGonder() {
+  // Bugün zaten gönderildiyse tekrar gönderme
+  const bugunStr = new Date().toISOString().split('T')[0];
+  const son = localStorage.getItem(BILDIRIM_KEY);
+  if(son === bugunStr) return;
+
+  const izinVar = await bildirimIzniIste();
+  if(!izinVar) return;
+
+  const v = ayVerisi(aktifAy);
+  const bugun = new Date().getDate();
+  const mesajlar = [];
+
+  v.giderler.filter(k => !k.odendi).forEach(k => {
+    const gun = parseInt(k.not);
+    if(gun >= 1 && gun <= 31) {
+      const fark = gun - bugun;
+      if(fark === 0) mesajlar.push(`🔴 Bugün: ${k.ad} — ${fTL(k.tutar)}`);
+      else if(fark === 1) mesajlar.push(`🟡 Yarın: ${k.ad} — ${fTL(k.tutar)}`);
+      else if(fark === 2 || fark === 3) mesajlar.push(`🟠 ${fark} gün: ${k.ad} — ${fTL(k.tutar)}`);
+    }
+  });
+
+  if(mesajlar.length === 0) return;
+
+  localStorage.setItem(BILDIRIM_KEY, bugunStr);
+
+  if(mesajlar.length === 1) {
+    bildirimGonder('Maaş Günü — Ödeme Hatırlatıcı', mesajlar[0]);
+  } else {
+    bildirimGonder(
+      `Maaş Günü — ${mesajlar.length} yaklaşan ödeme`,
+      mesajlar.slice(0, 3).join('\n') + (mesajlar.length > 3 ? `\n+${mesajlar.length - 3} daha...` : '')
+    );
+  }
+}
+
 function faturaHatirlaticiKontrol() {
   const uyari = document.getElementById('faturaUyari'); if(!uyari) return;
   const v = ayVerisi(aktifAy);
@@ -1199,6 +1290,9 @@ function faturaHatirlaticiKontrol() {
   } else {
     document.getElementById('faturaUyariTxt').textContent = `${yakinlar.length} ödeme yaklaşıyor (7 gün içinde)`;
   }
+
+  // Bildirimleri gönder (arka planda)
+  setTimeout(faturabildirimleriGonder, 2000);
 }
 
 function faturaModalAc() {
@@ -1918,7 +2012,7 @@ function maasModalAc(tip){
   document.querySelector('#tekrarRow .toggle-lbl').textContent = tip === 'gelir' ? '🔄 Sabit Gelir' : '🔄 Sabit Gider';
   document.getElementById('mEkle').classList.add('on'); setTimeout(()=>document.getElementById('eTutar').focus(),350);
 }
-function ayarlarAc() { Haptic.light(); document.getElementById('ayarMaasGunu').value = getMaasGunu(); document.getElementById('ayarHedef').value = getPortfoyHedefi() || ''; document.getElementById('ayarTasarrufHedef').value = veri.ayarlar?.tasarrufHedef || ''; document.getElementById('ayarTasarrufTarih').value = veri.ayarlar?.tasarrufTarih || ''; document.getElementById('mAyarlar').classList.add('on'); }
+function ayarlarAc() { Haptic.light(); document.getElementById('ayarMaasGunu').value = getMaasGunu(); document.getElementById('ayarHedef').value = getPortfoyHedefi() || ''; document.getElementById('ayarTasarrufHedef').value = veri.ayarlar?.tasarrufHedef || ''; document.getElementById('ayarTasarrufTarih').value = veri.ayarlar?.tasarrufTarih || ''; bildirimIzniBtnGuncelle(); document.getElementById('mAyarlar').classList.add('on'); }
 async function ayarlarKaydet() {
   let mg = parseInt(document.getElementById('ayarMaasGunu').value) || 15; if(mg < 1) mg = 1; if(mg > 31) mg = 31;
   let hedef = parseFloat(document.getElementById('ayarHedef').value) || 0;
