@@ -1520,21 +1520,44 @@ function adminKapat() {
   document.body.style.overflow = '';
 }
 
+async function profilKaydet(kullanici) {
+  if(!db || !kullanici) return;
+  try {
+    const {doc, setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(db, 'users', kullanici.uid, 'profil', 'bilgi'), {
+      ad: kullanici.displayName || '',
+      email: kullanici.email || '',
+      fotograf: kullanici.photoURL || '',
+      sonGiris: new Date().toISOString(),
+      uid: kullanici.uid
+    }, { merge: true });
+  } catch(e) { /* sessizce geç */ }
+}
+
 async function adminVerileriYukle() {
   if(!db || !window._fb) return;
   try {
-    const {collection, getDocs, query, orderBy, limit} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const {collection, getDocs, query, orderBy, limit, doc, getDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
 
     // Destek mesajları
     const destekSnap = await getDocs(query(collection(db, 'destek'), orderBy('tarih', 'desc'), limit(50)));
     const mesajlar = [];
     destekSnap.forEach(d => mesajlar.push({id: d.id, ...d.data()}));
 
-    // Kullanıcı profilleri (users koleksiyonu)
+    // Kullanıcı profilleri — users/{uid}/profil/bilgi
     const usersSnap = await getDocs(collection(db, 'users'));
     const kullanicilar = [];
     for(const ud of usersSnap.docs) {
-      kullanicilar.push({ uid: ud.id });
+      try {
+        const profilSnap = await getDoc(doc(db, 'users', ud.id, 'profil', 'bilgi'));
+        if(profilSnap.exists()) {
+          kullanicilar.push({ uid: ud.id, ...profilSnap.data() });
+        } else {
+          kullanicilar.push({ uid: ud.id, ad: '', email: '' });
+        }
+      } catch(e) {
+        kullanicilar.push({ uid: ud.id, ad: '', email: '' });
+      }
     }
 
     document.getElementById('aStatKullanici').textContent = kullanicilar.length;
@@ -1564,14 +1587,17 @@ async function adminVerileriYukle() {
     if(kullanicilar.length === 0) {
       kEl.innerHTML = '<div class="admin-empty">Kullanıcı bulunamadı.</div>';
     } else {
-      kEl.innerHTML = kullanicilar.map((u, i) =>
-        `<div class="admin-row">
+      kEl.innerHTML = kullanicilar.map((u, i) => {
+        const sonGiris = u.sonGiris ? new Date(u.sonGiris).toLocaleString('tr-TR') : '—';
+        return `<div class="admin-row">
           <div class="admin-row-top">
-            <span class="admin-row-name">Kullanıcı ${i+1}</span>
+            <span class="admin-row-name">${escHtml(u.ad || 'İsimsiz Kullanıcı')}</span>
+            <span class="admin-badge">${i+1}</span>
           </div>
-          <div class="admin-row-meta">${escHtml(u.uid)}</div>
-        </div>`
-      ).join('');
+          <div class="admin-row-meta">${escHtml(u.email || u.uid)}</div>
+          <div class="admin-row-meta" style="font-size:10px;">Son giriş: ${sonGiris}</div>
+        </div>`;
+      }).join('');
     }
 
   } catch(e) {
@@ -2833,6 +2859,8 @@ async function init(){
          const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} 
          // Admin kontrolü
          adminKontrolEt();
+         // Kullanıcı profilini kaydet (admin paneli için)
+         profilKaydet(kullanici);
          lsYukle(); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
          // Onboarding kontrolü
          if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
@@ -2856,6 +2884,8 @@ async function init(){
   const av=document.getElementById('avatar'); if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
   // Admin kontrolü — Firestore admins koleksiyonunu kontrol et
   adminKontrolEt();
+  // Kullanıcı profilini kaydet (admin paneli için)
+  profilKaydet(u);
   lsYukle(); render(); await fbYukle(); 
   kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); });
   // Onboarding kontrolü
