@@ -5,4 +5,12 @@
     "package_name": "io.github.ysfykc.maasgunu",
     "sha256_cert_fingerprints": ["16:36:B1:D2:8E:35:6B:8B:35:C6:14:E6:77:BA:35:DD:AB:27:E3:A2:DE:CA:F4:D1:53:DD:39:57:95:56:5C:BC"]
   }
+},
+{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.ysfykc.twa",
+    "sha256_cert_fingerprints": ["A9:7F:A7:4F:48:91:F5:B6:73:84:6C:58:DF:24:67:63:81:15:53:55:9F:B8:C1:79:86:6F:06:2D:C9:F7:88:24"]
+  }
 }]
