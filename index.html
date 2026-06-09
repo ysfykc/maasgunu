@@ -3164,8 +3164,9 @@ async function init(){
       if(kullanici){ 
          user=kullanici; document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
          const av=document.getElementById('avatar'); if(kullanici.photoURL){av.src=kullanici.photoURL;av.style.display='block';} 
-         backButtonBaslat();
+         // Admin kontrolü
          adminKontrolEt();
+         // Kullanıcı profilini kaydet (admin paneli için)
          profilKaydet(kullanici);
          lsYukle(); navSec(navIdx); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
          // Onboarding kontrolü
@@ -3188,8 +3189,9 @@ async function init(){
   }
   document.getElementById('login').style.display='none'; uiLoginDurumuAyarla(false);
   const av=document.getElementById('avatar'); if(u.photoURL){av.src=u.photoURL;av.style.display='block';}
-  backButtonBaslat();
+  // Admin kontrolü — Firestore admins koleksiyonunu kontrol et
   adminKontrolEt();
+  // Kullanıcı profilini kaydet (admin paneli için)
   profilKaydet(u);
   lsYukle(); navSec(navIdx); render(); await fbYukle(); 
   kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); });
@@ -3208,49 +3210,9 @@ async function init(){
 }
 
 /* ══ GERİ TUŞU YÖNETİMİ ══ */
-function pushState(label) {
-  history.pushState({ label }, '', window.location.href);
-}
-
-window.addEventListener('popstate', function(e) {
-  // Giriş ekranındaysa hiçbir şey yapma
-  const loginEl = document.getElementById('login');
-  if(loginEl && loginEl.style.display !== 'none') {
-    history.pushState({}, '', window.location.href);
-    return;
-  }
-
-  // Açık modal var mı kontrol et
-  const modaller = ['mEkle','mDuzenle','mPortfoy','mPortfoyDuzenle','mAiPortfoy','mBorc','mOdeme','mAksiyon','mCopKutusu','mAyarlar','mDestek','mSablon','mBorcDuzenle'];
-  for(const id of modaller) {
-    const el = document.getElementById(id);
-    if(el && el.classList.contains('on')) {
-      el.classList.remove('on');
-      history.pushState({}, '', window.location.href);
-      return;
-    }
-  }
-  // Admin paneli açıksa kapat
-  const adminP = document.getElementById('adminPanel');
-  if(adminP && adminP.style.display === 'block') {
-    adminKapat();
-    history.pushState({}, '', window.location.href);
-    return;
-  }
-  // Ana sayfada değilsek ana sayfaya dön
-  if(navIdx !== 0) {
-    navSec(0);
-    history.pushState({}, '', window.location.href);
-    return;
-  }
-  // Hiçbir şey yoksa state'i geri koy (uygulamadan çıkma)
-  history.pushState({}, '', window.location.href);
-});
-
-// Kullanıcı giriş yaptıktan sonra state ekle
-function backButtonBaslat() {
-  history.pushState({}, '', window.location.href);
-}
+// History API Firebase Auth popup'ı ile çakışıyor — şimdilik devre dışı
+function pushState(label) { /* devre dışı */ }
+function backButtonBaslat() { /* devre dışı */ }
 
 document.addEventListener('DOMContentLoaded',init);
 function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
