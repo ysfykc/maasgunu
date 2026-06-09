@@ -527,23 +527,22 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 </div>
 
-<div id="login" style="position: fixed; inset: 0; z-index: 9999; background: #000; overflow: hidden; display: flex; flex-direction: column;">
-  <div class="login-bg" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; background: radial-gradient(circle at 50% 35%, #1a7a42 0%, #0a1a0e 80%); pointer-events: none;"></div>
+<div id="login">
+  <div class="login-bg"></div>
+  <div class="login-badge">Developed by <strong>ysfykc</strong> • Maaş Günü v1.0.0.0</div>
   
-  <div class="login-badge" style="position: absolute; top: calc(24px + env(safe-area-inset-top)); right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; z-index: 10; border: 0.5px solid rgba(255, 255, 255, 0.15);">Maaş Günü v4.6 Pro</div>
-  
-  <div id="loginPanel" style="position: relative; z-index: 10; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px;">
+  <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
     <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:40px;">
       <img src="16379.png" style="width:96px; height:96px; border-radius:24px; box-shadow:0 16px 36px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.1);">
       <div style="font-family:var(--fs); font-size:38px; color:#fff; letter-spacing:-.5px; line-height:1;">Maaş Günü</div>
       <div style="font-size:11px; color:rgba(255,255,255,0.5); font-weight:700; letter-spacing:1px; text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
     </div>
     <div style="width:100%; display:flex; flex-direction:column; gap:12px; margin-bottom:10vh;">
-      <button id="loginBtn" onclick="girisYap()" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+      <button id="loginBtn" onclick="girisYap()" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:none; cursor:pointer;">
         <svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Google ile Giriş Yap
       </button>
-      <button onclick="emailPanelAc('giris')" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.12); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.2); cursor:pointer;">
+      <button onclick="emailPanelAc('giris')" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.12); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.2); cursor:pointer; backdrop-filter:blur(8px);">
         ✉️ E-posta ile Giriş Yap
       </button>
       <button onclick="emailPanelAc('kayit')" style="width:100%; padding:13px 16px; border-radius:16px; background:transparent; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; border:none; cursor:pointer;">
@@ -552,8 +551,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
     </div>
   </div>
 
-  <div id="emailPanel" style="position: relative; z-index: 10; display:none; flex:1; flex-direction:column; width:100%; padding:0 32px;">
-    <button onclick="emailPanelKapat()" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer;">← Geri</button>
+  <div id="emailPanel" style="display:none; flex:1; flex-direction:column; width:100%; padding:0 32px;">
+    <button onclick="emailPanelKapat()" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px);">← Geri</button>
     <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; margin-bottom:10vh;">
       <div id="emailPanelTtl" style="font-family:var(--fs); font-size:30px; color:#fff; letter-spacing:-.5px; text-align:center; margin-bottom:8px;">Giriş Yap</div>
       <div id="emailHata" style="display:none; background:rgba(255,80,80,0.2); border:1px solid rgba(255,80,80,0.4); color:#ffb3b3; padding:10px 14px; border-radius:12px; font-size:13px; text-align:center;"></div>
@@ -562,7 +561,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
       </div>
       <input id="eEmail" type="email" placeholder="E-posta adresi" autocomplete="email" inputmode="email" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
       <input id="eSifre" type="password" placeholder="Şifre" autocomplete="current-password" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
-      <button id="emailGirisBtn" onclick="emailIslem()" style="width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; border:none; cursor:pointer;">Giriş Yap</button>
+      <button id="emailGirisBtn" onclick="emailIslem()" style="width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.3);">Giriş Yap</button>
       <button id="sifremiUnuttumBtn" onclick="sifremiUnuttum()" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer; padding:4px;">Şifremi unuttum</button>
       <div id="emailAltLink" style="text-align:center;">
         <button onclick="emailPanelAc('kayit')" id="kayitGecBtn" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer;">Hesabın yok mu? Kayıt ol →</button>
@@ -570,7 +569,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
     </div>
   </div>
 </div>
-
 
 <header class="topbar">
 <div class="logo">
