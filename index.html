@@ -834,45 +834,26 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp">
   <label class="ilbl">Varlık Tipi</label>
   <select class="inp" id="vTip" onchange="vTipKontrol()" style="appearance:none; -webkit-appearance:none;">
-     <option value="bist">📈 Türk Hissesi (BIST)</option>
-     <option value="abd">🇺🇸 ABD Hissesi / ETF</option>
-     <option value="tefas">📊 Yatırım Fonu (TEFAS)</option>
-     <option value="altin">🪙 Altın</option>
-     <option value="doviz">💵 Döviz</option>
-     <option value="bes">🛡️ BES / Emeklilik</option>
+     <option value="tefas">Yatırım Fonu (TEFAS)</option><option value="bist">Türk Hissesi (BIST)</option>
+     <option value="abd">ABD Hissesi / ETF</option><option value="altin">Altın (Fiziksel / Banka)</option>
+     <option value="doviz">Döviz (USD, EUR vb.)</option><option value="bes">Bireysel Emeklilik (BES)</option>
   </select>
 </div>
-<div class="igrp" id="vKodRow">
-  <label class="ilbl" id="vKodLbl">Hisse Kodu</label>
-  <input class="inp" id="vKod" type="text" style="text-transform:uppercase" placeholder="örn. THYAO, AAPL"/>
-  <div id="vKodIpucu" style="font-size:11px;color:var(--txt3);margin-top:6px;line-height:1.5;display:none;"></div>
-</div>
+<div class="igrp" id="vKodRow"><label class="ilbl" id="vKodLbl">Hisse / Fon Kodu</label><input class="inp" id="vKod" type="text" style="text-transform:uppercase"/></div>
 <div class="igrp" id="vAltinRow" style="display:none;">
   <label class="ilbl">Altın Türü</label>
   <select class="inp" id="vAltinTip" style="appearance:none; -webkit-appearance:none;">
-     <option value="gram-altin">Gram Altın (24 Ayar)</option>
-     <option value="22-ayar-bilezik">22 Ayar Gram Altın</option>
-     <option value="ceyrek-altin">Çeyrek Altın</option>
-     <option value="yarim-altin">Yarım Altın</option>
-     <option value="tam-altin">Tam Altın</option>
-     <option value="cumhuriyet-altini">Cumhuriyet Altını</option>
-     <option value="ata-altin">Ata Altın</option>
-     <option value="gremse-altin">Gremse Altın</option>
+     <option value="gram-altin">Gram Altın (24 Ayar)</option><option value="22-ayar-bilezik">22 Ayar Gram Altın</option>
+     <option value="ceyrek-altin">Çeyrek Altın</option><option value="yarim-altin">Yarım Altın</option>
+     <option value="tam-altin">Tam Altın</option><option value="cumhuriyet-altini">Cumhuriyet Altını</option>
   </select>
 </div>
 <div class="igrp" id="vDovizRow" style="display:none;">
   <label class="ilbl">Döviz Cinsi</label>
-  <select class="inp" id="vDovizTip" style="appearance:none; -webkit-appearance:none;">
-    <option value="USD">🇺🇸 Amerikan Doları (USD)</option>
-    <option value="EUR">🇪🇺 Euro (EUR)</option>
-    <option value="GBP">🇬🇧 İngiliz Sterlini (GBP)</option>
-  </select>
+  <select class="inp" id="vDovizTip" style="appearance:none; -webkit-appearance:none;"><option value="USD">Dolar (USD)</option><option value="EUR">Euro (EUR)</option><option value="GBP">Sterlin (GBP)</option></select>
 </div>
 <div class="igrp"><label class="ilbl" id="vMiktarLbl">Miktar</label><input class="inp" id="vMiktar" min="0" step="any" type="number" inputmode="decimal"/></div>
-<div class="igrp" id="vMaliyetRow">
-  <label class="ilbl">Birim Alış Fiyatı (₺) <span style="font-weight:400;color:var(--txt3)">— kâr/zarar hesabı için</span></label>
-  <div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vMaliyet" min="0" step="any" type="number" inputmode="decimal" placeholder="0 (isteğe bağlı)"/></div>
-</div>
+<div class="igrp" id="vMaliyetRow"><label class="ilbl">Ortalama Maliyet (Birim Alış Fiyatı)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="vMaliyet" min="0" step="any" type="number" inputmode="decimal"/></div></div>
 <button class="sbtn a" onclick="varlikKaydet()">✓ Varlığı Kaydet</button>
 <button class="cancel-btn" onclick="document.getElementById('mPortfoy').classList.remove('on')">İptal</button>
 </div></div>
@@ -1122,142 +1103,16 @@ function obBitir() {
   toast('🎉 Hoş geldin! Gelirlerini eklemeye başla.');
 }
 
-/* ══ PORTFÖY FİYAT GÜNCELLEME SİSTEMİ ══ */
-
-// BIST/TEFAS için proxy listesi
-const PROXY = [
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://thingproxy.freeboard.io/fetch/${url}`,
-];
-
-async function proxyFetch(url, timeout=6000) {
-  for(const p of PROXY) {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(()=>ctrl.abort(), timeout);
-      const r = await fetch(p(url), {signal:ctrl.signal});
-      clearTimeout(t);
-      if(r.ok) return await r.text();
-    } catch(e) { continue; }
-  }
-  return null;
-}
-
-// BIST fiyatı — Borsa İstanbul / BİST
-async function bistFiyatCek(sembol) {
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sembol}.IS?interval=1d&range=1d`;
-    const txt = await proxyFetch(url);
-    if(!txt) return null;
-    const d = JSON.parse(txt);
-    return d?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
-  } catch(e) { return null; }
-}
-
-// ABD hissesi/ETF fiyatı — Yahoo Finance (USD cinsinden, TL'ye çevrilecek)
-async function abdFiyatCek(sembol) {
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sembol}?interval=1d&range=1d`;
-    const txt = await proxyFetch(url);
-    if(!txt) return null;
-    const d = JSON.parse(txt);
-    const usdFiyat = d?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
-    if(!usdFiyat) return null;
-    const kur = parseFloat(veri.kurlar?.usd || veri.kurlar?.USD) || 33;
-    return usdFiyat * kur; // TL'ye çevir
-  } catch(e) { return null; }
-}
-
-// TEFAS fon fiyatı
-async function tefasFiyatCek(fonKodu) {
-  try {
-    const url = `https://www.tefas.gov.tr/api/DB/BindHistoryInfo?fontip=YAT&bastarih=${new Date().toLocaleDateString('tr-TR')}&bittarih=${new Date().toLocaleDateString('tr-TR')}&fonkod=${fonKodu}`;
-    const txt = await proxyFetch(url);
-    if(!txt) return null;
-    const d = JSON.parse(txt);
-    return d?.data?.[0]?.FIYAT || null;
-  } catch(e) { return null; }
-}
-
-// Altın fiyatı truncgil'den (zaten kurlariGuncelle'de çekiliyor)
-function altinFiyatGetir(kod) {
-  const k = veri.kurlar;
-  const map = {
-    'gram-altin': k.gram_altin,
-    '22-ayar-bilezik': k['22_ayar'],
-    'ceyrek-altin': k.ceyrek,
-    'yarim-altin': k.yarim,
-    'tam-altin': k.tam,
-    'cumhuriyet-altini': k.cumhuriyet,
-    'ata-altin': k.ata,
-    'gremse-altin': k.gremse,
-  };
-  return map[kod] || null;
-}
-
-// Döviz fiyatı
-function dovizFiyatGetir(kod) {
-  const k = veri.kurlar;
-  const map = { 'USD': k.usd||k.USD, 'EUR': k.eur||k.EUR, 'GBP': k.gbp||38 };
-  return map[kod.toUpperCase()] || null;
-}
-
 async function portfoyGuncelle() {
   const btn = document.querySelector('[onclick="portfoyGuncelle()"]');
   if(btn) { btn.textContent = '⏳ Güncelleniyor...'; btn.disabled = true; }
-  
   try {
-    // Önce kurları güncelle (altın + döviz için)
-    await kurlariGuncelle();
-    
-    if(!veri.portfoy || veri.portfoy.length === 0) { portfoyRender(); return; }
-    
-    let basarili = 0, basarisiz = 0;
-    const guncellenecek = veri.portfoy.filter(v => !v.manuelFiyat);
-    
-    // Her varlık için paralel fiyat çek
-    const gorevler = guncellenecek.map(async (v) => {
-      let yeniFiyat = null;
-      
-      if(v.tip === 'altin') {
-        yeniFiyat = altinFiyatGetir(v.kod);
-      } else if(v.tip === 'doviz') {
-        yeniFiyat = dovizFiyatGetir(v.kod);
-      } else if(v.tip === 'bes') {
-        yeniFiyat = 1; // BES bakiye olarak saklanır
-      } else if(v.tip === 'bist') {
-        yeniFiyat = await bistFiyatCek(v.kod);
-      } else if(v.tip === 'abd') {
-        yeniFiyat = await abdFiyatCek(v.kod);
-      } else if(v.tip === 'tefas') {
-        yeniFiyat = await tefasFiyatCek(v.kod);
-      }
-      
-      if(yeniFiyat && yeniFiyat > 0) {
-        v.sonFiyat = yeniFiyat;
-        v.sonGuncelleme = new Date().toISOString();
-        basarili++;
-      } else {
-        basarisiz++;
-      }
-    });
-    
-    await Promise.all(gorevler);
-    
+    const basari = await kurlariGuncelle();
     portfoyRender(); render();
-    await fbKaydet();
-    
-    if(basarisiz === 0) {
-      toast(`✅ ${basarili} varlık güncellendi`);
-    } else if(basarili > 0) {
-      toast(`✅ ${basarili} güncellendi, ${basarisiz} manuel kontrol gerek`);
-    } else {
-      toast('⚠️ Fiyatlar alınamadı. Bağlantını kontrol et.');
-    }
+    if(basari) { toast('✅ Fiyatlar güncellendi'); }
+    else { toast('⚠️ Güncelleme başarısız, bağlantını kontrol et'); }
   } catch(e) {
-    console.error('Portföy güncelleme hatası:', e);
-    toast('❌ Güncelleme sırasında hata oluştu');
+    toast('❌ Hata: ' + e.message);
   } finally {
     if(btn) { btn.textContent = '🔄 Canlı Fiyatları Çek'; btn.disabled = false; }
   }
@@ -2604,46 +2459,15 @@ function grafikRender(v){
 
 
 /* ══ PORTFÖY FONKSİYONLARI ══ */
-const altinIsimMap = { 'gram-altin':'Gram Altın (24K)', '22-ayar-bilezik':'22 Ayar Gram Altın', 'ceyrek-altin':'Çeyrek Altın', 'yarim-altin':'Yarım Altın', 'tam-altin':'Tam Altın', 'cumhuriyet-altini':'Cumhuriyet Altını', 'ata-altin':'Ata Altın', 'gremse-altin':'Gremse Altın' };
+const altinIsimMap = { 'gram-altin': 'Gram Altın (24K)', '22-ayar-bilezik': '22 Ayar Gram', 'ceyrek-altin': 'Çeyrek Altın', 'yarim-altin': 'Yarım Altın', 'tam-altin': 'Tam Altın', 'cumhuriyet-altini': 'Cumhuriyet Altını' };
 function togglePChart() { Haptic.light(); showPChart = !showPChart; document.getElementById('pChartWrap').style.display = showPChart ? 'block' : 'none'; if(showPChart) portfoyRender(); }
-function modalVarlikAc() { Haptic.light(); document.getElementById('vKod').value = ''; document.getElementById('vMiktar').value = ''; document.getElementById('vMaliyet').value = ''; document.getElementById('vTip').value = 'bist'; vTipKontrol(); document.getElementById('mPortfoy').classList.add('on'); }
+function modalVarlikAc() { Haptic.light(); document.getElementById('vKod').value = ''; document.getElementById('vMiktar').value = ''; document.getElementById('vMaliyet').value = ''; document.getElementById('vTip').value = 'tefas'; vTipKontrol(); document.getElementById('mPortfoy').classList.add('on'); }
 function vTipKontrol() {
-   const tip = document.getElementById('vTip').value;
-   const ipucu = document.getElementById('vKodIpucu');
-   document.getElementById('vKodRow').style.display = 'none';
-   document.getElementById('vAltinRow').style.display = 'none';
-   document.getElementById('vDovizRow').style.display = 'none';
-   document.getElementById('vMaliyetRow').style.display = 'block';
-   if(ipucu) ipucu.style.display = 'none';
-   
-   if(tip === 'altin') {
-     document.getElementById('vAltinRow').style.display = 'block';
-     document.getElementById('vMiktarLbl').textContent = 'Miktar (Gram / Adet)';
-   } else if(tip === 'doviz') {
-     document.getElementById('vDovizRow').style.display = 'block';
-     document.getElementById('vMiktarLbl').textContent = 'Miktar (Birim)';
-   } else if(tip === 'bes') {
-     document.getElementById('vKodRow').style.display = 'block';
-     document.getElementById('vMaliyetRow').style.display = 'none';
-     document.getElementById('vKodLbl').textContent = 'Şirket / Açıklama (isteğe bağlı)';
-     document.getElementById('vMiktarLbl').textContent = 'Güncel Toplam Bakiye (₺)';
-     if(ipucu){ ipucu.textContent = '💡 BES bakiyeniz otomatik olarak güncellenmez. Bakiyeniz değiştiğinde düzenleyebilirsiniz.'; ipucu.style.display='block'; }
-   } else if(tip === 'bist') {
-     document.getElementById('vKodRow').style.display = 'block';
-     document.getElementById('vKodLbl').textContent = 'Hisse Kodu (BIST)';
-     document.getElementById('vMiktarLbl').textContent = 'Adet (Lot)';
-     if(ipucu){ ipucu.textContent = '💡 Örn: THYAO, SASA, FROTO — Canlı fiyat otomatik çekilir.'; ipucu.style.display='block'; }
-   } else if(tip === 'abd') {
-     document.getElementById('vKodRow').style.display = 'block';
-     document.getElementById('vKodLbl').textContent = 'Hisse / ETF Kodu (ABD)';
-     document.getElementById('vMiktarLbl').textContent = 'Adet';
-     if(ipucu){ ipucu.textContent = '💡 Örn: AAPL, TSLA, SPY, QQQ — Fiyat USD'den TL'ye çevrilir.'; ipucu.style.display='block'; }
-   } else if(tip === 'tefas') {
-     document.getElementById('vKodRow').style.display = 'block';
-     document.getElementById('vKodLbl').textContent = 'Fon Kodu (TEFAS)';
-     document.getElementById('vMiktarLbl').textContent = 'Adet (Pay Sayısı)';
-     if(ipucu){ ipucu.textContent = '💡 Örn: AKB, YAE, GAP — TEFAS'taki 3 harfli fon kodunu girin. Fiyat manuel güncellenir.'; ipucu.style.display='block'; }
-   }
+   const tip = document.getElementById('vTip').value; document.getElementById('vKodRow').style.display = 'none'; document.getElementById('vAltinRow').style.display = 'none'; document.getElementById('vDovizRow').style.display = 'none'; document.getElementById('vMaliyetRow').style.display = 'block';
+   if(tip === 'altin') { document.getElementById('vAltinRow').style.display = 'block'; document.getElementById('vMiktarLbl').textContent = 'Miktar (Adet/Gram)'; } 
+   else if (tip === 'doviz') { document.getElementById('vDovizRow').style.display = 'block'; document.getElementById('vMiktarLbl').textContent = 'Miktar (Birim)'; } 
+   else if (tip === 'bes') { document.getElementById('vKodRow').style.display = 'block'; document.getElementById('vMaliyetRow').style.display = 'none'; document.getElementById('vKodLbl').textContent = 'BES Şirketi (İsteğe Bağlı)'; document.getElementById('vMiktarLbl').textContent = 'Güncel Toplam Bakiye (₺)'; } 
+   else { document.getElementById('vKodRow').style.display = 'block'; document.getElementById('vKodLbl').textContent = 'Hisse / Fon Kodu'; document.getElementById('vMiktarLbl').textContent = 'Miktar (Adet/Lot)'; }
 }
 
 async function varlikKaydet() {
@@ -2658,132 +2482,54 @@ async function varlikKaydet() {
 
 function portfoyRender() {
    const el = document.getElementById('portfoyIcerik');
-   if(!veri.portfoy || veri.portfoy.length === 0) {
-     el.innerHTML = `<div class="empty-sec"><div class="empty-ico">💼</div><div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px;">Portföy boş</div><div style="font-size:13px;color:var(--txt3);">+ Ekle butonuyla ilk varlığını ekle</div></div>`;
-     document.getElementById('pToplam').textContent = '₺0';
-     document.getElementById('pGenelKz').innerHTML = '';
-     document.getElementById('pDovizToplam').innerHTML = '';
-     return;
-   }
-   
+   if(!veri.portfoy || veri.portfoy.length === 0) { el.innerHTML = '<div class="empty-sec"><div class="empty-ico">💼</div>Henüz varlık yok.</div>'; document.getElementById('pToplam').textContent = '₺0'; return; }
    let totalNetWorth = 0, totalCost = 0, html = '', chartData = {};
-   const GRUPLAR = {
-     'bist':  { ad: '📈 Türk Hisseleri',   cls: 'bist',  icon: '📈', varliklar: [] },
-     'abd':   { ad: '🇺🇸 ABD Hisseleri',   cls: 'abd',   icon: '🇺🇸', varliklar: [] },
-     'tefas': { ad: '📊 Yatırım Fonları',  cls: 'tefas', icon: '📊', varliklar: [] },
-     'altin': { ad: '🪙 Altın',            cls: 'altin', icon: '🪙', varliklar: [] },
-     'doviz': { ad: '💵 Döviz',            cls: 'doviz', icon: '💵', varliklar: [] },
-     'bes':   { ad: '🛡️ BES',             cls: 'bes',   icon: '🛡️', varliklar: [] },
-   };
-   
-   // Eski kod düzeltme
+   const gruplar = { 'bist': { ad: 'Türk Hisseleri', class: 'bist', icon: '📈', varliklar: [] }, 'abd': { ad: 'ABD Hisseleri', class: 'abd', icon: '🇺🇸', varliklar: [] }, 'tefas': { ad: 'Fonlar', class: 'tefas', icon: '📊', varliklar: [] }, 'altin': { ad: 'Altın', class: 'altin', icon: '🪙', varliklar: [] }, 'doviz': { ad: 'Döviz', class: 'doviz', icon: '💵', varliklar: [] }, 'bes': { ad: 'BES', class: 'bes', icon: '🛡️', varliklar: [] } };
    veri.portfoy.forEach(v => { if(v.tip==='altin' && v.kod==='GRAM ALTIN') v.kod='gram-altin'; });
+   veri.portfoy.forEach(v => { const vTotal = v.miktar * (v.sonFiyat || 0); const vCostTotal = v.miktar * (v.maliyet || 0); if(!isNaN(vTotal)) totalNetWorth += vTotal; if(v.tip !== 'bes' && !isNaN(vCostTotal)) totalCost += vCostTotal; chartData[v.tip] = (chartData[v.tip] || 0) + (isNaN(vTotal) ? 0 : vTotal); if(gruplar[v.tip]) gruplar[v.tip].varliklar.push({...v, vTotal, vCostTotal}); });
+   let genelKz = totalNetWorth - totalCost; let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
    
-   veri.portfoy.forEach(v => {
-     const vTotal = v.tip === 'bes' ? v.miktar : (v.miktar * (v.sonFiyat || 0));
-     const vCostTotal = v.tip === 'bes' ? v.maliyet : (v.miktar * (v.maliyet || 0));
-     if(!isNaN(vTotal)) totalNetWorth += vTotal;
-     if(!isNaN(vCostTotal)) totalCost += vCostTotal;
-     chartData[v.tip] = (chartData[v.tip] || 0) + (isNaN(vTotal) ? 0 : vTotal);
-     if(GRUPLAR[v.tip]) GRUPLAR[v.tip].varliklar.push({...v, vTotal, vCostTotal});
-   });
-   
-   let genelKz = totalNetWorth - totalCost;
-   let genelKzPct = totalCost > 0 ? (genelKz / totalCost) * 100 : 0;
-   
+   // 1. AŞAMA EKLENTİSİ: ANIMASYONLU SAYI
    animTL('pToplam', totalNetWorth);
-   document.getElementById('pGenelKz').innerHTML = totalCost > 0
-     ? `Net Kâr/Zarar: <span class="${genelKz >= 0 ? 'pl-pos' : 'pl-neg'}">${genelKz > 0 ? '+' : ''}${fTL(genelKz)} (${genelKz > 0 ? '+' : ''}%${genelKzPct.toFixed(2)})</span>`
-     : '';
    
-   const uRate = parseFloat(veri.kurlar?.usd || veri.kurlar?.USD) || 33;
-   const eRate = parseFloat(veri.kurlar?.eur || veri.kurlar?.EUR) || 35;
-   document.getElementById('pDovizToplam').innerHTML =
-     `≈ $${(totalNetWorth/uRate).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})} <span style="opacity:0.4;margin:0 4px;">|</span> €${(totalNetWorth/eRate).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}`;
+   document.getElementById('pGenelKz').innerHTML = totalCost > 0 ? `Net Kâr/Zarar: <span class="${genelKz >= 0 ? 'pl-pos' : 'pl-neg'}">${genelKz > 0 ? '+' : ''}${fTL(genelKz)} (${genelKz > 0 ? '+' : ''}%${genelKzPct.toFixed(2)})</span>` : '';
    
-   // Hedef kontrolü
+   let uRate = parseFloat(veri.kurlar?.usd || veri.kurlar?.USD) || 33.0;
+   let eRate = parseFloat(veri.kurlar?.eur || veri.kurlar?.EUR) || 35.0;
+   let uTotal = uRate > 0 ? (totalNetWorth / uRate) : 0;
+   let eTotal = eRate > 0 ? (totalNetWorth / eRate) : 0;
+   document.getElementById('pDovizToplam').innerHTML = `≈ $${uTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})} <span style="opacity:0.5; margin:0 4px;">|</span> €${eTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+   
+   // 1. AŞAMA EKLENTİSİ: HEDEF KONTROLÜ VE CONFETTI
    const hdf = getPortfoyHedefi();
    if(hdf > 0 && totalNetWorth >= hdf && !veri.hedefKutlandi) {
-     veri.hedefKutlandi = true;
-     setTimeout(()=>confetti({particleCount:200,spread:100,origin:{y:0.5},zIndex:10000}),500);
-   } else if(hdf > 0 && totalNetWorth < hdf) { veri.hedefKutlandi = false; }
-
-   // Render gruplar
-   for(const gKey in GRUPLAR) {
-     const g = GRUPLAR[gKey];
-     if(g.varliklar.length === 0) continue;
-     
-     // Grup toplam
-     const gToplam = g.varliklar.reduce((s,v)=>s+(isNaN(v.vTotal)?0:v.vTotal),0);
-     const gOran = totalNetWorth > 0 ? Math.round(gToplam/totalNetWorth*100) : 0;
-     
-     html += `<div class="p-grp-ttl" style="display:flex;justify-content:space-between;align-items:center;">
-       <span>${g.ad}</span>
-       <span style="font-size:10px;color:var(--txt3);font-weight:600;">${fTL(gToplam)} · %${gOran}</span>
-     </div>`;
-     
-     g.varliklar.forEach(v => {
-       // İsim belirleme
-       let title = v.kod;
-       if(v.tip === 'altin') title = altinIsimMap[v.kod] || v.kod;
-       if(v.tip === 'doviz') title = {'USD':'Amerikan Doları','EUR':'Euro','GBP':'İngiliz Sterlini'}[v.kod.toUpperCase()] || v.kod;
-       if(v.tip === 'bes') title = v.kod || 'BES Birikimi';
-       
-       // Kâr/zarar
-       let plHtml = '';
-       if(v.tip !== 'bes' && v.maliyet > 0 && v.vTotal > 0) {
-         const pl = v.vTotal - v.vCostTotal;
-         const plPct = (pl / v.vCostTotal) * 100;
-         plHtml = `<span class="${pl >= 0 ? 'pl-pos' : 'pl-neg'}">${pl > 0 ? '+' : ''}${fTL(Math.round(Math.abs(pl)))} (${pl > 0 ? '+' : ''}%${Math.abs(plPct).toFixed(1)})</span>`;
-       }
-       
-       // Birim fiyat ve miktar
-       let metaHtml = '';
-       if(v.tip === 'bes') {
-         metaHtml = `<span>Bakiye</span>`;
-       } else {
-         const birimFiyat = v.sonFiyat > 0 ? fTL(v.sonFiyat) : '<span style="color:var(--amber)">Fiyat yok</span>';
-         const birim = v.tip === 'altin' ? 'gr/adet' : v.tip === 'doviz' ? 'birim' : 'adet';
-         metaHtml = `<span>${v.miktar} ${birim}</span><span style="color:var(--txt3);">·</span><span>${birimFiyat}</span>`;
-       }
-       
-       // Son güncelleme
-       const guncel = v.sonGuncelleme
-         ? new Date(v.sonGuncelleme).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})
-         : (v.manuelFiyat ? 'Manuel' : '—');
-       
-       html += `<div class="portfoy-card" onclick="varlikDuzenleAc('${v.id}')">
-         <div class="portfoy-left">
-           <div class="portfoy-ad">${escHtml(title)}</div>
-           <div class="portfoy-meta">
-             <span class="p-badge ${g.cls}">${v.tip.toUpperCase()}</span>
-             ${metaHtml}
-           </div>
-           <div class="portfoy-meta" style="margin-top:2px;">${plHtml}</div>
-         </div>
-         <div class="portfoy-right">
-           <div class="portfoy-val">${v.tip==='bes' ? fTL(v.miktar) : fTL(v.vTotal)}</div>
-           <div class="portfoy-price" style="font-size:10px;color:var(--txt3);margin-top:2px;">🕐 ${guncel}</div>
-         </div>
-         <div class="p-bg-icon">${g.icon}</div>
-       </div>`;
-     });
+       veri.hedefKutlandi = true;
+       setTimeout(() => { confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, zIndex: 10000 }); }, 500);
+   } else if (hdf > 0 && totalNetWorth < hdf) {
+       veri.hedefKutlandi = false;
    }
-   
+
+   for (let gKey in gruplar) {
+       let g = gruplar[gKey];
+       if (g.varliklar.length > 0) {
+           html += `<div class="p-grp-ttl">${g.ad}</div>`;
+           g.varliklar.forEach(v => {
+               let title = v.tip === 'altin' ? (altinIsimMap[v.kod] || v.kod) : v.kod;
+               if(v.tip === 'doviz') {
+                   const dIsim = {'usd':'Amerikan Doları (USD)', 'eur':'Euro (EUR)', 'gbp':'İngiliz Sterlini (GBP)'};
+                   title = dIsim[v.kod.toLowerCase()] || v.kod;
+               }
+               
+               let plHtml = '';
+               if (v.tip !== 'bes' && v.maliyet > 0 && v.vTotal > 0) { let pl = v.vTotal - v.vCostTotal; let plPct = (pl / v.vCostTotal) * 100; plHtml = `<span class="${pl >= 0 ? 'pl-pos' : 'pl-neg'}">${pl > 0 ? '+' : ''}₺${Math.abs(pl).toLocaleString('tr-TR', {maximumFractionDigits:0})} (${pl > 0 ? '+' : ''}%${plPct.toFixed(1)})</span>`; }
+               html += `<div class="portfoy-card" onclick="varlikDuzenleAc('${v.id}')"><div class="portfoy-left"><div class="portfoy-ad">${escHtml(title)}</div><div class="portfoy-meta"><span class="p-badge ${g.class}">${v.tip.toUpperCase()}</span><span>${v.tip==='bes'?'Bakiye':'Adet'}: ${v.miktar}</span></div></div><div class="portfoy-right"><div class="portfoy-val">${fTL(v.vTotal)}</div><div class="portfoy-price">${plHtml}</div></div><div class="p-bg-icon">${g.icon}</div></div>`;
+           });
+       }
+   }
    el.innerHTML = html;
-   
    if(showPChart) {
-     const ctx = document.getElementById('portfoyChart');
-     if(portfoyChartInst) portfoyChartInst.destroy();
-     const tipAdlar = {'bist':'BIST','abd':'ABD','tefas':'Fon','altin':'Altın','doviz':'Döviz','bes':'BES'};
-     const tipRenkler = {'bist':'#0a84ff','abd':'#32d74b','tefas':'#bf5af2','altin':'#ff9f0a','doviz':'#32ade6','bes':'#ff3b30'};
-     const labels = Object.keys(chartData).map(k=>tipAdlar[k]||k);
-     const colors = Object.keys(chartData).map(k=>tipRenkler[k]||'#8e8e93');
-     portfoyChartInst = new Chart(ctx, {
-       type: 'doughnut',
-       data: { labels, datasets: [{ data: Object.values(chartData), backgroundColor: colors, borderWidth: 2, borderColor: getComputedStyle(document.documentElement).getPropertyValue('--surf')||'#fff' }] },
-       options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins: { legend: { position:'right', labels: { font:{family:'DM Sans',size:11}, color: getComputedStyle(document.documentElement).getPropertyValue('--txt2') } } } }
-     });
+       const ctx = document.getElementById('portfoyChart'); if(portfoyChartInst) portfoyChartInst.destroy();
+       portfoyChartInst = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(chartData), datasets: [{ data: Object.values(chartData), backgroundColor: ['#0a84ff','#32d74b','#bf5af2','#ff9f0a','#32ade6','#ff3b30'], borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right' } } } });
    }
 }
 
