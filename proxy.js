@@ -1,0 +1,1 @@
+export default{async fetch(r){const u=new URL(r.url);const t=u.searchParams.get("url");if(!t)return new Response("missing url",{status:400});const s=await fetch(decodeURIComponent(t),{headers:{"User-Agent":"Mozilla/5.0"}});const b=await s.text();return new Response(b,{headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}})}}
