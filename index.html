@@ -1124,107 +1124,65 @@ function obBitir() {
 
 /* ══ PORTFÖY FİYAT GÜNCELLEME SİSTEMİ ══ */
 
-// Proxy listesi — sırayla denir, ilk çalışan kullanılır
-const PROXY = [
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-];
+// BIST/TEFAS için proxy listesi
+// Cloudflare Worker proxy — Türkiye'de engellenmeyen tek güvenilir yol
+const CF_WORKER = 'https://dry-poetry-ac48.yusuf-aykac.workers.dev';
 
-async function proxyFetch(url, timeout=8000) {
-  for(const p of PROXY) {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(()=>ctrl.abort(), timeout);
-      const r = await fetch(p(url), {signal:ctrl.signal});
-      clearTimeout(t);
-      if(r.ok) { const txt = await r.text(); if(txt && txt.length > 2) return txt; }
-    } catch(e) { continue; }
-  }
+async function wFetch(url, timeout=10000) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeout);
+    const r = await fetch(`${CF_WORKER}/?url=${encodeURIComponent(url)}`, {signal:ctrl.signal});
+    clearTimeout(t);
+    if(r.ok) { const txt = await r.text(); if(txt && txt.length > 2) return txt; }
+  } catch(e) {}
   return null;
 }
 
-// BIST fiyatı — çoklu kaynak
+// BIST fiyatı — Bigpara üzerinden
 async function bistFiyatCek(sembol) {
-  // Kaynak 1: Yahoo Finance v7 (daha basit endpoint)
   try {
-    const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${sembol}.IS`;
-    const txt = await proxyFetch(url, 7000);
+    const txt = await wFetch('https://bigpara.hurriyet.com.tr/api/v1/hisse/list');
+    if(!txt) return null;
+    const d = JSON.parse(txt);
+    const hisse = (d?.data || []).find(h => 
+      h.kod === sembol.toUpperCase() || h.Kod === sembol.toUpperCase()
+    );
+    if(hisse) {
+      const fiyat = parseFloat(hisse.alis || hisse.Alis || hisse.kapanis || hisse.Kapanis || 0);
+      if(fiyat > 0) return fiyat;
+    }
+  } catch(e) {}
+  
+  // Yedek: Yahoo Finance
+  try {
+    const txt = await wFetch(`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${sembol}.IS`);
     if(txt) {
       const d = JSON.parse(txt);
       const fiyat = d?.quoteResponse?.result?.[0]?.regularMarketPrice;
       if(fiyat && fiyat > 0) return fiyat;
     }
   } catch(e) {}
-
-  // Kaynak 2: Yahoo Finance v8
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sembol}.IS?range=1d&interval=1d`;
-    const txt = await proxyFetch(url, 7000);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const fiyat = d?.chart?.result?.[0]?.meta?.regularMarketPrice;
-      if(fiyat && fiyat > 0) return fiyat;
-    }
-  } catch(e) {}
-
-  // Kaynak 3: Bigpara
-  try {
-    const url = `https://bigpara.hurriyet.com.tr/api/v1/hisse/list`;
-    const txt = await proxyFetch(url, 8000);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const hisse = (d?.data || []).find(h => h.kod === sembol.toUpperCase());
-      if(hisse?.alis) return parseFloat(hisse.alis);
-    }
-  } catch(e) {}
-
+  
   return null;
 }
 
-// ABD hissesi/ETF fiyatı — USD, TL'ye çevrilir
+// ABD hissesi/ETF fiyatı
 async function abdFiyatCek(sembol) {
   const kur = parseFloat(veri.kurlar?.usd || veri.kurlar?.USD) || 33;
-
-  // Kaynak 1: Yahoo Finance v7
   try {
-    const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${sembol}`;
-    const txt = await proxyFetch(url, 7000);
+    const txt = await wFetch(`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${sembol}`);
     if(txt) {
       const d = JSON.parse(txt);
       const usd = d?.quoteResponse?.result?.[0]?.regularMarketPrice;
       if(usd && usd > 0) return usd * kur;
     }
   } catch(e) {}
-
-  // Kaynak 2: Yahoo Finance v8
-  try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sembol}?range=1d&interval=1d`;
-    const txt = await proxyFetch(url, 7000);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const usd = d?.chart?.result?.[0]?.meta?.regularMarketPrice;
-      if(usd && usd > 0) return usd * kur;
-    }
-  } catch(e) {}
-
-  // Kaynak 3: FMP (Financial Modeling Prep) — ücretsiz, demo key
-  try {
-    const url = `https://financialmodelingprep.com/api/v3/quote-short/${sembol}?apikey=demo`;
-    const txt = await proxyFetch(url, 7000);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const usd = d?.[0]?.price;
-      if(usd && usd > 0) return usd * kur;
-    }
-  } catch(e) {}
-
   return null;
 }
 
-// TEFAS fon fiyatı — çoklu format
+// TEFAS fon fiyatı
 async function tefasFiyatCek(fonKodu) {
-  // Kaynak 1: TEFAS güncel endpoint
   try {
     const bugun = new Date();
     const dd = String(bugun.getDate()).padStart(2,'0');
@@ -1232,25 +1190,13 @@ async function tefasFiyatCek(fonKodu) {
     const yyyy = bugun.getFullYear();
     const tarih = `${dd}.${mm}.${yyyy}`;
     const url = `https://www.tefas.gov.tr/api/DB/BindHistoryInfo?fontip=YAT&bastarih=${tarih}&bittarih=${tarih}&fonkod=${fonKodu.toUpperCase()}`;
-    const txt = await proxyFetch(url, 8000);
+    const txt = await wFetch(url);
     if(txt) {
       const d = JSON.parse(txt);
       const fiyat = d?.data?.[0]?.FIYAT;
       if(fiyat && parseFloat(fiyat) > 0) return parseFloat(fiyat);
     }
   } catch(e) {}
-
-  // Kaynak 2: TEFAS alternatif endpoint
-  try {
-    const url = `https://www.tefas.gov.tr/api/DB/BindHistoryAllocation?fontip=YAT&fonkod=${fonKodu.toUpperCase()}`;
-    const txt = await proxyFetch(url, 8000);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const fiyat = d?.data?.[0]?.FIYAT;
-      if(fiyat && parseFloat(fiyat) > 0) return parseFloat(fiyat);
-    }
-  } catch(e) {}
-
   return null;
 }
 
@@ -2241,14 +2187,14 @@ async function fetchWithTimeout(url, options = {}, timeout = 4000) {
 async function kurlariGuncelle() {
    try { 
        let d = null;
+       // Önce doğrudan dene, olmazsa Worker üzerinden
        const URLS = [
          'https://finans.truncgil.com/v4/today.json',
-         'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://finans.truncgil.com/v4/today.json'),
-         'https://corsproxy.io/?' + encodeURIComponent('https://finans.truncgil.com/v4/today.json'),
+         `${CF_WORKER}/?url=${encodeURIComponent('https://finans.truncgil.com/v4/today.json')}`,
        ];
        for(const url of URLS) {
          try {
-           const r = await fetchWithTimeout(url, {cache:'no-store'}, 5000);
+           const r = await fetchWithTimeout(url, {cache:'no-store'}, 6000);
            if(r.ok) { d = await r.json(); break; }
          } catch(e) { continue; }
        }
