@@ -1125,58 +1125,43 @@ function obBitir() {
 /* ══ PORTFÖY FİYAT GÜNCELLEME SİSTEMİ ══ */
 
 // BIST/TEFAS için proxy listesi
-// Cloudflare Worker proxy — Türkiye'de engellenmeyen tek güvenilir yol
+// Cloudflare Worker — Türkiye'den erişilebilen güvenilir proxy
 const CF_WORKER = 'https://dry-poetry-ac48.yusuf-aykac.workers.dev';
 
-async function wFetch(url, timeout=10000) {
+async function wFetch(targetUrl, timeout=10000) {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(()=>ctrl.abort(), timeout);
-    const r = await fetch(`${CF_WORKER}/?url=${encodeURIComponent(url)}`, {signal:ctrl.signal});
+    // URL'yi encode et — & gibi karakterler %26 olmalı
+    const encoded = encodeURIComponent(targetUrl);
+    const r = await fetch(`${CF_WORKER}/?url=${encoded}`, {signal:ctrl.signal});
     clearTimeout(t);
     if(r.ok) { const txt = await r.text(); if(txt && txt.length > 2) return txt; }
   } catch(e) {}
   return null;
 }
 
-// BIST fiyatı — Bigpara üzerinden
+// BIST fiyatı — Yahoo Finance v8 üzerinden
 async function bistFiyatCek(sembol) {
   try {
-    const txt = await wFetch('https://bigpara.hurriyet.com.tr/api/v1/hisse/list');
+    const txt = await wFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sembol}.IS?range=1d&interval=1d`);
     if(!txt) return null;
     const d = JSON.parse(txt);
-    const hisse = (d?.data || []).find(h => 
-      h.kod === sembol.toUpperCase() || h.Kod === sembol.toUpperCase()
-    );
-    if(hisse) {
-      const fiyat = parseFloat(hisse.alis || hisse.Alis || hisse.kapanis || hisse.Kapanis || 0);
-      if(fiyat > 0) return fiyat;
-    }
+    const fiyat = d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    if(fiyat && fiyat > 0) return fiyat;
   } catch(e) {}
-  
-  // Yedek: Yahoo Finance
-  try {
-    const txt = await wFetch(`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${sembol}.IS`);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const fiyat = d?.quoteResponse?.result?.[0]?.regularMarketPrice;
-      if(fiyat && fiyat > 0) return fiyat;
-    }
-  } catch(e) {}
-  
   return null;
 }
 
-// ABD hissesi/ETF fiyatı
+// ABD hissesi/ETF — Yahoo Finance, USD → TL
 async function abdFiyatCek(sembol) {
   const kur = parseFloat(veri.kurlar?.usd || veri.kurlar?.USD) || 33;
   try {
-    const txt = await wFetch(`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${sembol}`);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const usd = d?.quoteResponse?.result?.[0]?.regularMarketPrice;
-      if(usd && usd > 0) return usd * kur;
-    }
+    const txt = await wFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sembol}?range=1d&interval=1d`);
+    if(!txt) return null;
+    const d = JSON.parse(txt);
+    const usd = d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    if(usd && usd > 0) return usd * kur;
   } catch(e) {}
   return null;
 }
@@ -1189,13 +1174,11 @@ async function tefasFiyatCek(fonKodu) {
     const mm = String(bugun.getMonth()+1).padStart(2,'0');
     const yyyy = bugun.getFullYear();
     const tarih = `${dd}.${mm}.${yyyy}`;
-    const url = `https://www.tefas.gov.tr/api/DB/BindHistoryInfo?fontip=YAT&bastarih=${tarih}&bittarih=${tarih}&fonkod=${fonKodu.toUpperCase()}`;
-    const txt = await wFetch(url);
-    if(txt) {
-      const d = JSON.parse(txt);
-      const fiyat = d?.data?.[0]?.FIYAT;
-      if(fiyat && parseFloat(fiyat) > 0) return parseFloat(fiyat);
-    }
+    const txt = await wFetch(`https://www.tefas.gov.tr/api/DB/BindHistoryInfo?fontip=YAT&bastarih=${tarih}&bittarih=${tarih}&fonkod=${fonKodu.toUpperCase()}`);
+    if(!txt) return null;
+    const d = JSON.parse(txt);
+    const fiyat = d?.data?.[0]?.FIYAT;
+    if(fiyat && parseFloat(fiyat) > 0) return parseFloat(fiyat);
   } catch(e) {}
   return null;
 }
@@ -2187,14 +2170,13 @@ async function fetchWithTimeout(url, options = {}, timeout = 4000) {
 async function kurlariGuncelle() {
    try { 
        let d = null;
-       // Önce doğrudan dene, olmazsa Worker üzerinden
        const URLS = [
          'https://finans.truncgil.com/v4/today.json',
          `${CF_WORKER}/?url=${encodeURIComponent('https://finans.truncgil.com/v4/today.json')}`,
        ];
        for(const url of URLS) {
          try {
-           const r = await fetchWithTimeout(url, {cache:'no-store'}, 6000);
+           const r = await fetchWithTimeout(url, {cache:'no-store'}, 7000);
            if(r.ok) { d = await r.json(); break; }
          } catch(e) { continue; }
        }
