@@ -153,9 +153,20 @@ input[type=number]{-moz-appearance:textfield}
 .sablon-ekle { padding:6px 14px; border-radius:99px; background:var(--green); color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; }
 .sablon-ekle.r { background:var(--red); }
 #login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; overflow: hidden; }
-.login-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 35%, #1a7a42 0%, #0a1a0e 80%); }
-.login-badge { position: absolute; top: 24px; right: 24px; background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.85); padding: 6px 12px; border-radius: 999px; font-size: 10.5px; letter-spacing: 0.02em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 0.5px solid rgba(255, 255, 255, 0.15); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-#loginBtn { width: 100%; padding: 15px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #1a1814; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: none; cursor: pointer; }
+.login-bg { position:absolute; inset:0; width:100%; height:100%; z-index:-1; background:radial-gradient(ellipse at 50% 30%, #1a5c38 0%, #0a1f14 55%, #060e09 100%); }
+.login-badge { display:none; }
+#login { position:fixed; inset:0; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
+.login-splash { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; width:100%; flex:1; padding-top:env(safe-area-inset-top); }
+.login-logo-wrap { position:relative; margin-bottom:28px; }
+.login-logo-wrap img { width:110px; height:110px; border-radius:28px; box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 0 1.5px rgba(255,255,255,0.12); }
+.login-logo-glow { position:absolute; inset:-20px; border-radius:50px; background:radial-gradient(circle, rgba(42,173,98,0.25) 0%, transparent 70%); z-index:-1; }
+.login-appname { font-family:var(--fs); font-size:42px; color:#fff; letter-spacing:-.5px; line-height:1; margin-bottom:8px; text-shadow:0 2px 20px rgba(0,0,0,0.4); }
+.login-tagline { font-size:11px; color:rgba(255,255,255,0.45); font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:48px; }
+.login-btns { width:100%; padding:0 28px; display:flex; flex-direction:column; gap:12px; margin-bottom:calc(env(safe-area-inset-bottom) + 32px); }
+.login-btn-google { width:100%; padding:16px; border-radius:18px; background:rgba(255,255,255,0.97); color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.35); border:none; cursor:pointer; letter-spacing:-.01em; }
+.login-btn-email { width:100%; padding:16px; border-radius:18px; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.9); font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.18); cursor:pointer; backdrop-filter:blur(12px); }
+.login-btn-kayit { width:100%; padding:12px; border-radius:18px; background:transparent; color:rgba(255,255,255,0.45); font-size:13px; font-weight:500; border:none; cursor:pointer; }
+.login-version { position:absolute; bottom:calc(env(safe-area-inset-bottom) + 8px); font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:.04em; }
 
 /* ══ HEDEF TASARRUFU ══ */
 .hedef-card { margin:0 16px 12px; background:linear-gradient(135deg,#1a3a8b,#5a3a8b); border-radius:20px; padding:16px; box-shadow:0 8px 24px rgba(26,58,139,.25); }
@@ -529,27 +540,30 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="login">
   <div class="login-bg"></div>
-  <div class="login-badge">Developed by <strong>ysfykc</strong> • Maaş Günü v1.0.0.0</div>
-  
-  <div id="loginPanel" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:0 32px; gap:0;">
-    <div style="display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:40px;">
-      <img src="16379.png" style="width:96px; height:96px; border-radius:24px; box-shadow:0 16px 36px rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.1);">
-      <div style="font-family:var(--fs); font-size:38px; color:#fff; letter-spacing:-.5px; line-height:1;">Maaş Günü</div>
-      <div style="font-size:11px; color:rgba(255,255,255,0.5); font-weight:700; letter-spacing:1px; text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
+
+  <div class="login-splash" id="loginPanel">
+    <div class="login-logo-wrap">
+      <div class="login-logo-glow"></div>
+      <img src="16379.png" alt="Maaş Günü">
     </div>
-    <div style="width:100%; display:flex; flex-direction:column; gap:12px; margin-bottom:10vh;">
-      <button id="loginBtn" onclick="girisYap()" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:none; cursor:pointer;">
+    <div class="login-appname">Maaş Günü</div>
+    <div class="login-tagline">Gelirini Planla • Geleceğini Kur</div>
+
+    <div class="login-btns">
+      <button id="loginBtn" class="login-btn-google" onclick="girisYap()">
         <svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Google ile Giriş Yap
       </button>
-      <button onclick="emailPanelAc('giris')" style="width:100%; padding:15px 16px; border-radius:16px; background:rgba(255,255,255,0.12); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.2); cursor:pointer; backdrop-filter:blur(8px);">
+      <button class="login-btn-email" onclick="emailPanelAc('giris')">
         ✉️ E-posta ile Giriş Yap
       </button>
-      <button onclick="emailPanelAc('kayit')" style="width:100%; padding:13px 16px; border-radius:16px; background:transparent; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; border:none; cursor:pointer;">
+      <button class="login-btn-kayit" onclick="emailPanelAc('kayit')">
         Hesabın yok mu? Kayıt ol →
       </button>
     </div>
   </div>
+
+  <div class="login-version">Maaş Günü v4.6</div>
 
   <div id="emailPanel" style="display:none; flex:1; flex-direction:column; width:100%; padding:0 32px;">
     <button onclick="emailPanelKapat()" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px);">← Geri</button>
@@ -620,7 +634,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="ai-chip-text" id="aiInsightText"></div>
 <div class="ai-chip-actions">
 <button class="ai-mini-btn" onclick="aiOneriYenile()">Başka öneri</button>
-<button class="ai-mini-btn" onclick="tabSec(3)">Grafiğe bak</button>
+<button class="ai-mini-btn" onclick="navSec(0); setTimeout(()=>tabSec(3),100); window.scrollTo({top:999,behavior:'smooth'})">Grafiğe bak</button>
 </div>
 </div>
 </div>
@@ -2031,8 +2045,20 @@ async function fbYukle(){
 }
 
 async function girisYap(){
-  Haptic.light(); document.getElementById('loginBtn').textContent='⏳ Bekleyin...';
-  try { await window._fb.signInWithPopup(auth, new window._fb.GoogleAuthProvider()); } catch(e) { document.getElementById('loginBtn').innerHTML='<svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> ⚠️ Tekrar Dene'; }
+  Haptic.light();
+  const btn = document.getElementById('loginBtn');
+  const googleSvg = '<svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>';
+  btn.innerHTML = '⏳ Bekleyin...'; btn.disabled = true;
+  // 20 saniye sonra otomatik sıfırla
+  const resetTimer = setTimeout(()=>{ btn.innerHTML = googleSvg + ' Google ile Giriş Yap'; btn.disabled = false; }, 20000);
+  try {
+    await window._fb.signInWithPopup(auth, new window._fb.GoogleAuthProvider());
+    clearTimeout(resetTimer);
+  } catch(e) {
+    clearTimeout(resetTimer);
+    btn.innerHTML = googleSvg + ' ⚠️ Tekrar Dene';
+    btn.disabled = false;
+  }
 }
 
 let emailMod = 'giris'; // 'giris' veya 'kayit'
