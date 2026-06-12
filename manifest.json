@@ -3,7 +3,7 @@
   "short_name": "Maaş Günü",
   "start_url": "/",
   "scope": "/",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#0a1a0e",
   "theme_color": "#0a1a0e",
   "icons": [
