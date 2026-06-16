@@ -468,6 +468,34 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </style>
 </head>
 <body>
+<!-- SPLASH SCREEN -->
+<div id="appSplash" style="
+  position:fixed; inset:0; z-index:99999;
+  background:radial-gradient(ellipse at 50% 40%, #1a5c38 0%, #0a2018 50%, #060e09 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:0; transition:opacity .4s ease; pointer-events:none;
+">
+  <div style="position:relative; margin-bottom:32px;">
+    <div style="
+      position:absolute; inset:-24px; border-radius:60px;
+      background:radial-gradient(circle, rgba(42,173,98,0.3) 0%, transparent 70%);
+    "></div>
+    <img src="16379.png" style="
+      width:120px; height:120px; border-radius:28px;
+      box-shadow:0 24px 64px rgba(0,0,0,0.6), 0 0 0 1.5px rgba(255,255,255,0.1);
+      display:block; position:relative;
+    ">
+  </div>
+  <div style="
+    font-family:'Instrument Serif',Georgia,serif;
+    font-size:44px; color:#fff; letter-spacing:-.5px; line-height:1;
+    margin-bottom:10px; text-shadow:0 2px 24px rgba(0,0,0,0.5);
+  ">Maaş Günü</div>
+  <div style="
+    font-size:11px; color:rgba(255,255,255,0.4);
+    font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  ">Gelirini Planla • Geleceğini Kur</div>
+</div>
 
 <div id="vLoader"><div id="vLoaderBar"></div></div>
 
@@ -3197,6 +3225,7 @@ async function init(){
          // Kullanıcı profilini kaydet (admin paneli için)
          profilKaydet(kullanici);
          lsYukle(); navSec(navIdx); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
+         if(window._hideSplash) window._hideSplash();
          // Onboarding kontrolü
          if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
          window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
@@ -3210,7 +3239,8 @@ async function init(){
          }, (err) => { setSynk('off'); });
       } else { 
          user=null;veri={aylar:{}, portfoy:[], borclar:[], copKutusu:[], ayarlar:{maasGunu:15, portfoyHedef:0}, kurlar:{usd:32.5,eur:35.0,USD:32.5,EUR:35.0}, guncelleme:null}; 
-         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); 
+         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
+         if(window._hideSplash) window._hideSplash();
       }
     });
     return;
@@ -3242,7 +3272,24 @@ async function init(){
 function pushState(label) { /* devre dışı */ }
 function backButtonBaslat() { /* devre dışı */ }
 
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded', function() {
+  // Splash screen'i gizle — Firebase auth hazır olunca
+  const splash = document.getElementById('appSplash');
+  if(!splash) return;
+  // Min 1.2sn göster, sonra fade out
+  const minShow = 1200;
+  const startTime = Date.now();
+  window._hideSplash = function() {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, minShow - elapsed);
+    setTimeout(() => {
+      splash.style.opacity = '0';
+      setTimeout(() => { splash.style.display = 'none'; }, 400);
+    }, remaining);
+  };
+  // Max 3sn sonra her halükarda gizle
+  setTimeout(() => { if(splash.style.display !== 'none') window._hideSplash(); }, 3000);
+});
 function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
 document.addEventListener('DOMContentLoaded', function(){
   const login=document.getElementById('login');
