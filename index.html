@@ -3434,18 +3434,136 @@ function renderBorcumIcerik() {
         if(!tum.length) { el.innerHTML = '<div class="empty-sec">Geçmiş ödeme yok.</div>'; return; }
         el.innerHTML = tum.map(o => `<div style="background:var(--ios-surface-strong); border:.5px solid var(--brd2); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--ios-shadow-soft);"><div style="display:flex; align-items:center; gap:10px;"><div style="font-size:20px;">${tipIko(o.bTip)}</div><div><div style="font-size:13.5px; font-weight:800; color:var(--txt);">${o.bAd}</div><div style="font-size:11px; color:var(--txt3); margin-top:2px;">${tarihStr(o.tarih)}</div></div></div><div style="text-align:right;"><div style="font-size:14px; font-weight:800; color:var(--green);">−${fM(o.bTip,o.miktar)}</div><div style="font-size:11px; color:var(--txt3); font-weight:600;">${fTL(o.kurTL||tlye(o.bTip,o.miktar))}</div></div></div>`).join('');
     }
-    else if(bTabIdx === 2) { // Grafik
-        el.innerHTML = '<div class="mini-chart"><div class="mini-chart-ttl">Borç Dağılımı (TL)</div><div style="height:200px;position:relative;"><canvas id="bc1"></canvas></div></div>';
+    else if(bTabIdx === 2) { // Grafik + Ödeme Planı
+        el.innerHTML = `
+          <div class="mini-chart" style="padding-bottom:0;">
+            <div class="mini-chart-ttl">Borç Dağılımı (TL)</div>
+            <div style="height:180px;position:relative;"><canvas id="bc1"></canvas></div>
+          </div>
+          <div style="margin-top:16px;">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:10px;">🧮 Ödeme Planı</div>
+            <div style="background:var(--surf);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--sh);">
+              <div style="font-size:12px;color:var(--txt3);margin-bottom:10px;">Aylık ne kadar ödeyebilirsin?</div>
+              <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <div style="flex:1;position:relative;">
+                  <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--txt3);font-size:13px;">₺</span>
+                  <input id="planAylikOdeme" type="number" inputmode="decimal" placeholder="5.000" style="width:100%;padding:10px 10px 10px 26px;border-radius:12px;border:1px solid var(--brd);background:var(--bg2);color:var(--txt);font-size:14px;font-weight:700;box-sizing:border-box;" oninput="odemeHesapla()"/>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <button id="planSnowball" onclick="planSec('snowball')" style="padding:10px 12px;border-radius:12px;border:none;font-size:11px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;">❄️ Snowball</button>
+                  <button id="planAvalanche" onclick="planSec('avalanche')" style="padding:10px 12px;border-radius:12px;border:none;font-size:11px;font-weight:700;cursor:pointer;background:var(--bg2);color:var(--txt2);">🏔 Avalanche</button>
+                </div>
+              </div>
+              <div id="planSonuc" style="font-size:12px;color:var(--txt3);text-align:center;padding:8px 0;">Aylık ödeme miktarını gir</div>
+            </div>
+            <div id="planSira" style="display:none;">
+              <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:8px;" id="planSiraTtl"></div>
+              <div id="planSiraIcerik"></div>
+            </div>
+          </div>`;
+        
+        window._planYontem = 'snowball';
+        
         setTimeout(() => {
             const g = {}; veri.borclar.forEach(b => { const tl=tlye(b.tip,kalanB(b)); let t=isAltin(b.tip)?'altin':b.tip; g[t]=(g[t]||0)+tl; });
             const entries = Object.entries(g).filter(([,v])=>v>0);
             if(!entries.length) return;
             const lmap = {altin:'Altın',usd:'Dolar',eur:'Euro',tl:'TL',kredi:'Kredi',kk:'K. Kartı'};
             if(bChart1) bChart1.destroy();
-            bChart1 = new Chart(document.getElementById('bc1'), {type:'doughnut',data:{labels:entries.map(([k])=>lmap[k]),datasets:[{data:entries.map(([,v])=>v),backgroundColor:['#b8860b','#2d6a4f','#1a3a6b','#e05050','#5a3a8b','#1a5a8b'],borderWidth:2}]},options:{responsive:true, maintainAspectRatio:false, cutout:'65%',plugins:{legend:{position:'right'}}}});
+            bChart1 = new Chart(document.getElementById('bc1'), {type:'doughnut',data:{labels:entries.map(([k])=>lmap[k]||k),datasets:[{data:entries.map(([,v])=>v),backgroundColor:['#b8860b','#2d6a4f','#1a3a6b','#e05050','#5a3a8b','#1a5a8b'],borderWidth:2,borderColor:getComputedStyle(document.documentElement).getPropertyValue('--surf')||'#1a1a1a'}]},options:{responsive:true, maintainAspectRatio:false, cutout:'65%',plugins:{legend:{position:'right',labels:{font:{family:'DM Sans',size:11}}}}}});
         }, 50);
     }
 }
+
+/* ══ BORÇ ÖDEME PLANI ══ */
+function planSec(yontem) {
+  window._planYontem = yontem;
+  document.getElementById('planSnowball').style.background = yontem==='snowball' ? 'var(--blue)' : 'var(--bg2)';
+  document.getElementById('planSnowball').style.color = yontem==='snowball' ? '#fff' : 'var(--txt2)';
+  document.getElementById('planAvalanche').style.background = yontem==='avalanche' ? 'var(--blue)' : 'var(--bg2)';
+  document.getElementById('planAvalanche').style.color = yontem==='avalanche' ? '#fff' : 'var(--txt2)';
+  odemeHesapla();
+}
+
+function odemeHesapla() {
+  const aylikTL = parseFloat(document.getElementById('planAylikOdeme')?.value) || 0;
+  const sonuc = document.getElementById('planSonuc');
+  const siraDiv = document.getElementById('planSira');
+  if(!sonuc) return;
+
+  if(aylikTL <= 0) { sonuc.textContent = 'Aylık ödeme miktarını gir'; if(siraDiv) siraDiv.style.display='none'; return; }
+
+  // Aktif borçları TL'ye çevir
+  const borclar = veri.borclar
+    .filter(b => kalanB(b) > 0)
+    .map(b => ({
+      id: b.id,
+      ad: b.ad,
+      tip: b.tip,
+      kalanTL: tlye(b.tip, kalanB(b)),
+      kalan: kalanB(b)
+    }));
+
+  if(!borclar.length) { sonuc.textContent = 'Aktif borç bulunmuyor'; if(siraDiv) siraDiv.style.display='none'; return; }
+
+  const toplamBorcTL = borclar.reduce((s,b)=>s+b.kalanTL, 0);
+  if(aylikTL >= toplamBorcTL) {
+    sonuc.innerHTML = `<span style="color:var(--green);font-weight:700;">🎉 Bu ödemeyle tüm borçları tek seferde kapatabilirsin!</span>`;
+    if(siraDiv) siraDiv.style.display='none';
+    return;
+  }
+
+  // Sıralama: snowball = küçükten büyüğe, avalanche = büyükten küçüğe
+  const yontem = window._planYontem || 'snowball';
+  const sirali = [...borclar].sort((a,b) => yontem==='snowball' ? a.kalanTL-b.kalanTL : b.kalanTL-a.kalanTL);
+
+  // Her borç için tahmini kapanma ayı hesapla (basit simülasyon)
+  let kalanlar = sirali.map(b => ({...b, kalanSim: b.kalanTL}));
+  let ay = 0; const maxAy = 240; // max 20 yıl
+  const sonuclar = {};
+  
+  while(kalanlar.some(b=>b.kalanSim>0) && ay < maxAy) {
+    ay++;
+    let kalanOdeme = aylikTL;
+    for(const b of kalanlar) {
+      if(b.kalanSim <= 0) continue;
+      const odeme = Math.min(kalanOdeme, b.kalanSim);
+      b.kalanSim -= odeme;
+      kalanOdeme -= odeme;
+      if(b.kalanSim <= 0.01 && !sonuclar[b.id]) sonuclar[b.id] = ay;
+      if(kalanOdeme <= 0) break;
+    }
+  }
+
+  const toplamAy = Math.max(...Object.values(sonuclar));
+  const yil = Math.floor(toplamAy/12);
+  const kalanAy = toplamAy%12;
+  const sureYazi = yil>0 ? `${yil} yıl ${kalanAy>0?kalanAy+' ay':''}` : `${toplamAy} ay`;
+
+  sonuc.innerHTML = `<span style="color:var(--txt);font-weight:700;">Tüm borçlar yaklaşık <span style="color:var(--blue);">${sureYazi}</span> içinde kapanır</span>`;
+
+  // Sıra listesi
+  if(siraDiv) {
+    siraDiv.style.display = 'block';
+    document.getElementById('planSiraTtl').textContent = yontem==='snowball' ? '❄️ Snowball — Küçükten büyüğe' : '🏔 Avalanche — Büyükten küçüğe';
+    document.getElementById('planSiraIcerik').innerHTML = sirali.map((b,i) => {
+      const ay = sonuclar[b.id] || '?';
+      const ayYazi = typeof ay==='number' ? (ay<12?`${ay} ay`:`${Math.floor(ay/12)}y ${ay%12>0?ay%12+'a':''}`) : '?';
+      return `<div style="background:var(--surf);border:1px solid var(--brd);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh);">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--txt);">${escHtml(b.ad)}</div>
+          <div style="font-size:11px;color:var(--txt3);">${fTL(b.kalanTL)} kalan</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;font-weight:700;color:var(--green);">~${ayYazi}</div>
+          <div style="font-size:10px;color:var(--txt3);">kapanır</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+/* ══ BORÇ ÖDEME PLANI BİTİŞ ══ */
 
 /* BORCUM MODAL & AKSİYONLAR */
 function borcModalAc(id) { 
