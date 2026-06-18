@@ -93,6 +93,16 @@
 .blim-ekle-row { display:flex; gap:8px; margin-top:4px; }
 .blim-ekle-row input { flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--brd); background:var(--bg2); color:var(--txt); font-size:13px; }
 
+/* ══ TEKRARlayan GEÇMİŞİ ══ */
+.tekrar-gecmis-modal .ay-satir { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:.5px solid var(--brd); }
+.tekrar-gecmis-modal .ay-satir:last-child { border-bottom:none; }
+.tekrar-gecmis-modal .ay-adi { font-size:13px; font-weight:600; color:var(--txt); flex:1; }
+.tekrar-gecmis-modal .ay-tutar { font-size:13px; font-weight:700; color:var(--txt); margin-right:10px; }
+.tekrar-gecmis-modal .ay-durum { font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; }
+.tekrar-gecmis-modal .ay-durum.odendi { background:var(--green-bg); color:var(--green); }
+.tekrar-gecmis-modal .ay-durum.atland { background:var(--red-bg); color:var(--red); }
+.tekrar-gecmis-modal .ay-durum.yok { background:var(--bg2); color:var(--txt3); }
+
 /* ══ ADMİN PANELİ ══ */
 #adminPanel { display:none; position:fixed; inset:0; z-index:9998; background:var(--bg); overflow-y:auto; padding-bottom:40px; }
 .admin-topbar { position:sticky; top:0; background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-bottom:.5px solid var(--brd2); padding:calc(env(safe-area-inset-top) + 12px) 16px 12px; display:flex; align-items:center; gap:12px; z-index:10; }
@@ -1088,6 +1098,16 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   </div>
 </div>
 
+<!-- TEKRARlayan GEÇMİŞ MODAL -->
+<div class="ov" id="mTekrarGecmis" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal tekrar-gecmis-modal">
+  <div class="mhandle"></div>
+  <div class="mttl" id="tgBaslik">Geçmiş</div>
+  <div style="font-size:12px;color:var(--txt3);margin-bottom:14px;" id="tgAciklama"></div>
+  <div id="tgIcerik"></div>
+</div>
+</div>
+
 <!-- BÜTÇE LİMİT MODAL -->
 <div class="ov" id="mButceLimitler" onclick="if(event.target===this)this.classList.remove('on')">
 <div class="modal">
@@ -1694,6 +1714,42 @@ function dragTouchBasla(e, handle) {
 
   document.addEventListener('touchmove', onMove, { passive: false });
   document.addEventListener('touchend', onEnd);
+}
+
+/* ══ TEKRARlayan GEÇMİŞİ ══ */
+function tekrarGecmisAc(tip, ad, kaynakId) {
+  Haptic.light();
+  document.getElementById('tgBaslik').textContent = `📋 ${ad}`;
+  document.getElementById('tgAciklama').textContent = tip === 'gelir' ? 'Sabit Gelir — Son 12 ay durumu' : 'Sabit Gider — Son 12 ay durumu';
+
+  const satirlar = [];
+  for(let i = 11; i >= 0; i--) {
+    const ay = ayEkleStr(aktifAy, -i);
+    const ayVeri = veri.aylar[ay];
+    if(!ayVeri) { satirlar.push({ay, durum:'yok', tutar:0}); continue; }
+    const liste = tip === 'gelir' ? (ayVeri.gelirler || []) : (ayVeri.giderler || []);
+    const silinenler = tip === 'gelir' ? (ayVeri.silinenGelirler || []) : (ayVeri.silinenGiderler || []);
+    const kalem = liste.find(k => k.kaynakId === kaynakId || k.id === kaynakId || k.ad === ad);
+    const silindi = silinenler.some(s => s.kaynakId === kaynakId || s.ad === ad);
+    if(kalem) satirlar.push({ay, durum: kalem.odendi ? 'odendi' : 'bekliyor', tutar: kalem.tutar});
+    else if(silindi) satirlar.push({ay, durum:'atland', tutar:0});
+    else satirlar.push({ay, durum:'yok', tutar:0});
+  }
+
+  const durumYazi = {odendi:'✅ Ödendi', bekliyor:'⏳ Bekliyor', atland:'❌ Atlandı', yok:'— Yok'};
+  const durumCls = {odendi:'odendi', bekliyor:'odendi', atland:'atland', yok:'yok'};
+
+  document.getElementById('tgIcerik').innerHTML = satirlar.map(s => {
+    const [yil, ay2] = s.ay.split('-');
+    const ayIsmi = new Date(parseInt(yil), parseInt(ay2)-1, 1).toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
+    return `<div class="ay-satir">
+      <span class="ay-adi">${ayIsmi}</span>
+      ${s.tutar > 0 ? `<span class="ay-tutar">${fTL(s.tutar)}</span>` : ''}
+      <span class="ay-durum ${durumCls[s.durum]}">${durumYazi[s.durum]}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('mTekrarGecmis').classList.add('on');
 }
 
 /* ══ BÜTÇE LİMİTLERİ ══ */
@@ -2655,6 +2711,7 @@ function icerikRender(){
 function kalemHtml(k,tip,idx){
   const renk=tip==='gelir'?'g':'r'; const badges=[]; const tekrarYazi = tip === 'gelir' ? 'Sabit Gelir' : 'Sabit Gider';
   if(k.tekrar)badges.push(`<span class="badge tekrar">${tekrarYazi}</span>`); if(k.yatirim)badges.push('<span class="badge yatirim">Yatırım</span>');
+  const gecmisBadge = k.tekrar ? `<button onclick="event.stopPropagation();tekrarGecmisAc('${tip}','${escHtml(k.ad)}','${k.kaynakId||k.id}')" style="background:none;border:none;color:var(--txt3);font-size:10px;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:99px;background:var(--bg2);margin-left:4px;">📋 Geçmiş</button>` : '';
   return`<div class="kalem-wrap" id="kw-${k.id}" data-id="${k.id}" data-tip="${tip}" data-idx="${idx}">
     <div class="kalem-bg"><div class="kalem-bg-l"><span>✓ İşaretle</span></div><div class="kalem-bg-r"><span>Sil 🗑</span></div></div>
     <div class="kalem" id="k-${k.id}" onclick="kalemDuzenleAc('${tip}','${k.id}')">
@@ -2662,7 +2719,7 @@ function kalemHtml(k,tip,idx){
       <div class="kalem-check ${k.odendi?'on':''}" onclick="event.stopPropagation();toggleOdendi('${tip}','${k.id}')"></div>
       <div class="kalem-info">
         <div class="kalem-ad ${k.odendi?'done':''}">${escHtml(k.ad)}</div>
-        <div class="kalem-meta">${k.kategori?`<span class="kalem-not">${escHtml(k.kategori)}</span>`:''} ${k.not?(k.tekrar?`<span class="kalem-not">📅 Her ayın ${escHtml(k.not)}. günü</span>`:`<span class="kalem-not">📅 Ayın ${escHtml(k.not)}. günü</span>`):''} ${badges.join('')}</div>
+        <div class="kalem-meta">${k.kategori?`<span class="kalem-not">${escHtml(k.kategori)}</span>`:''} ${k.not?(k.tekrar?`<span class="kalem-not">📅 Her ayın ${escHtml(k.not)}. günü</span>`:`<span class="kalem-not">📅 Ayın ${escHtml(k.not)}. günü</span>`):''} ${badges.join('')}${gecmisBadge}</div>
       </div>
       <div class="kalem-tutar ${renk}">${fTL(k.tutar)}</div>
     </div>
