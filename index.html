@@ -2608,6 +2608,7 @@ function render(){
   const yatirimHedefi = h.topGelir * 0.20; const kavanozWrap = document.getElementById('kavanozWrap');
   if(yatirimHedefi > 0) { kavanozWrap.style.display = 'block'; const kPct = Math.min(100, (h.yatirim / yatirimHedefi) * 100); document.getElementById('kYatirim').textContent = `${fTL(h.yatirim)} / ${fTL(yatirimHedefi)}`; document.getElementById('kBar').style.width = kPct + '%'; } else { kavanozWrap.style.display = 'none'; }
   // Bütçe limitleri render
+  const v = ayVerisi(aktifAy);
   butceLimitlériRender(v, h);
   icerikRender();
 }
