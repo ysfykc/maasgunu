@@ -1003,6 +1003,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl" id="adLbl">Borç Adı / Kişi</label><input class="inp" id="bAd" placeholder="örn. Ahmet amca" type="text"/></div>
 <div class="igrp"><label class="ilbl" id="miktarLbl">Miktar (gram)</label><div class="ipfx"><span class="pfx" id="pfx">gr</span><input class="inp" id="bMiktar" min="0" placeholder="0" step="0.01" type="number" inputmode="decimal"/></div></div>
 <div class="igrp"><label class="ilbl">Not (isteğe bağlı)</label><input class="inp" id="bNot" placeholder="örn. 2024 borcu" type="text"/></div>
+<div class="igrp"><label class="ilbl">📅 Ödeme Günü (ayın kaçında?) <span style="font-weight:400;color:var(--txt3)">— hatırlatıcı için</span></label><input class="inp" id="bOdemeTarihi" type="number" inputmode="decimal" min="1" max="31" placeholder="örn. 15 (isteğe bağlı)"/></div>
 <button class="sbtn" id="borcKaydetBtn" onclick="borcKaydet()" style="background:var(--txt); color:var(--bg);">✓ Kaydet</button>
 <button class="cancel-btn" onclick="document.getElementById('mBorc').classList.remove('on')">İptal</button>
 </div>
@@ -1498,6 +1499,44 @@ function hedefModalAc() {
 /* ══ FATURA HATIRLATICI ══ */
 /* ══ BİLDİRİM SİSTEMİ ══ */
 const BILDIRIM_KEY = 'mg_bildirim_son';
+const BORC_BILDIRIM_KEY = 'mg_borc_bildirim_son';
+
+async function borcHatirlaticiGonder() {
+  const bugunStr = new Date().toISOString().split('T')[0];
+  const son = localStorage.getItem(BORC_BILDIRIM_KEY);
+  if(son === bugunStr) return;
+
+  const izinVar = await bildirimIzniIste();
+  if(!izinVar) return;
+
+  const bugun = new Date();
+  const bugunGun = bugun.getDate();
+  const mesajlar = [];
+
+  veri.borclar.filter(b => kalanB(b) > 0 && b.odemeTarihi).forEach(b => {
+    const odemeGun = parseInt(b.odemeTarihi);
+    if(odemeGun >= 1 && odemeGun <= 31) {
+      const fark = odemeGun - bugunGun;
+      const kalanStr = fTL(tlye(b.tip, kalanB(b)));
+      if(fark === 0) mesajlar.push(`🔴 Bugün ödeme: ${b.ad} — ${kalanStr}`);
+      else if(fark === 1) mesajlar.push(`🟡 Yarın ödeme: ${b.ad} — ${kalanStr}`);
+      else if(fark === 2 || fark === 3) mesajlar.push(`🟠 ${fark} gün kaldı: ${b.ad} — ${kalanStr}`);
+      else if(fark === 7) mesajlar.push(`📅 1 hafta kaldı: ${b.ad} — ${kalanStr}`);
+    }
+  });
+
+  if(mesajlar.length === 0) return;
+  localStorage.setItem(BORC_BILDIRIM_KEY, bugunStr);
+
+  if(mesajlar.length === 1) {
+    bildirimGonder('Maaş Günü — Borç Hatırlatıcı', mesajlar[0], 'https://ysfykc.github.io/16379.png');
+  } else {
+    bildirimGonder(
+      `Maaş Günü — ${mesajlar.length} borç hatırlatıcı`,
+      mesajlar.slice(0,3).join('\n') + (mesajlar.length>3?`\n+${mesajlar.length-3} daha...`:'')
+    );
+  }
+}
 
 async function bildirimIzniAc() {
   if(!('Notification' in window)) { toast('❌ Tarayıcın bildirim desteklemiyor'); return; }
@@ -1611,6 +1650,7 @@ function faturaHatirlaticiKontrol() {
 
   // Bildirimleri gönder (arka planda)
   setTimeout(faturabildirimleriGonder, 2000);
+  setTimeout(borcHatirlaticiGonder, 3000);
 }
 
 function faturaModalAc() {
@@ -3594,9 +3634,10 @@ function tipSec(btn) { Haptic.light(); secilenTip = btn.dataset.tip; document.qu
 
 async function borcKaydet() {
   const ad = document.getElementById('bAd').value.trim(); const miktar = parseFloat(document.getElementById('bMiktar').value)||0; const not = document.getElementById('bNot').value.trim();
+  const odemeTarihi = document.getElementById('bOdemeTarihi')?.value?.trim() || '';
   if (!ad || !miktar) { Haptic.error(); toast('⚠️ Ad ve miktar gir'); return; }
-  if(duzenlenenBorcId){ const b=veri.borclar.find(x=>x.id===duzenlenenBorcId); if(b){ b.tip=secilenTip; b.ad=ad; b.not=not; b.miktar=miktar; } duzenlenenBorcId=null; }
-  else{ veri.borclar.push({id:uid(), tip:secilenTip, ad, not, miktar, odemeler:[]}); }
+  if(duzenlenenBorcId){ const b=veri.borclar.find(x=>x.id===duzenlenenBorcId); if(b){ b.tip=secilenTip; b.ad=ad; b.not=not; b.miktar=miktar; b.odemeTarihi=odemeTarihi; } duzenlenenBorcId=null; }
+  else{ veri.borclar.push({id:uid(), tip:secilenTip, ad, not, miktar, odemeTarihi, odemeler:[]}); }
   document.getElementById('mBorc').classList.remove('on'); renderBorcum(); await fbKaydet(); Haptic.success(); toast('✅ Kaydedildi');
 }
 
@@ -3612,6 +3653,7 @@ function aksiyonDuzenle(){
   duzenlenenBorcId=b.id; secilenTip=b.tip; secilenKat=isAltin(b.tip)?'gold':b.tip;
   document.getElementById('borcModalTtl').textContent='Borcu Düzenle'; document.getElementById('borcKaydetBtn').textContent='✓ Güncelle';
   document.getElementById('bAd').value=b.ad||''; document.getElementById('bMiktar').value=b.miktar||0; document.getElementById('bNot').value=b.not||'';
+  if(document.getElementById('bOdemeTarihi')) document.getElementById('bOdemeTarihi').value=b.odemeTarihi||'';
   document.querySelectorAll('[data-cat]').forEach(btn=>{ btn.className='tbx '+btn.dataset.cat; if(btn.dataset.cat===secilenKat)btn.classList.add('on'); });
   const ag=document.getElementById('altinGrup'); if(secilenKat==='gold'){ ag.style.display='block'; document.querySelectorAll('[data-tip]').forEach(btn=>{ btn.className='tbx gold'; if(btn.dataset.tip===secilenTip)btn.classList.add('on'); }); } else { ag.style.display='none'; }
   borcMiktarUIGuncelle(); document.getElementById('mBorc').classList.add('on');
