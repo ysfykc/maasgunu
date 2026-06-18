@@ -73,6 +73,26 @@
   --ios-ring:rgba(255,255,255,.08);
 }
 
+/* ══ BÜTÇE LİMİTLERİ ══ */
+#butceLimitKart { margin:0 16px 12px; }
+.butce-ttl { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--txt3); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.butce-item { background:var(--surf); border-radius:16px; border:1px solid var(--brd); padding:13px 15px; margin-bottom:8px; box-shadow:var(--sh); }
+.butce-item-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.butce-item-ad { font-size:13px; font-weight:700; color:var(--txt); }
+.butce-item-tutar { font-size:12px; color:var(--txt2); font-weight:600; }
+.butce-bar-wrap { height:6px; background:var(--bg2); border-radius:99px; overflow:hidden; }
+.butce-bar { height:100%; border-radius:99px; transition:width .5s cubic-bezier(.34,1.56,.64,1); }
+.butce-bar.ok { background:var(--green2); }
+.butce-bar.warn { background:var(--amber); }
+.butce-bar.danger { background:var(--red2); }
+.butce-asim { font-size:10px; color:var(--red); font-weight:700; margin-top:4px; }
+#mButceLimitler .blim-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+#mButceLimitler .blim-kat { flex:1; font-size:13px; font-weight:600; color:var(--txt); }
+#mButceLimitler .blim-inp { width:110px; padding:8px 10px; border-radius:10px; border:1px solid var(--brd); background:var(--bg2); color:var(--txt); font-size:13px; text-align:right; }
+#mButceLimitler .blim-sil { background:var(--red-bg); border:none; color:var(--red); width:30px; height:30px; border-radius:99px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.blim-ekle-row { display:flex; gap:8px; margin-top:4px; }
+.blim-ekle-row input { flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--brd); background:var(--bg2); color:var(--txt); font-size:13px; }
+
 /* ══ ADMİN PANELİ ══ */
 #adminPanel { display:none; position:fixed; inset:0; z-index:9998; background:var(--bg); overflow-y:auto; padding-bottom:40px; }
 .admin-topbar { position:sticky; top:0; background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-bottom:.5px solid var(--brd2); padding:calc(env(safe-area-inset-top) + 12px) 16px 12px; display:flex; align-items:center; gap:12px; z-index:10; }
@@ -671,6 +691,15 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   </div>
 </div>
 
+<!-- BÜTÇE LİMİTLERİ KARTI -->
+<div id="butceLimitKart" style="display:none;">
+  <div class="butce-ttl">
+    <span>📊 Bütçe Limitleri</span>
+    <button onclick="butceLimitModalAc()" style="background:none;border:none;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;">Düzenle</button>
+  </div>
+  <div id="butceLimitIcerik"></div>
+</div>
+
 <div style="margin:0 16px 10px; display:flex; gap:8px;">
   <button onclick="sablonModalAc()" style="flex:1; padding:10px 14px; border-radius:14px; background:var(--blue-bg); color:var(--blue); font-size:12px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">📋 Şablonlardan Ekle</button>
 </div>
@@ -1016,6 +1045,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl">📅 Hedef Tarihi</label><input class="inp" id="ayarTasarrufTarih" type="month" /></div>
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
 <button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>document.getElementById('mDestek').classList.add('on'),200)" style="margin-top:6px; justify-content:center; background:var(--blue-bg); color:var(--blue);">💬 Destek & İletişim</button>
+<button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>butceLimitModalAc(),200)" style="margin-top:6px; justify-content:center; background:var(--green-bg); color:var(--green);">📊 Bütçe Limitleri</button>
 <button class="action-item-btn" id="adminBtn" onclick="adminAc()" style="display:none; margin-top:6px; justify-content:center; background:var(--purple-bg); color:var(--purple);">🛡️ Yönetici Paneli</button>
 <button class="action-item-btn" onclick="bildirimIzniAc()" id="bildirimIzniBtn" style="margin-top:6px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Fatura Bildirimleri</button>
 <button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:6px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
@@ -1056,6 +1086,23 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
       <div class="admin-empty">Yükleniyor...</div>
     </div>
   </div>
+</div>
+
+<!-- BÜTÇE LİMİT MODAL -->
+<div class="ov" id="mButceLimitler" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+  <div class="mhandle"></div>
+  <div class="mttl">📊 Bütçe Limitleri</div>
+  <div style="font-size:12px;color:var(--txt3);margin-bottom:16px;">Kategori başına aylık harcama limiti belirle. Limitin %80'ine ulaşınca sarı, %100'ünü aşınca kırmızı uyarı alırsın.</div>
+  <div id="blimListesi"></div>
+  <div class="blim-ekle-row">
+    <input id="blimKatInp" type="text" placeholder="Kategori adı (örn: Market)" style="appearance:none;"/>
+    <input id="blimTutarInp" type="number" inputmode="decimal" placeholder="Limit ₺" style="width:110px;appearance:none;"/>
+    <button onclick="butceLimitEkle()" style="background:var(--green-bg);color:var(--green);border:none;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ekle</button>
+  </div>
+  <button class="sbtn g" style="margin-top:16px;" onclick="butceLimitKaydet()">✓ Kaydet</button>
+  <button class="cancel-btn" onclick="document.getElementById('mButceLimitler').classList.remove('on')">İptal</button>
+</div>
 </div>
 
 <!-- DESTEK MODAL -->
@@ -1648,6 +1695,98 @@ function dragTouchBasla(e, handle) {
   document.addEventListener('touchmove', onMove, { passive: false });
   document.addEventListener('touchend', onEnd);
 }
+
+/* ══ BÜTÇE LİMİTLERİ ══ */
+function butceLimitlériRender(v, h) {
+  const limitler = veri.ayarlar?.butceLimitleri || {};
+  const kart = document.getElementById('butceLimitKart');
+  const icerik = document.getElementById('butceLimitIcerik');
+  if(!kart || !icerik) return;
+
+  if(Object.keys(limitler).length === 0) { kart.style.display = 'none'; return; }
+  kart.style.display = 'block';
+
+  // Mevcut aydaki gider kategorilerini topla
+  const katHarcama = {};
+  (v.giderler || []).filter(g => g.odendi).forEach(g => {
+    const kat = g.kategori || 'Diğer';
+    katHarcama[kat] = (katHarcama[kat] || 0) + g.tutar;
+  });
+
+  let html = '';
+  for(const [kat, limit] of Object.entries(limitler)) {
+    const harcanan = katHarcama[kat] || 0;
+    const pct = Math.min(100, limit > 0 ? (harcanan / limit) * 100 : 0);
+    const renk = pct >= 100 ? 'danger' : pct >= 80 ? 'warn' : 'ok';
+    const asim = harcanan > limit;
+    html += `<div class="butce-item">
+      <div class="butce-item-top">
+        <span class="butce-item-ad">${escHtml(kat)}</span>
+        <span class="butce-item-tutar" style="color:${asim?'var(--red)':'var(--txt2)'};">${fTL(harcanan)} / ${fTL(limit)}</span>
+      </div>
+      <div class="butce-bar-wrap">
+        <div class="butce-bar ${renk}" style="width:${pct}%;"></div>
+      </div>
+      ${asim ? `<div class="butce-asim">⚠️ ${fTL(harcanan - limit)} limit aşımı</div>` : ''}
+    </div>`;
+  }
+  icerik.innerHTML = html;
+}
+
+function butceLimitModalAc() {
+  Haptic.light();
+  const limitler = veri.ayarlar?.butceLimitleri || {};
+  const liste = document.getElementById('blimListesi');
+  liste.innerHTML = Object.entries(limitler).map(([kat, tutar]) =>
+    `<div class="blim-row" id="blim-${escHtml(kat)}">
+      <span class="blim-kat">${escHtml(kat)}</span>
+      <input class="blim-inp" type="number" inputmode="decimal" value="${tutar}" onchange="window._blimTemp['${escHtml(kat)}']=parseFloat(this.value)||0"/>
+      <button class="blim-sil" onclick="butceLimitSil('${escHtml(kat)}')">✕</button>
+    </div>`
+  ).join('');
+  window._blimTemp = {...limitler};
+  document.getElementById('blimKatInp').value = '';
+  document.getElementById('blimTutarInp').value = '';
+  document.getElementById('mButceLimitler').classList.add('on');
+}
+
+function butceLimitEkle() {
+  const kat = document.getElementById('blimKatInp').value.trim();
+  const tutar = parseFloat(document.getElementById('blimTutarInp').value) || 0;
+  if(!kat || !tutar) { toast('❌ Kategori adı ve limit gir'); return; }
+  if(!window._blimTemp) window._blimTemp = {};
+  window._blimTemp[kat] = tutar;
+  const liste = document.getElementById('blimListesi');
+  const row = document.createElement('div');
+  row.className = 'blim-row';
+  row.id = `blim-${kat}`;
+  row.innerHTML = `<span class="blim-kat">${escHtml(kat)}</span>
+    <input class="blim-inp" type="number" inputmode="decimal" value="${tutar}" onchange="window._blimTemp['${escHtml(kat)}']=parseFloat(this.value)||0"/>
+    <button class="blim-sil" onclick="butceLimitSil('${escHtml(kat)}')">✕</button>`;
+  liste.appendChild(row);
+  document.getElementById('blimKatInp').value = '';
+  document.getElementById('blimTutarInp').value = '';
+  Haptic.light();
+}
+
+function butceLimitSil(kat) {
+  Haptic.light();
+  if(window._blimTemp) delete window._blimTemp[kat];
+  const row = document.getElementById(`blim-${kat}`);
+  if(row) row.remove();
+}
+
+async function butceLimitKaydet() {
+  Haptic.success();
+  if(!veri.ayarlar) veri.ayarlar = {};
+  veri.ayarlar.butceLimitleri = window._blimTemp || {};
+  document.getElementById('mButceLimitler').classList.remove('on');
+  lsKaydet(); await fbKaydet();
+  render();
+  toast('✅ Bütçe limitleri kaydedildi');
+}
+
+/* ══ BÜTÇE LİMİTLERİ BİTİŞ ══ */
 
 /* ══ DESTEK GÖNDER ══ */
 
@@ -2468,6 +2607,8 @@ function render(){
   document.getElementById('prgOde').textContent=fTL(h.odendi)+' ödendi'; document.getElementById('prgKal').textContent=fTL(Math.max(0,h.topGider-h.odendi))+' kaldı';
   const yatirimHedefi = h.topGelir * 0.20; const kavanozWrap = document.getElementById('kavanozWrap');
   if(yatirimHedefi > 0) { kavanozWrap.style.display = 'block'; const kPct = Math.min(100, (h.yatirim / yatirimHedefi) * 100); document.getElementById('kYatirim').textContent = `${fTL(h.yatirim)} / ${fTL(yatirimHedefi)}`; document.getElementById('kBar').style.width = kPct + '%'; } else { kavanozWrap.style.display = 'none'; }
+  // Bütçe limitleri render
+  butceLimitlériRender(v, h);
   icerikRender();
 }
 
