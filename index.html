@@ -2615,7 +2615,37 @@ function render(){
 
 function icerikRender(){
   const v=ayVerisi(aktifAy); const el=document.getElementById('icerik');
-  if(tabIdx===3){ el.innerHTML='<div class="mini-chart"><div class="mini-chart-ttl">Gider Kategorileri</div><canvas id="catChart" height="200"></canvas></div>'; setTimeout(()=>grafikRender(v),50);return; }
+  if(tabIdx===3){ 
+    el.innerHTML=`
+    <div class="mini-chart" style="padding-bottom:8px;">
+      <div style="display:flex;gap:6px;margin-bottom:14px;background:var(--bg2);border-radius:12px;padding:4px;">
+        <button id="gTabKat" onclick="gTabSec(0)" style="flex:1;padding:7px;border-radius:9px;border:none;font-size:12px;font-weight:700;cursor:pointer;background:var(--surf);color:var(--txt);box-shadow:var(--sh);">Kategoriler</button>
+        <button id="gTabAylik" onclick="gTabSec(1)" style="flex:1;padding:7px;border-radius:9px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--txt3);">Aylık</button>
+        <button id="gTabTrend" onclick="gTabSec(2)" style="flex:1;padding:7px;border-radius:9px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--txt3);">Trend</button>
+      </div>
+      <div id="gPanelKat">
+        <div class="mini-chart-ttl">Gider Kategorileri</div>
+        <div style="height:200px;position:relative;"><canvas id="catChart"></canvas></div>
+        <div id="katDetay" style="margin-top:12px;"></div>
+      </div>
+      <div id="gPanelAylik" style="display:none;">
+        <div class="mini-chart-ttl">Son 6 Ay Karşılaştırma</div>
+        <div style="height:220px;position:relative;"><canvas id="aylikChart"></canvas></div>
+      </div>
+      <div id="gPanelTrend" style="display:none;">
+        <div class="mini-chart-ttl">Kategori Trendi</div>
+        <div id="trendKatSec" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;"></div>
+        <div style="height:200px;position:relative;"><canvas id="trendChart"></canvas></div>
+      </div>
+    </div>`;
+    window._gTab = 0;
+    window._trendKat = null;
+    window._chartKat = null;
+    window._chartAylik = null;
+    window._chartTrend = null;
+    setTimeout(()=>{ gTabSec(0); }, 50);
+    return; 
+  }
   let html=''; const gG=tabIdx===0||tabIdx===1; const gD=tabIdx===0||tabIdx===2;
   if(gG){ const top=v.gelirler.reduce((s,k)=>s+k.tutar,0); const aktifTop=v.gelirler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0); html+=`<div class="sec" id="sec-gelir"><div class="sec-hdr"><span class="sec-ttl">🟢 Gelirler</span><span class="sec-total g">${fTL(aktifTop)} / ${fTL(top)}</span></div>`; html+=v.gelirler.length?v.gelirler.map((k,i)=>kalemHtml(k,'gelir',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🟢</div>Henüz gelir eklenmedi</div>'; html+='</div>'; }
   if(gD){ const top=v.giderler.reduce((s,k)=>s+k.tutar,0); const aktifTop=v.giderler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0); html+=`<div class="sec" id="sec-gider"><div class="sec-hdr"><span class="sec-ttl">🔴 Giderler</span><span class="sec-total r">${fTL(aktifTop)} / ${fTL(top)}</span></div>`; html+=v.giderler.length?v.giderler.map((k,i)=>kalemHtml(k,'gider',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🔴</div>Henüz gider eklenmedi</div>'; html+='</div>'; }
@@ -2760,14 +2790,142 @@ async function duzenleKaydet(){
 function toggleTikla(w){ Haptic.light(); if(w==='tekrar'){tekrarAcik=!tekrarAcik;document.getElementById('tekrarToggle').classList.toggle('on',tekrarAcik);} else if(w==='yatirim'){yatirimAcik=!yatirimAcik;document.getElementById('yatirimToggle').classList.toggle('on',yatirimAcik);} else if(w==='dTekrar'){dTekrarAcik=!dTekrarAcik;document.getElementById('dTekrar').classList.toggle('on',dTekrarAcik);} }
 function tabSec(i){ Haptic.light(); tabIdx=i; document.querySelectorAll('#pageAy .tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===i)); icerikRender(); }
 
-function grafikRender(v){
-  const katMap={}; v.giderler.forEach(k=>{const kat=k.kategori||k.ad;katMap[kat]=(katMap[kat]||0)+k.tutar;});
+const GRAFIK_RENKLER = ['#ff453a','#0a84ff','#30d158','#ff9f0a','#bf5af2','#32ade6','#ff3b30','#1a7a42','#ff6b6b','#4dabf7'];
+
+function gTabSec(idx) {
+  window._gTab = idx;
+  ['gTabKat','gTabAylik','gTabTrend'].forEach((id,i)=>{
+    const btn = document.getElementById(id); if(!btn) return;
+    btn.style.background = i===idx ? 'var(--surf)' : 'transparent';
+    btn.style.color = i===idx ? 'var(--txt)' : 'var(--txt3)';
+    btn.style.fontWeight = i===idx ? '700' : '600';
+    btn.style.boxShadow = i===idx ? 'var(--sh)' : 'none';
+  });
+  ['gPanelKat','gPanelAylik','gPanelTrend'].forEach((id,i)=>{
+    const el = document.getElementById(id); if(el) el.style.display = i===idx ? 'block' : 'none';
+  });
+  const v = ayVerisi(aktifAy);
+  if(idx===0) grafikKatRender(v);
+  else if(idx===1) grafikAylikRender();
+  else if(idx===2) grafikTrendRender(v);
+}
+
+function grafikKatRender(v) {
+  const katMap={};
+  v.giderler.forEach(k=>{const kat=k.kategori||k.ad; katMap[kat]=(katMap[kat]||0)+k.tutar;});
   const entries=Object.entries(katMap).sort(([,a],[,b])=>b-a).slice(0,8);
   const ctx=document.getElementById('catChart'); if(!ctx)return;
-  if(chartInst)chartInst.destroy();
-  if(!entries.length) return;
-  chartInst=new Chart(ctx,{type:'doughnut', data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v),backgroundColor:['#ff453a','#32d74b','#0a84ff','#ff9f0a','#bf5af2','#30d158','#ff3b30','#1a3a8b'],borderWidth:2,borderColor:getComputedStyle(document.documentElement).getPropertyValue('--surf')||'#fff'}]}, options:{responsive:true,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{family:'DM Sans',size:11}}}}} });
+  if(window._chartKat) window._chartKat.destroy();
+  if(!entries.length) { ctx.parentElement.innerHTML='<div class="empty-sec" style="height:100px;">Gider yok</div>'; return; }
+  const toplam = entries.reduce((s,[,v])=>s+v,0);
+  window._chartKat=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v),backgroundColor:GRAFIK_RENKLER,borderWidth:2,borderColor:getComputedStyle(document.documentElement).getPropertyValue('--surf')||'#1a1a1a'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}
+  });
+  // Detay listesi
+  const detay = document.getElementById('katDetay');
+  if(detay) detay.innerHTML = entries.map(([k,tutar],i)=>{
+    const pct = toplam>0?Math.round(tutar/toplam*100):0;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--brd);">
+      <div style="width:10px;height:10px;border-radius:50%;background:${GRAFIK_RENKLER[i]};flex-shrink:0;"></div>
+      <span style="flex:1;font-size:13px;color:var(--txt);font-weight:600;">${escHtml(k)}</span>
+      <span style="font-size:11px;color:var(--txt3);">%${pct}</span>
+      <span style="font-size:13px;font-weight:700;color:var(--txt);">${fTL(tutar)}</span>
+    </div>`;
+  }).join('');
 }
+
+function grafikAylikRender() {
+  const ctx = document.getElementById('aylikChart'); if(!ctx) return;
+  if(window._chartAylik) window._chartAylik.destroy();
+
+  // Son 6 ay verisini topla
+  const aylar = []; const gelirler = []; const giderler = [];
+  for(let i=5; i>=0; i--) {
+    const ay = ayEkleStr(aktifAy, -i);
+    const v = veri.aylar[ay] || {gelirler:[],giderler:[]};
+    const [yil,ay2] = ay.split('-');
+    const ayIsmi = new Date(parseInt(yil),parseInt(ay2)-1,1).toLocaleDateString('tr-TR',{month:'short'});
+    aylar.push(ayIsmi);
+    gelirler.push(v.gelirler?.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0)||0);
+    giderler.push(v.giderler?.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0)||0);
+  }
+
+  window._chartAylik = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: aylar,
+      datasets:[
+        {label:'Gelir', data:gelirler, backgroundColor:'rgba(42,173,98,0.8)', borderRadius:6, borderSkipped:false},
+        {label:'Gider', data:giderler, backgroundColor:'rgba(255,69,58,0.8)', borderRadius:6, borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:11},color:getComputedStyle(document.documentElement).getPropertyValue('--txt2')}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:getComputedStyle(document.documentElement).getPropertyValue('--txt3')}},
+        y:{grid:{color:getComputedStyle(document.documentElement).getPropertyValue('--brd')},ticks:{font:{family:'DM Sans',size:10},color:getComputedStyle(document.documentElement).getPropertyValue('--txt3'),callback:v=>v>=1000?Math.round(v/1000)+'B':v}}
+      }
+    }
+  });
+}
+
+function grafikTrendRender(v) {
+  // Mevcut aydaki kategorileri bul
+  const katlar = [...new Set(v.giderler.map(k=>k.kategori||k.ad))].slice(0,6);
+  const secKat = window._trendKat || katlar[0];
+  window._trendKat = secKat;
+
+  // Kategori seçici butonları
+  const secEl = document.getElementById('trendKatSec');
+  if(secEl) secEl.innerHTML = katlar.map(kat =>
+    `<button onclick="window._trendKat='${escHtml(kat)}';grafikTrendRender(ayVerisi(aktifAy))" style="
+      padding:5px 10px;border-radius:99px;border:none;font-size:11px;font-weight:700;cursor:pointer;
+      background:${kat===secKat?'var(--blue)':'var(--bg2)'};
+      color:${kat===secKat?'#fff':'var(--txt2)'};
+    ">${escHtml(kat)}</button>`
+  ).join('');
+
+  // Son 6 ay için seçili kategori verisini topla
+  const aylar = []; const degerler = [];
+  for(let i=5; i>=0; i--) {
+    const ay = ayEkleStr(aktifAy, -i);
+    const av = veri.aylar[ay] || {giderler:[]};
+    const [yil,ay2] = ay.split('-');
+    const ayIsmi = new Date(parseInt(yil),parseInt(ay2)-1,1).toLocaleDateString('tr-TR',{month:'short'});
+    aylar.push(ayIsmi);
+    const toplam = (av.giderler||[]).filter(k=>(k.kategori||k.ad)===secKat).reduce((s,k)=>s+k.tutar,0);
+    degerler.push(toplam);
+  }
+
+  const ctx = document.getElementById('trendChart'); if(!ctx) return;
+  if(window._chartTrend) window._chartTrend.destroy();
+
+  window._chartTrend = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels:aylar,
+      datasets:[{
+        label:secKat, data:degerler,
+        borderColor:'#0a84ff', backgroundColor:'rgba(10,132,255,0.1)',
+        borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#0a84ff',
+        fill:true, tension:0.4
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:getComputedStyle(document.documentElement).getPropertyValue('--txt3')}},
+        y:{grid:{color:getComputedStyle(document.documentElement).getPropertyValue('--brd')},ticks:{font:{family:'DM Sans',size:10},color:getComputedStyle(document.documentElement).getPropertyValue('--txt3'),callback:v=>v>=1000?Math.round(v/1000)+'B':v},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function grafikRender(v){ grafikKatRender(v); }
 
 
 /* ══ PORTFÖY FONKSİYONLARI ══ */
