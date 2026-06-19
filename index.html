@@ -1058,7 +1058,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>document.getElementById('mDestek').classList.add('on'),200)" style="margin-top:6px; justify-content:center; background:var(--blue-bg); color:var(--blue);">💬 Destek & İletişim</button>
 <button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>butceLimitModalAc(),200)" style="margin-top:6px; justify-content:center; background:var(--green-bg); color:var(--green);">📊 Bütçe Limitleri</button>
 <button class="action-item-btn" id="adminBtn" onclick="adminAc()" style="display:none; margin-top:6px; justify-content:center; background:var(--purple-bg); color:var(--purple);">🛡️ Yönetici Paneli</button>
-<button class="action-item-btn" onclick="bildirimIzniAc()" id="bildirimIzniBtn" style="margin-top:6px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Fatura Bildirimleri</button>
+<button class="action-item-btn" onclick="bildirimPanelAc()" id="bildirimIzniBtn" style="margin-top:6px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Bildirim Ayarları</button>
 <button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:6px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
 <button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
 <div style="margin-top:20px; padding-top:16px; border-top:.5px solid var(--brd); display:flex; align-items:center; justify-content:space-between;">
@@ -1097,6 +1097,48 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
       <div class="admin-empty">Yükleniyor...</div>
     </div>
   </div>
+</div>
+
+<!-- BİLDİRİM YÖNETİM MODALI -->
+<div class="ov" id="mBildirim" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+  <div class="mhandle"></div>
+  <div class="mttl">🔔 Bildirim Ayarları</div>
+
+  <div id="bildirimIzinDurum" style="padding:10px 14px;border-radius:12px;margin-bottom:16px;font-size:13px;font-weight:600;"></div>
+
+  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:16px;overflow:hidden;margin-bottom:12px;">
+    <div style="padding:13px 16px;border-bottom:.5px solid var(--brd);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--txt);">💳 Fatura Hatırlatıcı</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:2px;">Ödeme günü yaklaşan giderler</div>
+      </div>
+      <div class="toggle" id="togFatura" onclick="bildirimToggle('fatura')"></div>
+    </div>
+    <div style="padding:13px 16px;border-bottom:.5px solid var(--brd);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--txt);">💰 Borç Hatırlatıcı</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:2px;">Borç ödeme günü yaklaşanlar</div>
+      </div>
+      <div class="toggle" id="togBorc" onclick="bildirimToggle('borc')"></div>
+    </div>
+    <div style="padding:13px 16px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--txt);">📅 Maaş Günü</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:2px;">Maaş günü geldiğinde hatırlat</div>
+      </div>
+      <div class="toggle" id="togMaas" onclick="bildirimToggle('maas')"></div>
+    </div>
+  </div>
+
+  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:16px;padding:14px 16px;margin-bottom:16px;">
+    <div style="font-size:12px;font-weight:700;color:var(--txt3);margin-bottom:8px;">Son gönderilen bildirimler</div>
+    <div id="bildirimGecmis" style="font-size:12px;color:var(--txt2);"></div>
+  </div>
+
+  <button class="sbtn" onclick="bildirimIzniAc()" style="margin-bottom:8px;">🔔 İzin Ver / Test Bildirimi</button>
+  <button class="cancel-btn" onclick="document.getElementById('mBildirim').classList.remove('on')">Kapat</button>
+</div>
 </div>
 
 <!-- TEKRARlayan GEÇMİŞ MODAL -->
@@ -1498,10 +1540,95 @@ function hedefModalAc() {
 
 /* ══ FATURA HATIRLATICI ══ */
 /* ══ BİLDİRİM SİSTEMİ ══ */
+/* ══ BİLDİRİM YÖNETİM PANELİ ══ */
+const BILDIRIM_PREFS_KEY = 'mg_bildirim_prefs';
+
+function bildirimPrefsYukle() {
+  try { return JSON.parse(localStorage.getItem(BILDIRIM_PREFS_KEY) || '{"fatura":true,"borc":true,"maas":true}'); }
+  catch(e) { return {fatura:true, borc:true, maas:true}; }
+}
+
+function bildirimPrefKaydet(prefs) {
+  localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(prefs));
+}
+
+function bildirimToggle(tip) {
+  const prefs = bildirimPrefsYukle();
+  prefs[tip] = !prefs[tip];
+  bildirimPrefKaydet(prefs);
+  document.getElementById(`tog${tip.charAt(0).toUpperCase()+tip.slice(1)}`).classList.toggle('on', prefs[tip]);
+  toast(prefs[tip] ? `✅ ${tip} bildirimi açıldı` : `🔕 ${tip} bildirimi kapatıldı`);
+}
+
+function bildirimPanelAc() {
+  Haptic.light();
+  document.getElementById('mAyarlar').classList.remove('on');
+
+  // İzin durumu
+  const durumEl = document.getElementById('bildirimIzinDurum');
+  if(!('Notification' in window)) {
+    durumEl.style.background = 'var(--red-bg)'; durumEl.style.color = 'var(--red)';
+    durumEl.textContent = '❌ Tarayıcın bildirim desteklemiyor';
+  } else if(Notification.permission === 'granted') {
+    durumEl.style.background = 'var(--green-bg)'; durumEl.style.color = 'var(--green)';
+    durumEl.textContent = '✅ Bildirimler aktif';
+  } else if(Notification.permission === 'denied') {
+    durumEl.style.background = 'var(--red-bg)'; durumEl.style.color = 'var(--red)';
+    durumEl.textContent = '🔕 Bildirimler engellendi — Tarayıcı ayarlarından izin ver';
+  } else {
+    durumEl.style.background = 'var(--amber-bg)'; durumEl.style.color = 'var(--amber)';
+    durumEl.textContent = '⚠️ Bildirim izni verilmemiş — İzin Ver\'e bas';
+  }
+
+  // Toggle durumları
+  const prefs = bildirimPrefsYukle();
+  document.getElementById('togFatura').classList.toggle('on', prefs.fatura);
+  document.getElementById('togBorc').classList.toggle('on', prefs.borc);
+  document.getElementById('togMaas').classList.toggle('on', prefs.maas);
+
+  // Son gönderilen
+  const gecmisEl = document.getElementById('bildirimGecmis');
+  const sonlar = [
+    {key: BILDIRIM_KEY, ad: 'Fatura'},
+    {key: BORC_BILDIRIM_KEY, ad: 'Borç'},
+    {key: 'mg_maas_bildirim_son', ad: 'Maaş'},
+  ];
+  gecmisEl.innerHTML = sonlar.map(s => {
+    const tarih = localStorage.getItem(s.key);
+    return `<div style="display:flex;justify-content:space-between;padding:4px 0;">
+      <span>${s.ad}</span>
+      <span style="color:var(--txt3);">${tarih ? tarih : 'Henüz gönderilmedi'}</span>
+    </div>`;
+  }).join('');
+
+  setTimeout(() => document.getElementById('mBildirim').classList.add('on'), 200);
+}
+
+function maasBildirimiGonder() {
+  const prefs = bildirimPrefsYukle();
+  if(!prefs.maas) return;
+  const bugunStr = new Date().toISOString().split('T')[0];
+  const son = localStorage.getItem('mg_maas_bildirim_son');
+  if(son === bugunStr) return;
+  const bugun = new Date().getDate();
+  const maasGunu = veri.ayarlar?.maasGunu || 15;
+  const fark = maasGunu - bugun;
+  if(fark === 0) {
+    bildirimGonder('Maaş Günü 🎉', '🎊 Bugün maaş günün! Gelirini işaretlemeyi unutma.');
+    localStorage.setItem('mg_maas_bildirim_son', bugunStr);
+  } else if(fark === 1) {
+    bildirimGonder('Maaş Günü', '📅 Yarın maaş günün!');
+    localStorage.setItem('mg_maas_bildirim_son', bugunStr);
+  }
+}
+/* ══ BİLDİRİM YÖNETİM PANELİ BİTİŞ ══ */
+
 const BILDIRIM_KEY = 'mg_bildirim_son';
 const BORC_BILDIRIM_KEY = 'mg_borc_bildirim_son';
 
 async function borcHatirlaticiGonder() {
+  const prefs = bildirimPrefsYukle();
+  if(!prefs.borc) return;
   const bugunStr = new Date().toISOString().split('T')[0];
   const son = localStorage.getItem(BORC_BILDIRIM_KEY);
   if(son === bugunStr) return;
@@ -1589,7 +1716,8 @@ function bildirimGonder(baslik, govde, ico) {
 }
 
 async function faturabildirimleriGonder() {
-  // Bugün zaten gönderildiyse tekrar gönderme
+  const prefs = bildirimPrefsYukle();
+  if(!prefs.fatura) return;
   const bugunStr = new Date().toISOString().split('T')[0];
   const son = localStorage.getItem(BILDIRIM_KEY);
   if(son === bugunStr) return;
@@ -1651,6 +1779,7 @@ function faturaHatirlaticiKontrol() {
   // Bildirimleri gönder (arka planda)
   setTimeout(faturabildirimleriGonder, 2000);
   setTimeout(borcHatirlaticiGonder, 3000);
+  setTimeout(maasBildirimiGonder, 4000);
 }
 
 function faturaModalAc() {
