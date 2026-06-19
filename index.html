@@ -1540,6 +1540,87 @@ function hedefModalAc() {
 
 /* ══ FATURA HATIRLATICI ══ */
 /* ══ BİLDİRİM SİSTEMİ ══ */
+/* ══ SERVICE WORKER & PUSH BİLDİRİMLER ══ */
+const VAPID_PUBLIC = 'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9a9NHw0CZO1UFkr5h3HlhY1_kgEW5T2KD-D9dpYzJuLJlX7hjk';
+// Not: Bu demo VAPID key'dir. Gerçek kullanım için kendi key'ini üretmen gerekir.
+
+async function swKaydet() {
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js', {scope: '/'});
+    await navigator.serviceWorker.ready;
+    return reg;
+  } catch(e) {
+    console.warn('SW kaydı başarısız:', e);
+    return null;
+  }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function pushAbonelikAl(reg) {
+  try {
+    const existing = await reg.pushManager.getSubscription();
+    if(existing) return existing;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
+    });
+    return sub;
+  } catch(e) {
+    console.warn('Push abonelik hatası:', e);
+    return null;
+  }
+}
+
+async function swBildirimGonder(baslik, govde, tag) {
+  // Önce SW ile dene (TWA için)
+  if('serviceWorker' in navigator) {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      if(reg) {
+        await reg.showNotification(baslik, {
+          body: govde,
+          icon: '/16379.png',
+          badge: '/16379.png',
+          tag: tag || 'maas-gunu',
+          renotify: true,
+        });
+        return true;
+      }
+    } catch(e) {}
+  }
+  // Fallback: normal Notification API
+  if('Notification' in window && Notification.permission === 'granted') {
+    try {
+      new Notification(baslik, {body: govde, icon: '/16379.png', badge: '/16379.png', tag: tag||'maas-gunu', renotify:true});
+      return true;
+    } catch(e) {}
+  }
+  return false;
+}
+
+async function bildirimIzniVeSwKur() {
+  if(!('Notification' in window)) return false;
+  if(Notification.permission === 'denied') return false;
+  if(Notification.permission !== 'granted') {
+    const izin = await Notification.requestPermission();
+    if(izin !== 'granted') return false;
+  }
+  // SW kaydet
+  const reg = await swKaydet();
+  if(reg) {
+    console.log('SW başarıyla kaydedildi');
+  }
+  return true;
+}
+/* ══ SERVICE WORKER BİTİŞ ══ */
+
 /* ══ BİLDİRİM YÖNETİM PANELİ ══ */
 const BILDIRIM_PREFS_KEY = 'mg_bildirim_prefs';
 
@@ -1667,20 +1748,18 @@ async function borcHatirlaticiGonder() {
 
 async function bildirimIzniAc() {
   if(!('Notification' in window)) { toast('❌ Tarayıcın bildirim desteklemiyor'); return; }
-  if(Notification.permission === 'granted') { 
-    toast('✅ Bildirimler zaten açık'); 
-    bildirimGonder('Maaş Günü', '🔔 Test bildirimi — Her şey çalışıyor!');
-    return; 
-  }
   if(Notification.permission === 'denied') { 
-    toast('❌ Bildirimler engellendi. Tarayıcı ayarlarından izin ver.'); 
+    toast('❌ Bildirimler engellendi. Telefon Ayarları → Uygulamalar → Maaş Günü → Bildirimler yolunu dene.'); 
     return; 
   }
-  const izin = await Notification.requestPermission();
-  if(izin === 'granted') {
+  const izinOk = await bildirimIzniVeSwKur();
+  if(izinOk) {
     toast('✅ Bildirimler açıldı!');
-    bildirimGonder('Maaş Günü', '🎉 Fatura hatırlatıcıları aktif! Yaklaşan ödemeler için bildirim alacaksın.');
-    document.getElementById('bildirimIzniBtn').textContent = '🔔 Bildirimler Açık ✓';
+    // SW üzerinden test bildirimi gönder
+    const basarili = await swBildirimGonder('Maaş Günü 🔔', 'Bildirimler aktif! Fatura ve borç hatırlatıcıları çalışacak.', 'test');
+    if(!basarili) toast('⚠️ Test bildirimi gönderilemedi — Lütfen telefon bildirim ayarlarını kontrol et');
+    const btn = document.getElementById('bildirimIzniBtn');
+    if(btn) btn.textContent = '🔔 Bildirim Ayarları ✓';
   } else {
     toast('❌ Bildirim izni verilmedi');
   }
@@ -1689,9 +1768,9 @@ async function bildirimIzniAc() {
 function bildirimIzniBtnGuncelle() {
   const btn = document.getElementById('bildirimIzniBtn'); if(!btn) return;
   if(!('Notification' in window)) { btn.style.display = 'none'; return; }
-  if(Notification.permission === 'granted') btn.textContent = '🔔 Bildirimler Açık ✓';
+  if(Notification.permission === 'granted') btn.textContent = '🔔 Bildirim Ayarları ✓';
   else if(Notification.permission === 'denied') { btn.textContent = '🔕 Bildirimler Engellendi'; btn.style.opacity = '0.5'; }
-  else btn.textContent = '🔔 Fatura Bildirimleri — İzin Ver';
+  else btn.textContent = '🔔 Bildirim Ayarları';
 }
 
 async function bildirimIzniIste() {
@@ -1703,16 +1782,8 @@ async function bildirimIzniIste() {
 }
 
 function bildirimGonder(baslik, govde, ico) {
-  if(!('Notification' in window) || Notification.permission !== 'granted') return;
-  try {
-    new Notification(baslik, {
-      body: govde,
-      icon: ico || 'https://ysfykc.github.io/16379.png',
-      badge: 'https://ysfykc.github.io/16379.png',
-      tag: 'maas-gunu-fatura',
-      renotify: true
-    });
-  } catch(e) { console.warn('Bildirim gönderilemedi:', e); }
+  // SW üzerinden gönder (async, fire-and-forget)
+  swBildirimGonder(baslik, govde, 'maas-gunu').catch(()=>{});
 }
 
 async function faturabildirimleriGonder() {
@@ -1780,6 +1851,8 @@ function faturaHatirlaticiKontrol() {
   setTimeout(faturabildirimleriGonder, 2000);
   setTimeout(borcHatirlaticiGonder, 3000);
   setTimeout(maasBildirimiGonder, 4000);
+  // Service Worker'ı kaydet
+  swKaydet().catch(()=>{});
 }
 
 function faturaModalAc() {
