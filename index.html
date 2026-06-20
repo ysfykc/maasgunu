@@ -93,6 +93,15 @@
 .blim-ekle-row { display:flex; gap:8px; margin-top:4px; }
 .blim-ekle-row input { flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--brd); background:var(--bg2); color:var(--txt); font-size:13px; }
 
+/* ══ PORTFÖY DETAY ══ */
+.pd-stat { background:var(--surf); border:.5px solid var(--brd); border-radius:16px; padding:14px; flex:1; }
+.pd-stat-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--txt3); margin-bottom:4px; }
+.pd-stat-val { font-size:18px; font-weight:800; color:var(--txt); letter-spacing:-.02em; }
+.pd-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:.5px solid var(--brd); }
+.pd-row:last-child { border-bottom:none; }
+.pd-row-lbl { font-size:13px; color:var(--txt2); }
+.pd-row-val { font-size:13px; font-weight:700; color:var(--txt); }
+
 /* ══ TEKRARlayan GEÇMİŞİ ══ */
 .tekrar-gecmis-modal .ay-satir { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:.5px solid var(--brd); }
 .tekrar-gecmis-modal .ay-satir:last-child { border-bottom:none; }
@@ -1143,6 +1152,53 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
   <button class="sbtn" onclick="bildirimIzniAc()" style="margin-bottom:8px;">🔔 İzin Ver / Test Bildirimi</button>
   <button class="cancel-btn" onclick="document.getElementById('mBildirim').classList.remove('on')">Kapat</button>
+</div>
+</div>
+
+<!-- PORTFÖY DETAY MODAL -->
+<div class="ov" id="mPortfoyDetay" onclick="if(event.target===this)this.classList.remove('on')">
+<div class="modal">
+  <div class="mhandle"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div>
+      <div class="mttl" id="pdBaslik" style="margin-bottom:2px;"></div>
+      <div id="pdBadge" style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;"></div>
+    </div>
+    <button onclick="portfoyDetayDuzenle()" style="background:var(--blue-bg);color:var(--blue);border:none;padding:8px 14px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;">✏️ Düzenle</button>
+  </div>
+
+  <!-- Ana istatistikler -->
+  <div style="display:flex;gap:10px;margin-bottom:14px;">
+    <div class="pd-stat">
+      <div class="pd-stat-lbl">Güncel Değer</div>
+      <div class="pd-stat-val" id="pdGuncelDeger">—</div>
+    </div>
+    <div class="pd-stat">
+      <div class="pd-stat-lbl">Kâr / Zarar</div>
+      <div class="pd-stat-val" id="pdKarZarar">—</div>
+    </div>
+  </div>
+
+  <!-- Detay satırları -->
+  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:16px;padding:0 14px;margin-bottom:14px;">
+    <div class="pd-row"><span class="pd-row-lbl">Miktar</span><span class="pd-row-val" id="pdMiktar">—</span></div>
+    <div class="pd-row"><span class="pd-row-lbl">Birim Fiyat (Güncel)</span><span class="pd-row-val" id="pdBirimFiyat">—</span></div>
+    <div class="pd-row"><span class="pd-row-lbl">Alış Fiyatı (Ortalama)</span><span class="pd-row-val" id="pdAlisFiyat">—</span></div>
+    <div class="pd-row"><span class="pd-row-lbl">Toplam Maliyet</span><span class="pd-row-val" id="pdToplamMaliyet">—</span></div>
+    <div class="pd-row"><span class="pd-row-lbl">Son Güncelleme</span><span class="pd-row-val" id="pdSonGuncelleme">—</span></div>
+  </div>
+
+  <!-- Kâr/zarar yüzdesi bar -->
+  <div id="pdKzBarWrap" style="display:none;margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-bottom:4px;">
+      <span>Kâr/Zarar Oranı</span><span id="pdKzPct">%0</span>
+    </div>
+    <div style="height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;">
+      <div id="pdKzBar" style="height:100%;border-radius:99px;width:0%;transition:width .5s;"></div>
+    </div>
+  </div>
+
+  <button class="cancel-btn" onclick="document.getElementById('mPortfoyDetay').classList.remove('on')">Kapat</button>
 </div>
 </div>
 
@@ -3477,7 +3533,7 @@ function portfoyRender() {
          ? new Date(v.sonGuncelleme).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})
          : (v.manuelFiyat ? 'Manuel' : '—');
        
-       html += `<div class="portfoy-card" onclick="varlikDuzenleAc('${v.id}')">
+       html += `<div class="portfoy-card" onclick="varlikDetayAc('${v.id}')">
          <div class="portfoy-left">
            <div class="portfoy-ad">${escHtml(title)}</div>
            <div class="portfoy-meta">
@@ -3511,6 +3567,78 @@ function portfoyRender() {
      });
    }
 }
+
+/* ══ PORTFÖY DETAY ══ */
+function varlikDetayAc(id) {
+  Haptic.light();
+  const v = veri.portfoy.find(x => x.id === id);
+  if(!v) return;
+
+  window._aktifDetayId = id;
+
+  const GRUPLAR = {bist:'📈 BIST',abd:'🇺🇸 ABD',tefas:'📊 Fon',altin:'🪙 Altın',doviz:'💵 Döviz',bes:'🛡️ BES'};
+  const altinIsimMap2 = {'gram-altin':'Gram Altın (24K)','22-ayar-bilezik':'22 Ayar','ceyrek-altin':'Çeyrek Altın','yarim-altin':'Yarım Altın','tam-altin':'Tam Altın','cumhuriyet-altini':'Cumhuriyet','ata-altin':'Ata Altın','gremse-altin':'Gremse Altın'};
+  const dovizIsimMap = {USD:'Amerikan Doları',EUR:'Euro',GBP:'İngiliz Sterlini'};
+
+  let title = v.kod;
+  if(v.tip==='altin') title = altinIsimMap2[v.kod] || v.kod;
+  if(v.tip==='doviz') title = dovizIsimMap[v.kod?.toUpperCase()] || v.kod;
+  if(v.tip==='bes') title = v.kod || 'BES Birikimi';
+
+  document.getElementById('pdBaslik').textContent = title;
+  const badge = document.getElementById('pdBadge');
+  badge.textContent = GRUPLAR[v.tip] || v.tip.toUpperCase();
+  badge.style.background = 'var(--blue-bg)'; badge.style.color = 'var(--blue)';
+
+  // Değer hesapla
+  const guncelDeger = v.tip==='bes' ? v.miktar : (v.miktar * (v.sonFiyat||0));
+  const toplamMaliyet = v.tip==='bes' ? (v.maliyet||0) : (v.miktar * (v.maliyet||0));
+  const karZarar = guncelDeger - toplamMaliyet;
+  const karZararPct = toplamMaliyet > 0 ? (karZarar/toplamMaliyet*100) : 0;
+  const pozitif = karZarar >= 0;
+
+  document.getElementById('pdGuncelDeger').textContent = fTL(guncelDeger);
+  document.getElementById('pdGuncelDeger').style.color = 'var(--txt)';
+
+  const kzEl = document.getElementById('pdKarZarar');
+  if(toplamMaliyet > 0) {
+    kzEl.textContent = (pozitif?'+':'') + fTL(karZarar);
+    kzEl.style.color = pozitif ? 'var(--green)' : 'var(--red)';
+  } else {
+    kzEl.textContent = '—'; kzEl.style.color = 'var(--txt3)';
+  }
+
+  // Detay satırları
+  const birim = v.tip==='altin' ? 'gr/adet' : v.tip==='doviz' ? 'birim' : v.tip==='bes' ? '' : 'adet';
+  document.getElementById('pdMiktar').textContent = v.tip==='bes' ? '—' : `${v.miktar} ${birim}`;
+  document.getElementById('pdBirimFiyat').textContent = v.tip==='bes' ? '—' : (v.sonFiyat ? fTL(v.sonFiyat) : 'Fiyat yok');
+  document.getElementById('pdAlisFiyat').textContent = v.maliyet ? fTL(v.maliyet) : '—';
+  document.getElementById('pdToplamMaliyet').textContent = toplamMaliyet > 0 ? fTL(toplamMaliyet) : '—';
+  document.getElementById('pdSonGuncelleme').textContent = v.sonGuncelleme
+    ? new Date(v.sonGuncelleme).toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+    : (v.manuelFiyat ? 'Manuel' : '—');
+
+  // Kâr/zarar bar
+  const kzBarWrap = document.getElementById('pdKzBarWrap');
+  if(toplamMaliyet > 0) {
+    kzBarWrap.style.display = 'block';
+    const pct = Math.min(100, Math.abs(karZararPct));
+    document.getElementById('pdKzPct').textContent = (pozitif?'+':'') + karZararPct.toFixed(2) + '%';
+    document.getElementById('pdKzPct').style.color = pozitif ? 'var(--green)' : 'var(--red)';
+    document.getElementById('pdKzBar').style.width = pct + '%';
+    document.getElementById('pdKzBar').style.background = pozitif ? 'var(--green2)' : 'var(--red2)';
+  } else {
+    kzBarWrap.style.display = 'none';
+  }
+
+  document.getElementById('mPortfoyDetay').classList.add('on');
+}
+
+function portfoyDetayDuzenle() {
+  document.getElementById('mPortfoyDetay').classList.remove('on');
+  setTimeout(() => varlikDuzenleAc(window._aktifDetayId), 200);
+}
+/* ══ PORTFÖY DETAY BİTİŞ ══ */
 
 function varlikDuzenleAc(id) {
     Haptic.light();
