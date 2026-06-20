@@ -761,9 +761,14 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <div style="padding: 0 16px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
      <div style="font-size:14px; font-weight:800; color:var(--txt2);">Varlık Listesi</div>
      <div style="display:flex; gap:6px;">
+        <button class="sbtn" style="width:auto; padding:8px 12px; margin:0; border-radius:99px; font-size:12px; background:var(--bg2); color:var(--txt);" onclick="pGecmisToggle()" title="Geçmiş">📈</button>
         <button class="sbtn" style="width:auto; padding:8px 12px; margin:0; border-radius:99px; font-size:12px; background:var(--bg2); color:var(--txt);" onclick="togglePChart()">📊</button>
         <button class="sbtn a" style="width:auto; padding:8px 16px; margin:0; border-radius:99px; font-size:12px;" onclick="modalVarlikAc()">+ Ekle</button>
      </div>
+  </div>
+  <div class="mini-chart" id="pGecmisWrap" style="display:none; margin: 0 16px 12px; padding:14px;">
+    <div class="mini-chart-ttl" style="margin-bottom:0;">📈 Portföy Değer Geçmişi</div>
+    <div id="pGecmisIcerik"></div>
   </div>
   <div class="mini-chart" id="pChartWrap" style="display:none; margin: 0 16px 12px; padding:10px;">
      <div style="height:140px; position:relative;"><canvas id="portfoyChart"></canvas></div>
@@ -1374,6 +1379,11 @@ async function portfoyGuncelle() {
     
     portfoyRender(); render();
     await fbKaydet();
+    
+    // Günün portföy değerini geçmişe kaydet
+    let toplamDeger = 0;
+    veri.portfoy.forEach(v => { toplamDeger += v.tip==='bes' ? v.miktar : (v.miktar*(v.sonFiyat||0)); });
+    if(toplamDeger > 0) { portfoyGecmisKaydet(toplamDeger); lsKaydet(); }
     
     if(basarisiz === 0) {
       toast(`✅ ${basarili} varlık güncellendi`);
@@ -2258,7 +2268,7 @@ let db,auth,user=null;
 let veri={ aylar:{}, portfoy:[], borclar:[], copKutusu:[], ayarlar:{ maasGunu:15, portfoyHedef:0, borcumMigrated:false }, kurlar:{ usd:32.5, eur:35.0, USD:32.5, EUR:35.0 }, guncelleme:null };
 let aktifTip='gelir', tabIdx=0, navIdx=0, duzenlenenId=null, duzenlenenTip=null;
 let tekrarAcik=false, yatirimAcik=false, dTekrarAcik=false;
-let chartInst=null, portfoyChartInst=null, aiOneriIndex=0;
+let chartInst=null, portfoyChartInst=null, portfoyGecmisChartInst=null, aiOneriIndex=0;
 let showPChart = false, aktifVarlikId = null, vdManuelFiyatAcik = false;
 
 /* BORCUM DEĞİŞKENLERİ */
@@ -3229,7 +3239,98 @@ function grafikRender(v){ grafikKatRender(v); }
 
 /* ══ PORTFÖY FONKSİYONLARI ══ */
 const altinIsimMap = { 'gram-altin':'Gram Altın (24K)', '22-ayar-bilezik':'22 Ayar Gram Altın', 'ceyrek-altin':'Çeyrek Altın', 'yarim-altin':'Yarım Altın', 'tam-altin':'Tam Altın', 'cumhuriyet-altini':'Cumhuriyet Altını', 'ata-altin':'Ata Altın', 'gremse-altin':'Gremse Altın' };
+/* ══ PORTFÖY GEÇMİŞİ ══ */
+function portfoyGecmisKaydet(toplamDeger) {
+  if(!toplamDeger || toplamDeger <= 0) return;
+  if(!veri.portfoyGecmis) veri.portfoyGecmis = [];
+  const bugun = new Date().toISOString().split('T')[0];
+  // Aynı günün kaydını güncelle, yoksa ekle
+  const existing = veri.portfoyGecmis.findIndex(g => g.tarih === bugun);
+  if(existing >= 0) veri.portfoyGecmis[existing].deger = toplamDeger;
+  else veri.portfoyGecmis.push({tarih: bugun, deger: toplamDeger});
+  // Son 365 günü tut
+  if(veri.portfoyGecmis.length > 365) veri.portfoyGecmis = veri.portfoyGecmis.slice(-365);
+}
+
+function portfoyGecmisGrafikRender(sure) {
+  const gecmis = veri.portfoyGecmis || [];
+  if(gecmis.length < 2) {
+    const el = document.getElementById('pGecmisIcerik');
+    if(el) el.innerHTML = '<div class="empty-sec" style="padding:20px;"><div class="empty-ico">📈</div><div style="font-size:13px;color:var(--txt3);">Henüz yeterli veri yok.<br>Fiyatları her gün güncellersen<br>grafik oluşmaya başlar.</div></div>';
+    return;
+  }
+
+  // Süreye göre filtrele
+  const gunler = sure === '7' ? 7 : sure === '30' ? 30 : sure === '90' ? 90 : 365;
+  const filtrelenmis = gecmis.slice(-gunler);
+
+  const etiketler = filtrelenmis.map(g => {
+    const d = new Date(g.tarih);
+    return d.toLocaleDateString('tr-TR', {day:'numeric', month:'short'});
+  });
+  const degerler = filtrelenmis.map(g => g.deger);
+  const ilk = degerler[0]; const son = degerler[degerler.length-1];
+  const degisim = son - ilk;
+  const degisimPct = ilk > 0 ? (degisim / ilk * 100).toFixed(2) : 0;
+  const pozitif = degisim >= 0;
+
+  const el = document.getElementById('pGecmisIcerik');
+  if(!el) return;
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <div style="font-size:22px;font-weight:800;color:var(--txt);">${fTL(son)}</div>
+        <div style="font-size:13px;font-weight:700;color:${pozitif?'var(--green)':'var(--red)'};">
+          ${pozitif?'+':''}${fTL(degisim)} (${pozitif?'+':''}%${degisimPct})
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        ${['7','30','90','365'].map(s=>`<button onclick="portfoyGecmisGrafikRender('${s}')" style="padding:5px 9px;border-radius:99px;border:none;font-size:11px;font-weight:700;cursor:pointer;background:${s===sure?'var(--blue)':'var(--bg2)'};color:${s===sure?'#fff':'var(--txt3)'};">${s==='365'?'1Y':s+'G'}</button>`).join('')}
+      </div>
+    </div>
+    <div style="height:180px;position:relative;"><canvas id="pGecmisChart"></canvas></div>
+  `;
+
+  setTimeout(() => {
+    const ctx = document.getElementById('pGecmisChart');
+    if(!ctx) return;
+    if(portfoyGecmisChartInst) portfoyGecmisChartInst.destroy();
+    const renk = pozitif ? '#30d158' : '#ff453a';
+    portfoyGecmisChartInst = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: etiketler,
+        datasets: [{
+          data: degerler,
+          borderColor: renk,
+          backgroundColor: pozitif ? 'rgba(48,209,88,0.1)' : 'rgba(255,69,58,0.1)',
+          borderWidth: 2.5, pointRadius: filtrelenmis.length > 30 ? 0 : 3,
+          pointBackgroundColor: renk, fill: true, tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {legend:{display:false}},
+        scales: {
+          x: {grid:{display:false}, ticks:{font:{family:'DM Sans',size:10}, color:getComputedStyle(document.documentElement).getPropertyValue('--txt3'), maxTicksLimit:6}},
+          y: {grid:{color:getComputedStyle(document.documentElement).getPropertyValue('--brd')}, ticks:{font:{family:'DM Sans',size:10}, color:getComputedStyle(document.documentElement).getPropertyValue('--txt3'), callback:v=>v>=1000?Math.round(v/1000)+'B':v}, beginAtZero:false}
+        }
+      }
+    });
+  }, 50);
+}
+/* ══ PORTFÖY GEÇMİŞİ BİTİŞ ══ */
+
 function togglePChart() { Haptic.light(); showPChart = !showPChart; document.getElementById('pChartWrap').style.display = showPChart ? 'block' : 'none'; if(showPChart) portfoyRender(); }
+
+function pGecmisToggle() {
+  Haptic.light();
+  const wrap = document.getElementById('pGecmisWrap');
+  if(!wrap) return;
+  const acik = wrap.style.display !== 'none';
+  wrap.style.display = acik ? 'none' : 'block';
+  if(!acik) portfoyGecmisGrafikRender('30');
+}
 function modalVarlikAc() { Haptic.light(); document.getElementById('vKod').value = ''; document.getElementById('vMiktar').value = ''; document.getElementById('vMaliyet').value = ''; document.getElementById('vTip').value = 'bist'; vTipKontrol(); document.getElementById('mPortfoy').classList.add('on'); }
 function vTipKontrol() {
    const tip = document.getElementById('vTip').value;
