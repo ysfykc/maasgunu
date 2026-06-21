@@ -192,17 +192,17 @@ input[type=number]{-moz-appearance:textfield}
 .sablon-ekle { padding:6px 14px; border-radius:99px; background:var(--green); color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; }
 .sablon-ekle.r { background:var(--red); }
 #login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; overflow: hidden; }
-.login-bg { position:absolute; inset:0; width:100%; height:100%; z-index:-1; background:radial-gradient(ellipse at 50% 30%, #1a5c38 0%, #0a1f14 55%, #060e09 100%); }
+.login-bg { position:absolute; inset:0; width:100%; height:100%; z-index:-1; background:linear-gradient(160deg, #0d2818 0%, #0a1f12 40%, #071510 100%); }
 .login-badge { display:none; }
 #login { position:fixed; inset:0; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
 .login-splash { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; width:100%; flex:1; padding-top:env(safe-area-inset-top); }
 .login-logo-wrap { position:relative; margin-bottom:28px; }
-.login-logo-wrap img { width:110px; height:110px; border-radius:28px; box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 0 1.5px rgba(255,255,255,0.12); }
-.login-logo-glow { position:absolute; inset:-20px; border-radius:50px; background:radial-gradient(circle, rgba(42,173,98,0.25) 0%, transparent 70%); z-index:-1; }
-.login-appname { font-family:var(--fs); font-size:42px; color:#fff; letter-spacing:-.5px; line-height:1; margin-bottom:8px; text-shadow:0 2px 20px rgba(0,0,0,0.4); }
-.login-tagline { font-size:11px; color:rgba(255,255,255,0.45); font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:48px; }
-.login-btns { width:100%; padding:0 28px; display:flex; flex-direction:column; gap:12px; margin-bottom:calc(env(safe-area-inset-bottom) + 32px); }
-.login-btn-google { width:100%; padding:16px; border-radius:18px; background:rgba(255,255,255,0.97); color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.35); border:none; cursor:pointer; letter-spacing:-.01em; }
+.login-logo-wrap img { width:88px; height:88px; border-radius:22px; box-shadow:0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07); }
+.login-logo-glow { position:absolute; inset:-20px; border-radius:50px; background:radial-gradient(circle, rgba(42,173,98,0.15) 0%, transparent 65%); z-index:-1; }
+.login-appname { font-family:var(--fs); font-size:36px; color:#eef2ee; letter-spacing:-.5px; line-height:1; margin-bottom:8px; text-shadow:0 2px 20px rgba(0,0,0,0.4); }
+.login-tagline { font-size:11px; color:rgba(255,255,255,0.3); font-weight:600; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:52px; }
+.login-btns { width:100%; padding:0 28px; display:flex; flex-direction:column; gap:10px; margin-bottom:calc(env(safe-area-inset-bottom) + 28px); }
+.login-btn-google { width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.35); border:none; cursor:pointer; letter-spacing:-.01em; }
 .login-btn-email { width:100%; padding:16px; border-radius:18px; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.9); font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.18); cursor:pointer; backdrop-filter:blur(12px); }
 .login-btn-kayit { width:100%; padding:12px; border-radius:18px; background:transparent; color:rgba(255,255,255,0.45); font-size:13px; font-weight:500; border:none; cursor:pointer; }
 .login-version { position:absolute; bottom:calc(env(safe-area-inset-bottom) + 8px); font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:.04em; }
@@ -508,7 +508,20 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </head>
 <body>
 
-<div id="vLoader"><div id="vLoaderBar"></div></div>
+<!-- JS SPLASH SCREEN -->
+<div id="appSplash" style="
+  position:fixed; inset:0; z-index:99999;
+  background:linear-gradient(160deg, #0d2818 0%, #0a1f12 45%, #071510 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:opacity .5s ease; pointer-events:none;
+">
+  <div style="position:relative; margin-bottom:22px;">
+    <div style="position:absolute; inset:-28px; border-radius:60px; background:radial-gradient(circle, rgba(42,173,98,0.15) 0%, transparent 65%);"></div>
+    <img src="16379.png" style="width:88px; height:88px; border-radius:22px; box-shadow:0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.07); display:block; position:relative;">
+  </div>
+  <div style="font-family:'Instrument Serif',Georgia,serif; font-size:36px; color:#eef2ee; letter-spacing:-.4px; line-height:1; margin-bottom:9px;">Maaş Günü</div>
+  <div style="font-size:10px; color:rgba(255,255,255,0.28); font-weight:600; letter-spacing:1.4px; text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
+</div>
 
 <div id="undoToast"></div>
 
@@ -4153,6 +4166,7 @@ async function init(){
          // Kullanıcı profilini kaydet (admin paneli için)
          profilKaydet(kullanici);
          lsYukle(); navSec(navIdx); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
+         if(window._hideSplash) window._hideSplash();
          // Onboarding kontrolü
          if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
          window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
@@ -4166,7 +4180,8 @@ async function init(){
          }, (err) => { setSynk('off'); });
       } else { 
          user=null;veri={aylar:{}, portfoy:[], borclar:[], copKutusu:[], ayarlar:{maasGunu:15, portfoyHedef:0}, kurlar:{usd:32.5,eur:35.0,USD:32.5,EUR:35.0}, guncelleme:null}; 
-         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); 
+         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
+         if(window._hideSplash) window._hideSplash();
       }
     });
     return;
@@ -4240,7 +4255,20 @@ window.addEventListener('popstate', function(e) {
   history.pushState({mg:true}, '', window.location.href);
 });
 
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded', function() {
+  const splash = document.getElementById('appSplash');
+  if(!splash) return;
+  const startTime = Date.now();
+  window._hideSplash = function() {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, 1000 - elapsed);
+    setTimeout(() => {
+      splash.style.opacity = '0';
+      setTimeout(() => { splash.style.display = 'none'; }, 500);
+    }, remaining);
+  };
+  setTimeout(() => { if(splash.style.display !== 'none') window._hideSplash(); }, 3500);
+});
 function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
 document.addEventListener('DOMContentLoaded', function(){
   const login=document.getElementById('login');
