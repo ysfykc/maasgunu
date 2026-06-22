@@ -112,6 +112,37 @@
 .tekrar-gecmis-modal .ay-durum.atland { background:var(--red-bg); color:var(--red); }
 .tekrar-gecmis-modal .ay-durum.yok { background:var(--bg2); color:var(--txt3); }
 
+
+/* ══ SAYFA GEÇİŞ SİSTEMİ ══ */
+.page-screen {
+  position:fixed; inset:0; z-index:8000;
+  background:var(--bg);
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto; overflow-x:hidden;
+  display:flex; flex-direction:column;
+  -webkit-overflow-scrolling:touch;
+  will-change:transform;
+}
+.page-screen.open { transform:translateX(0); }
+.page-topbar {
+  position:sticky; top:0; z-index:10;
+  background:var(--ios-surface);
+  backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur);
+  border-bottom:.5px solid var(--brd2);
+  padding:calc(env(safe-area-inset-top) + 10px) 16px 12px;
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+}
+.page-topbar-back {
+  min-width:36px; height:36px; border-radius:99px;
+  background:none; border:none; padding:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; cursor:pointer; color:var(--blue);
+  flex-shrink:0; font-weight:400;
+}
+.page-topbar-title { font-size:17px; font-weight:800; color:var(--txt); flex:1; }
+.page-body { padding:16px; flex:1; padding-bottom:calc(env(safe-area-inset-bottom) + 40px); }
+
 /* ══ ADMİN PANELİ ══ */
 #adminPanel { display:none; position:fixed; inset:0; z-index:9998; background:var(--bg); overflow-y:auto; padding-bottom:40px; }
 .admin-topbar { position:sticky; top:0; background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-bottom:.5px solid var(--brd2); padding:calc(env(safe-area-inset-top) + 12px) 16px 12px; display:flex; align-items:center; gap:12px; z-index:10; }
@@ -1047,47 +1078,48 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 </div>
 
-<div class="ov" id="mCopKutusu" onclick="if(event.target===this)this.classList.remove('on')">
-<div class="modal">
-<div class="mhandle"></div>
-<div class="mttl" style="display:flex; justify-content:space-between; align-items:center;">
-   <span>🗑️ Çöp Kutusu</span>
-   <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:999px; border:none;">Tümünü Sil</button>
+<div class="page-screen" id="mCopSayfa">
+<div class="page-topbar">
+  <button class="page-topbar-back" onclick="sayfaKapat('mCopSayfa')">‹</button>
+  <div class="page-topbar-title">Çöp Kutusu</div>
+  <button onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:999px; border:none;">Tümünü Sil</button>
 </div>
+<div class="page-body">
 <div style="font-size:12px; color:var(--txt2); margin-bottom:16px;">Silinen gelirler, giderler, varlıklar ve borçlar burada toplanır. Geri yükleyebilirsiniz.</div>
-<div id="copListesi" style="max-height:50vh; overflow-y:auto; margin-bottom:16px;"></div>
-<button class="cancel-btn" onclick="document.getElementById('mCopKutusu').classList.remove('on')">Kapat</button>
+<div id="copListesi" style="margin-bottom:16px;"></div>
 </div>
 </div>
 
-<div class="ov" id="mAyarlar" onclick="if(event.target===this)this.classList.remove('on')">
-<div class="modal">
-<div class="mhandle"></div>
-<div class="mttl">⚙️ Ayarlar</div>
+<div class="page-screen" id="mAyarlar">
+<div class="page-topbar">
+  <button class="page-topbar-back" onclick="sayfaKapat('mAyarlar')">‹</button>
+  <div class="page-topbar-title">Ayarlar</div>
+</div>
+<div class="page-body">
 <div class="igrp"><label class="ilbl">Maaş Günü (Ayın kaçıncı günü?)</label><input class="inp" id="ayarMaasGunu" type="number" inputmode="decimal" min="1" max="31" /></div>
 <div class="igrp"><label class="ilbl">Portföy Büyüme Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarHedef" type="number" inputmode="decimal" min="0" /></div></div>
 <div class="igrp"><label class="ilbl">🎯 Tasarruf Hedefi (₺)</label><div class="ipfx"><span class="pfx">₺</span><input class="inp" id="ayarTasarrufHedef" type="number" inputmode="decimal" min="0" placeholder="Örn: 50000" /></div></div>
 <div class="igrp"><label class="ilbl">📅 Hedef Tarihi</label><input class="inp" id="ayarTasarrufTarih" type="month" /></div>
 <button class="sbtn g" onclick="ayarlarKaydet()">✓ Kaydet</button>
-<button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>document.getElementById('mDestek').classList.add('on'),200)" style="margin-top:6px; justify-content:center; background:var(--blue-bg); color:var(--blue);">💬 Destek & İletişim</button>
-<button class="action-item-btn" onclick="document.getElementById('mAyarlar').classList.remove('on'); setTimeout(()=>butceLimitModalAc(),200)" style="margin-top:6px; justify-content:center; background:var(--green-bg); color:var(--green);">📊 Bütçe Limitleri</button>
-<button class="action-item-btn" id="adminBtn" onclick="adminAc()" style="display:none; margin-top:6px; justify-content:center; background:var(--purple-bg); color:var(--purple);">🛡️ Yönetici Paneli</button>
-<button class="action-item-btn" onclick="bildirimPanelAc()" id="bildirimIzniBtn" style="margin-top:6px; justify-content:center; background:var(--amber-bg); color:var(--amber);">🔔 Bildirim Ayarları</button>
-<button class="action-item-btn" onclick="copKutusuAc()" style="margin-top:6px; justify-content:center; background:var(--bg2);">🗑️ Çöp Kutusu (Son Silinenler)</button>
-<button class="cancel-btn" onclick="document.getElementById('mAyarlar').classList.remove('on')">Kapat</button>
-<div style="margin-top:20px; padding-top:16px; border-top:.5px solid var(--brd); display:flex; align-items:center; justify-content:space-between;">
-  <div style="font-size:10px; color:var(--txt3); font-weight:600; letter-spacing:.04em;">Maaş Günü v4.6</div>
+<div style="margin-top:20px; display:flex; flex-direction:column; gap:8px;">
+  <button class="action-item-btn" onclick="sayfaAc('mDestek')" style="justify-content:flex-start; background:var(--blue-bg); color:var(--blue);">💬 Destek & İletişim</button>
+  <button class="action-item-btn" onclick="sayfaAc('mButceSayfa')" style="justify-content:flex-start; background:var(--green-bg); color:var(--green);">📊 Bütçe Limitleri</button>
+  <button class="action-item-btn" id="bildirimIzniBtn" onclick="sayfaAc('mBildirimSayfa')" style="justify-content:flex-start; background:var(--amber-bg); color:var(--amber);">🔔 Bildirim Ayarları</button>
+  <button class="action-item-btn" onclick="sayfaAc('mCopSayfa'); copKutusuIcerikYukle()" style="justify-content:flex-start; background:var(--bg2);">🗑️ Çöp Kutusu</button>
+  <button class="action-item-btn" id="adminBtn" onclick="sayfaAc('adminPanel'); adminVerileriYukle()" style="display:none; justify-content:flex-start; background:var(--purple-bg); color:var(--purple);">🛡️ Yönetici Paneli</button>
+</div>
+<div style="margin-top:28px; padding-top:16px; border-top:.5px solid var(--brd); display:flex; justify-content:space-between;">
+  <div style="font-size:10px; color:var(--txt3); font-weight:600;">Maaş Günü v4.6</div>
   <div style="font-size:10px; color:var(--txt3);">ysfykc</div>
 </div>
 </div>
 </div>
 
 <!-- YÖNETİCİ PANELİ -->
-<div id="adminPanel">
-  <div class="admin-topbar">
-    <span style="font-size:22px;">🛡️</span>
-    <h2>Yönetici Paneli</h2>
-    <button class="admin-close" onclick="adminKapat()">✕</button>
+<div id="adminPanel" class="page-screen">
+  <div class="page-topbar">
+    <button class="page-topbar-back" onclick="sayfaKapat('adminPanel')">‹</button>
+    <div class="page-topbar-title">🛡️ Yönetici Paneli</div>
   </div>
 
   <div class="admin-section">
@@ -1114,10 +1146,12 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <!-- BİLDİRİM YÖNETİM MODALI -->
-<div class="ov" id="mBildirim" onclick="if(event.target===this)this.classList.remove('on')">
-<div class="modal">
-  <div class="mhandle"></div>
-  <div class="mttl">🔔 Bildirim Ayarları</div>
+<div class="page-screen" id="mBildirimSayfa">
+<div class="page-topbar">
+  <button class="page-topbar-back" onclick="sayfaKapat('mBildirimSayfa')">‹</button>
+  <div class="page-topbar-title">Bildirim Ayarları</div>
+</div>
+<div class="page-body">
 
   <div id="bildirimIzinDurum" style="padding:10px 14px;border-radius:12px;margin-bottom:16px;font-size:13px;font-weight:600;"></div>
 
@@ -1151,7 +1185,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   </div>
 
   <button class="sbtn" onclick="bildirimIzniAc()" style="margin-bottom:8px;">🔔 İzin Ver / Test Bildirimi</button>
-  <button class="cancel-btn" onclick="document.getElementById('mBildirim').classList.remove('on')">Kapat</button>
 </div>
 </div>
 
@@ -1213,10 +1246,12 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <!-- BÜTÇE LİMİT MODAL -->
-<div class="ov" id="mButceLimitler" onclick="if(event.target===this)this.classList.remove('on')">
-<div class="modal">
-  <div class="mhandle"></div>
-  <div class="mttl">📊 Bütçe Limitleri</div>
+<div class="page-screen" id="mButceSayfa">
+<div class="page-topbar">
+  <button class="page-topbar-back" onclick="sayfaKapat('mButceSayfa')">‹</button>
+  <div class="page-topbar-title">Bütçe Limitleri</div>
+</div>
+<div class="page-body">
   <div style="font-size:12px;color:var(--txt3);margin-bottom:16px;">Kategori başına aylık harcama limiti belirle. Limitin %80'ine ulaşınca sarı, %100'ünü aşınca kırmızı uyarı alırsın.</div>
   <div id="blimListesi"></div>
   <div class="blim-ekle-row">
@@ -1225,15 +1260,16 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
     <button onclick="butceLimitEkle()" style="background:var(--green-bg);color:var(--green);border:none;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ekle</button>
   </div>
   <button class="sbtn g" style="margin-top:16px;" onclick="butceLimitKaydet()">✓ Kaydet</button>
-  <button class="cancel-btn" onclick="document.getElementById('mButceLimitler').classList.remove('on')">İptal</button>
 </div>
 </div>
 
 <!-- DESTEK MODAL -->
-<div class="ov" id="mDestek" onclick="if(event.target===this)this.classList.remove('on')">
-<div class="modal">
-<div class="mhandle"></div>
-<div class="mttl">💬 Destek & İletişim</div>
+<div class="page-screen" id="mDestek">
+<div class="page-topbar">
+  <button class="page-topbar-back" onclick="sayfaKapat('mDestek')">‹</button>
+  <div class="page-topbar-title">Destek & İletişim</div>
+</div>
+<div class="page-body">
 <div style="font-size:13px; color:var(--txt2); margin-bottom:16px; line-height:1.6;">Sorun mu var? Öneri mi? Merak ettiğin bir şey mi? Yazıver, en kısa sürede döneyim.</div>
 <div class="igrp"><label class="ilbl">Konu</label>
 <select class="inp" id="destekKonu" style="appearance:none;">
@@ -1245,7 +1281,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="igrp"><label class="ilbl">Mesajın</label><textarea class="inp" id="destekMesaj" rows="4" placeholder="Ne oldu, ne yapmak istedin, nasıl bir sorunla karşılaştın..." style="resize:none; height:100px;"></textarea></div>
 <div id="destekSonuc" style="display:none; padding:10px 14px; border-radius:12px; font-size:13px; margin-bottom:10px;"></div>
 <button class="sbtn g" onclick="destekGonder()">📨 Gönder</button>
-<button class="cancel-btn" onclick="document.getElementById('mDestek').classList.remove('on')">Kapat</button>
 </div>
 </div>
 
@@ -1748,7 +1783,7 @@ function bildirimPanelAc() {
     </div>`;
   }).join('');
 
-  setTimeout(() => document.getElementById('mBildirim').classList.add('on'), 200);
+  sayfaAc('mBildirimSayfa');
 }
 
 function maasBildirimiGonder() {
@@ -2111,7 +2146,7 @@ function butceLimitModalAc() {
   window._blimTemp = {...limitler};
   document.getElementById('blimKatInp').value = '';
   document.getElementById('blimTutarInp').value = '';
-  document.getElementById('mButceLimitler').classList.add('on');
+  sayfaAc('mButceSayfa');
 }
 
 function butceLimitEkle() {
@@ -2144,7 +2179,7 @@ async function butceLimitKaydet() {
   Haptic.success();
   if(!veri.ayarlar) veri.ayarlar = {};
   veri.ayarlar.butceLimitleri = window._blimTemp || {};
-  document.getElementById('mButceLimitler').classList.remove('on');
+  sayfaKapat('mButceSayfa');
   lsKaydet(); await fbKaydet();
   render();
   toast('✅ Bütçe limitleri kaydedildi');
@@ -2172,15 +2207,12 @@ function adminKontrolEt() {
 
 async function adminAc() {
   Haptic.light();
-  document.getElementById('mAyarlar').classList.remove('on');
-  document.getElementById('adminPanel').style.display = 'block';
-  document.body.style.overflow = 'hidden';
+  sayfaAc('adminPanel');
   await adminVerileriYukle();
 }
 
 function adminKapat() {
-  document.getElementById('adminPanel').style.display = 'none';
-  document.body.style.overflow = '';
+  sayfaKapat('adminPanel');
 }
 
 async function profilKaydet(kullanici) {
@@ -2437,9 +2469,12 @@ async function geriAl(copId) {
 }
 
 function copKutusuAc() {
-    document.getElementById('mAyarlar').classList.remove('on');
     copKutusuRender();
-    document.getElementById('mCopKutusu').classList.add('on');
+    sayfaAc('mCopSayfa');
+}
+
+function copKutusuIcerikYukle() {
+    copKutusuRender();
 }
 
 function copKutusuRender() {
@@ -2490,7 +2525,7 @@ async function copKutusundanKurtar(copId) {
     }
     
     renderAll();
-    if(document.getElementById('mCopKutusu').classList.contains('on')) copKutusuRender();
+    if(document.getElementById('mCopSayfa')?.classList.contains('open')) copKutusuRender();
     await fbKaydet(); Haptic.success(); toast('✅ Geri yüklendi');
 }
 
@@ -3100,7 +3135,7 @@ function maasModalAc(tip){
   document.querySelector('#tekrarRow .toggle-lbl').textContent = tip === 'gelir' ? '🔄 Sabit Gelir' : '🔄 Sabit Gider';
   document.getElementById('mEkle').classList.add('on'); setTimeout(()=>document.getElementById('eTutar').focus(),350);
 }
-function ayarlarAc() { Haptic.light(); document.getElementById('ayarMaasGunu').value = getMaasGunu(); document.getElementById('ayarHedef').value = getPortfoyHedefi() || ''; document.getElementById('ayarTasarrufHedef').value = veri.ayarlar?.tasarrufHedef || ''; document.getElementById('ayarTasarrufTarih').value = veri.ayarlar?.tasarrufTarih || ''; bildirimIzniBtnGuncelle(); document.getElementById('mAyarlar').classList.add('on'); }
+function ayarlarAc() { Haptic.light(); document.getElementById('ayarMaasGunu').value = getMaasGunu(); document.getElementById('ayarHedef').value = getPortfoyHedefi() || ''; document.getElementById('ayarTasarrufHedef').value = veri.ayarlar?.tasarrufHedef || ''; document.getElementById('ayarTasarrufTarih').value = veri.ayarlar?.tasarrufTarih || ''; bildirimIzniBtnGuncelle(); sayfaAc('mAyarlar'); }
 async function ayarlarKaydet() {
   let mg = parseInt(document.getElementById('ayarMaasGunu').value) || 15; if(mg < 1) mg = 1; if(mg > 31) mg = 31;
   let hedef = parseFloat(document.getElementById('ayarHedef').value) || 0;
@@ -3111,7 +3146,7 @@ async function ayarlarKaydet() {
   veri.ayarlar.portfoyHedef = hedef;
   veri.ayarlar.tasarrufHedef = tasarrufHedef;
   veri.ayarlar.tasarrufTarih = tasarrufTarih;
-  aktifAy = bugunAyId(); document.getElementById('mAyarlar').classList.remove('on');
+  aktifAy = bugunAyId(); sayfaKapat('mAyarlar');
   render(); if(navIdx === 1) portfoyRender(); await fbKaydet(); Haptic.success(); toast('Ayarlar kaydedildi');
 }
 async function kalemKaydet(){
@@ -4193,52 +4228,80 @@ async function init(){
   }, (err) => { setSynk('off'); });
 }
 
-/* ══ GERİ TUŞU YÖNETİMİ ══ */
+/* ══ SAYFA GEÇİŞ SİSTEMİ ══ */
+const _acikSayfalar = [];
+
+function sayfaAc(id) {
+  Haptic.light();
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('open');
+  _acikSayfalar.push(id);
+  history.pushState({sayfa: id}, '', window.location.href);
+  // Scroll en üste
+  setTimeout(() => { el.scrollTop = 0; }, 50);
+}
+
+function sayfaKapat(id) {
+  Haptic.light();
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('open');
+  const idx = _acikSayfalar.lastIndexOf(id);
+  if(idx > -1) _acikSayfalar.splice(idx, 1);
+}
+
+function tumSayfalariKapat() {
+  document.querySelectorAll('.page-screen').forEach(el => el.classList.remove('open'));
+  _acikSayfalar.length = 0;
+}
+
 function backButtonBaslat() {
   history.pushState({mg: true}, '', window.location.href);
 }
 
 window.addEventListener('popstate', function(e) {
-  // Giriş ekranındaysa hiçbir şey yapma
+  // Önce açık sayfa var mı
+  if(_acikSayfalar.length > 0) {
+    const sonSayfa = _acikSayfalar[_acikSayfalar.length - 1];
+    sayfaKapat(sonSayfa);
+    history.pushState({mg:true}, '', window.location.href);
+    return;
+  }
+  // Giriş ekranındaysa dur
   const loginEl = document.getElementById('login');
   if(loginEl && loginEl.style.display !== 'none') {
     history.pushState({mg:true}, '', window.location.href);
     return;
   }
-
-  // Açık modal var mı kontrol et
-  const modaller = ['mEkle','mDuzenle','mPortfoy','mPortfoyDuzenle','mAiPortfoy','mBorc','mOdeme','mAksiyon','mCopKutusu','mAyarlar','mDestek','mSablon','mBorcDuzenle'];
-  for(const id of modaller) {
-    const el = document.getElementById(id);
-    if(el && el.classList.contains('on')) {
-      el.classList.remove('on');
+  // Açık modal var mı
+  const modaller = ['mEkle','mDuzenle','mPortfoy','mPortfoyDuzenle','mAiPortfoy','mBorc','mOdeme','mAksiyon','mSablon','mBorcDuzenle','mTekrarGecmis','mPortfoyDetay','mBildirim','mButceLimitler'];
+  for(const mid of modaller) {
+    const mel = document.getElementById(mid);
+    if(mel && mel.classList.contains('on')) {
+      mel.classList.remove('on');
       history.pushState({mg:true}, '', window.location.href);
       return;
     }
   }
-  // Admin paneli açıksa kapat
-  const adminP = document.getElementById('adminPanel');
-  if(adminP && adminP.style.display === 'block') {
-    adminKapat();
-    history.pushState({mg:true}, '', window.location.href);
-    return;
-  }
-  // Email paneli açıksa kapat
+  // Email paneli
   const emailP = document.getElementById('emailPanel');
   if(emailP && emailP.style.display !== 'none') {
     emailPanelKapat();
     history.pushState({mg:true}, '', window.location.href);
     return;
   }
-  // Ana sayfada değilsek ana sayfaya dön
+  // Ana sayfada değilsek dön
   if(navIdx !== 0) {
     navSec(0);
     history.pushState({mg:true}, '', window.location.href);
     return;
   }
-  // Hiçbir şey yoksa state'i geri koy (uygulamadan çıkma)
   history.pushState({mg:true}, '', window.location.href);
 });
+/* ══ SAYFA GEÇİŞ BİTİŞ ══ */
+
+/* ══ BAŞLAT ══ */
 
 document.addEventListener('DOMContentLoaded',init);
 function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
