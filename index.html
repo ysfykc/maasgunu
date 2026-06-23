@@ -755,82 +755,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   </div>
 </div>
 
-
-<!-- AYARLAR SAYFASI (NAV SEKMESİ) -->
-<div class="page" id="pageAyarlar">
-<div style="height:calc(env(safe-area-inset-top) + 56px);"></div>
-<div style="padding:0 16px 100px;">
-
-  <!-- Profil Kartı -->
-  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:20px;margin-bottom:20px;box-shadow:var(--sh);display:flex;align-items:center;gap:14px;">
-    <img id="ayarAvatar" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;display:none;background:var(--bg2);">
-    <div style="width:52px;height:52px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;" id="ayarAvatarFallback">👤</div>
-    <div style="flex:1;min-width:0;">
-      <div id="ayarKullaniciAd" style="font-size:15px;font-weight:800;color:var(--txt);margin-bottom:2px;">—</div>
-      <div id="ayarKullaniciEmail" style="font-size:12px;color:var(--txt3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</div>
-    </div>
-    <button onclick="cikisYap()" style="background:var(--red-bg);color:var(--red);border:none;padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;">Çıkış</button>
-  </div>
-
-  <!-- Temel Ayarlar -->
-  <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:8px;">Temel Ayarlar</div>
-  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:18px;overflow:hidden;margin-bottom:20px;box-shadow:var(--sh);">
-    <div style="padding:14px 16px;border-bottom:.5px solid var(--brd);">
-      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px;">📅 Maaş Günü</div>
-      <input class="inp" id="ayarMaasGunu2" type="number" inputmode="decimal" min="1" max="31" placeholder="Ayın kaçıncı günü?" style="margin:0;"/>
-    </div>
-    <div style="padding:14px 16px;border-bottom:.5px solid var(--brd);">
-      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px;">🎯 Tasarruf Hedefi</div>
-      <div class="ipfx" style="margin:0;"><span class="pfx">₺</span><input class="inp" id="ayarTasarrufHedef2" type="number" inputmode="decimal" placeholder="Örn: 50000" style="margin:0;"/></div>
-    </div>
-    <div style="padding:14px 16px;border-bottom:.5px solid var(--brd);">
-      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px;">📈 Portföy Hedefi</div>
-      <div class="ipfx" style="margin:0;"><span class="pfx">₺</span><input class="inp" id="ayarHedef2" type="number" inputmode="decimal" placeholder="Örn: 1000000" style="margin:0;"/></div>
-    </div>
-    <div style="padding:14px 16px;">
-      <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px;">📅 Hedef Tarihi</div>
-      <input class="inp" id="ayarTasarrufTarih2" type="month" style="margin:0;"/>
-    </div>
-  </div>
-
-  <!-- Görünüm -->
-  <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:8px;">Görünüm</div>
-  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:18px;overflow:hidden;margin-bottom:20px;box-shadow:var(--sh);">
-    <div style="padding:14px 16px;border-bottom:.5px solid var(--brd);display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--txt);">🌙 Koyu Mod</div>
-        <div style="font-size:11px;color:var(--txt3);">Karanlık tema</div>
-      </div>
-      <div class="toggle" id="ayarKoyuToggle" onclick="ayarKoyuToggle()"></div>
-    </div>
-    <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--txt);">💰 Para Birimi</div>
-        <div style="font-size:11px;color:var(--txt3);">Gösterim formatı</div>
-      </div>
-      <span style="font-size:13px;font-weight:700;color:var(--txt3);">₺ TL</span>
-    </div>
-  </div>
-
-  <!-- Araçlar -->
-  <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:8px;">Araçlar</div>
-  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-    <button class="action-item-btn" onclick="sayfaAc('mDestek')" style="justify-content:flex-start;background:var(--blue-bg);color:var(--blue);">💬 Destek & İletişim</button>
-    <button class="action-item-btn" onclick="sayfaAc('mButceSayfa')" style="justify-content:flex-start;background:var(--green-bg);color:var(--green);">📊 Bütçe Limitleri</button>
-    <button class="action-item-btn" id="bildirimIzniBtn2" onclick="sayfaAc('mBildirimSayfa')" style="justify-content:flex-start;background:var(--amber-bg);color:var(--amber);">🔔 Bildirim Ayarları</button>
-    <button class="action-item-btn" onclick="sayfaAc('mCopSayfa');copKutusuIcerikYukle()" style="justify-content:flex-start;background:var(--bg2);">🗑️ Çöp Kutusu</button>
-    <button class="action-item-btn" id="adminBtn2" onclick="sayfaAc('adminPanel');adminVerileriYukle()" style="display:none;justify-content:flex-start;background:var(--purple-bg);color:var(--purple);">🛡️ Yönetici Paneli</button>
-  </div>
-
-  <button class="sbtn g" onclick="ayarlarKaydet2()" style="margin-bottom:12px;">✓ Kaydet</button>
-
-  <div style="text-align:center;padding-top:8px;border-top:.5px solid var(--brd);">
-    <div style="font-size:10px;color:var(--txt3);">Maaş Günü v4.6 · ysfykc</div>
-  </div>
-</div>
-</div>
-<!-- /AYARLAR SAYFASI -->
-
 <!-- BÜTÇE LİMİTLERİ KARTI -->
 <div id="butceLimitKart" style="display:none;">
   <div class="butce-ttl">
@@ -965,7 +889,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <button class="nitem on" id="nav0" onclick="navSec(0)"><span class="nico">📋</span>Bu Ay</button>
 <button class="nitem" id="nav1" onclick="navSec(1)"><span class="nico">💼</span>Portföy</button>
 <button class="nitem" id="nav2" onclick="navSec(2)"><span class="nico">💳</span>Borcum</button>
-<button class="nitem" id="nav3" onclick="navSec(3)"><span class="nico">⚙️</span>Ayarlar</button>
 </nav>
 
 <div class="ov" id="mEkle" onclick="if(event.target===this){this.classList.remove('on'); closeFab();}">
@@ -3120,13 +3043,13 @@ async function dekontOlustur() {
 /* ══ NAVİGASYON ══ */
 function navSec(i){
   Haptic.light(); navIdx=i; lsStateSave(); 
-  [0,1,2,3].forEach(n=>{ const el=document.getElementById('nav'+n); if(el) el.classList.toggle('on',n===i); });
+  document.getElementById('nav0').classList.toggle('on', i===0); 
+  document.getElementById('nav1').classList.toggle('on', i===1); 
+  document.getElementById('nav2').classList.toggle('on', i===2);
   
   document.getElementById('pageAy').className='page'+(i===0?' on':''); 
   document.getElementById('pagePortfoy').className='page'+(i===1?' on':'');
   document.getElementById('pageBorcum').className='page'+(i===2?' on':'');
-  const pAy = document.getElementById('pageAyarlar');
-  if(pAy) pAy.className='page'+(i===3?' on':'');
   
   const qaw=document.getElementById('fabContainer'); 
   if(qaw) { if(i === 0) { qaw.classList.remove('hide-fab'); } else { qaw.classList.add('hide-fab'); qaw.classList.remove('open'); } }
@@ -3136,7 +3059,6 @@ function navSec(i){
   
   if(i===1) { portfoyRender(); }
   if(i===2) { renderBorcum(); kurlariGuncelle().then(() => renderBorcum()); }
-  if(i===3) { ayarlarSayfasiDoldur(); }
 }
 function ayDegis(d){ Haptic.light(); aktifAy=ayEkleStr(aktifAy, d); tabIdx=0; lsStateSave(); document.querySelectorAll('.tbtn').forEach((b,idx)=>b.classList.toggle('on',idx===0)); render(); window.scrollTo({top:0,behavior:'smooth'}); }
 
@@ -4341,91 +4263,6 @@ async function odemeKaydet() {
   }
 }
 
-/* ══ AYARLAR SAYFASI ══ */
-function ayarlarSayfasiDoldur() {
-  if(user) {
-    const ad=document.getElementById('ayarKullaniciAd'), email=document.getElementById('ayarKullaniciEmail');
-    const avatar=document.getElementById('ayarAvatar'), avatarFb=document.getElementById('ayarAvatarFallback');
-    if(ad) ad.textContent=user.displayName||'Kullanıcı';
-    if(email) email.textContent=user.email||'';
-    if(avatar&&user.photoURL){avatar.src=user.photoURL;avatar.style.display='block';if(avatarFb)avatarFb.style.display='none';}
-  }
-  const tema=document.documentElement.dataset.theme||'light';
-  const tog=document.getElementById('ayarKoyuToggle'); if(tog) tog.classList.toggle('on',tema==='dark');
-  const mg=document.getElementById('ayarMaasGunu2'); if(mg) mg.value=getMaasGunu()||'';
-  const th=document.getElementById('ayarTasarrufHedef2'); if(th) th.value=veri.ayarlar?.tasarrufHedef||'';
-  const ph=document.getElementById('ayarHedef2'); if(ph) ph.value=getPortfoyHedefi()||'';
-  const tt=document.getElementById('ayarTasarrufTarih2'); if(tt) tt.value=veri.ayarlar?.tasarrufTarih||'';
-  const ab2=document.getElementById('adminBtn2');
-  if(ab2&&user) import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({getDoc,doc})=>{
-    getDoc(doc(db,'admins',user.uid)).then(snap=>{if(snap.exists()&&ab2)ab2.style.display='flex';});
-  }).catch(()=>{});
-}
-
-async function ayarlarKaydet2() {
-  if(!veri.ayarlar) veri.ayarlar={};
-  const mg=document.getElementById('ayarMaasGunu2')?.value;
-  const th=document.getElementById('ayarTasarrufHedef2')?.value;
-  const ph=document.getElementById('ayarHedef2')?.value;
-  const tt=document.getElementById('ayarTasarrufTarih2')?.value;
-  if(mg) veri.ayarlar.maasGunu=parseInt(mg);
-  veri.ayarlar.tasarrufHedef=parseFloat(th)||0;
-  veri.ayarlar.portfoyHedef=parseFloat(ph)||0;
-  veri.ayarlar.tasarrufTarih=tt||'';
-  lsKaydet(); await fbKaydet(); Haptic.success(); toast('✅ Ayarlar kaydedildi'); render();
-}
-
-function ayarKoyuToggle() {
-  const yeni=document.documentElement.dataset.theme==='dark'?'light':'dark';
-  document.documentElement.dataset.theme=yeni;
-  localStorage.setItem('masaygunu2Tema',yeni);
-  const tog=document.getElementById('ayarKoyuToggle'); if(tog) tog.classList.toggle('on',yeni==='dark');
-  const btn=document.getElementById('themeBtn'); if(btn) btn.textContent=yeni==='dark'?'☀️':'🌙';
-  Haptic.light();
-}
-
-/* ══ GÜNCELLEME BİLDİRİMİ ══ */
-const APP_VERSION = '4.6.1';
-const APP_VERSION_NOTLAR = [
-  '✨ Ayarlar artık altta ayrı bir sekme',
-  '📊 Portföy sayfasında canlı fiyat şeridi',
-  '🔔 Bildirim sistemi iyileştirildi',
-  '🐛 Bazı hatalar giderildi',
-];
-
-function guncellemeBildirimKontrol() {
-  const son=localStorage.getItem('mg_son_version');
-  if(son===APP_VERSION) return;
-  setTimeout(guncellemeMoyalGoster, 2000);
-}
-
-function guncellemeMoyalGoster() {
-  if(document.getElementById('mGuncelleme')) return;
-  const div=document.createElement('div');
-  div.id='mGuncelleme';
-  div.style.cssText='position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);';
-  div.innerHTML=`<div style="background:var(--surf);border-radius:24px;padding:24px;max-width:340px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.4);border:1px solid var(--brd);">
-    <div style="text-align:center;margin-bottom:16px;">
-      <div style="font-size:36px;margin-bottom:8px;">🎉</div>
-      <div style="font-family:var(--fs);font-size:22px;color:var(--txt);margin-bottom:4px;">Güncelleme!</div>
-      <div style="font-size:12px;color:var(--txt3);font-weight:600;">Maaş Günü v${APP_VERSION}</div>
-    </div>
-    <div style="background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:20px;">
-      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:10px;">Yenilikler</div>
-      ${APP_VERSION_NOTLAR.map(n=>'<div style="font-size:13px;color:var(--txt);padding:5px 0;border-bottom:.5px solid var(--brd);">'+n+'</div>').join('')}
-    </div>
-    <button onclick="guncellemeBildirimKapat()" style="width:100%;padding:14px;background:var(--green2);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">Harika! 👍</button>
-  </div>`;
-  document.body.appendChild(div);
-}
-
-function guncellemeBildirimKapat() {
-  localStorage.setItem('mg_son_version',APP_VERSION);
-  const el=document.getElementById('mGuncelleme');
-  if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);}
-}
-/* ══ GÜNCELLEME BİLDİRİMİ BİTİŞ ══ */
-
 /* ══ BAŞLAT ══ */
 async function init(){
   // 1. AŞAMA EKLENTİSİ: SKELETON BAŞLATMA
@@ -4450,7 +4287,7 @@ async function init(){
          // Kullanıcı profilini kaydet (admin paneli için)
          profilKaydet(kullanici);
          lsYukle(); navSec(navIdx); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
-         if(window._hideSplash) window._hideSplash(); guncellemeBildirimKontrol();
+         if(window._hideSplash) window._hideSplash();
          // Onboarding kontrolü
          if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
          window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
