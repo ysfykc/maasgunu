@@ -758,7 +758,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <!-- AYARLAR SAYFASI (NAV SEKMESİ) -->
 <div class="page" id="pageAyarlar">
-<div style="height:calc(env(safe-area-inset-top) + 60px);"></div>
 <div style="padding:0 16px 100px;">
 
   <!-- Profil Kartı -->
@@ -4344,30 +4343,25 @@ async function odemeKaydet() {
 
 /* ══ AYARLAR SAYFASI ══ */
 function ayarlarSayfasiDoldur() {
-  if(user) {
-    const ad=document.getElementById('ayarKullaniciAd'), email=document.getElementById('ayarKullaniciEmail');
-    const avatar=document.getElementById('ayarAvatar'), avatarFb=document.getElementById('ayarAvatarFallback');
-    if(ad) ad.textContent=user.displayName||'Kullanıcı';
-    if(email) email.textContent=user.email||'';
-    if(avatar&&user.photoURL){avatar.src=user.photoURL;avatar.style.display='block';if(avatarFb)avatarFb.style.display='none';}
-  }
-  const tema=document.documentElement.dataset.theme||'light';
-  const tog=document.getElementById('ayarKoyuToggle'); if(tog) tog.classList.toggle('on',tema==='dark');
-  const mg=document.getElementById('ayarMaasGunu2'); if(mg) mg.value=getMaasGunu()||'';
-  const th=document.getElementById('ayarTasarrufHedef2'); if(th) th.value=veri.ayarlar?.tasarrufHedef||'';
-  const ph=document.getElementById('ayarHedef2'); if(ph) ph.value=getPortfoyHedefi()||'';
-  const tt=document.getElementById('ayarTasarrufTarih2'); if(tt) tt.value=veri.ayarlar?.tasarrufTarih||'';
-  // Admin butonu - mevcut admin kontrolünü kullan
-  const ab2=document.getElementById('adminBtn2');
-  if(ab2) {
-    try {
-      if(db && user) {
-        window._fb?.getDoc(window._fb?.doc(db,'admins',user.uid))
-          .then(snap=>{ if(snap?.exists()) ab2.style.display='flex'; })
-          .catch(()=>{});
-      }
-    } catch(e) {}
-  }
+  try {
+    // Profil
+    if(user) {
+      const ad=document.getElementById('ayarKullaniciAd');
+      const em=document.getElementById('ayarKullaniciEmail');
+      if(ad) ad.textContent = user.displayName || 'Kullanıcı';
+      if(em) em.textContent = user.email || '';
+      const av=document.getElementById('ayarAvatar');
+      if(av && user.photoURL) { av.src=user.photoURL; av.style.display='block'; const fb=document.getElementById('ayarAvatarFallback'); if(fb) fb.style.display='none'; }
+    }
+    // Tema
+    const tema = document.documentElement.dataset.theme||'light';
+    const tog=document.getElementById('ayarKoyuToggle'); if(tog) tog.classList.toggle('on',tema==='dark');
+    // Inputlar
+    const mg=document.getElementById('ayarMaasGunu2'); if(mg) mg.value = veri?.ayarlar?.maasGunu || 15;
+    const th=document.getElementById('ayarTasarrufHedef2'); if(th) th.value = veri?.ayarlar?.tasarrufHedef || '';
+    const ph=document.getElementById('ayarHedef2'); if(ph) ph.value = veri?.ayarlar?.portfoyHedef || '';
+    const tt=document.getElementById('ayarTasarrufTarih2'); if(tt) tt.value = veri?.ayarlar?.tasarrufTarih || '';
+  } catch(e) { console.error('ayarlarSayfasiDoldur hata:', e); }
 }
 
 async function ayarlarKaydet2() {
