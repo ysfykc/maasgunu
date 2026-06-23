@@ -10,6 +10,18 @@ self.addEventListener('push', function(e) {
   }));
 });
 
+self.addEventListener('message', function(e) {
+  if(e.data && e.data.type === 'SHOW_NOTIFICATION') {
+    self.registration.showNotification(e.data.title || 'Maaş Günü', {
+      body: e.data.body || '',
+      icon: '/16379.png',
+      badge: '/16379.png',
+      tag: e.data.tag || 'maas-gunu',
+      renotify: true,
+    });
+  }
+});
+
 self.addEventListener('notificationclick', function(e) {
   e.notification.close();
   e.waitUntil(clients.openWindow('/'));
