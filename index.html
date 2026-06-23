@@ -1668,10 +1668,11 @@ const VAPID_PUBLIC = 'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9a9NHw0CZO1UFkr5h3HlhY1
 // Not: Bu demo VAPID key'dir. Gerçek kullanım için kendi key'ini üretmen gerekir.
 
 async function swKaydet() {
-  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+  if(!('serviceWorker' in navigator)) return null;
   try {
     const reg = await navigator.serviceWorker.register('/sw.js', {scope: '/'});
     await navigator.serviceWorker.ready;
+    console.log('SW kayıtlı:', reg.scope);
     return reg;
   } catch(e) {
     console.warn('SW kaydı başarısız:', e);
@@ -1679,33 +1680,11 @@ async function swKaydet() {
   }
 }
 
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-}
-
-async function pushAbonelikAl(reg) {
-  try {
-    const existing = await reg.pushManager.getSubscription();
-    if(existing) return existing;
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
-    });
-    return sub;
-  } catch(e) {
-    console.warn('Push abonelik hatası:', e);
-    return null;
-  }
-}
-
 async function swBildirimGonder(baslik, govde, tag) {
-  // Önce SW ile dene (TWA için)
+  // Önce mevcut SW kaydını bul
   if('serviceWorker' in navigator) {
     try {
-      const reg = await navigator.serviceWorker.getRegistration('/');
+      const reg = await navigator.serviceWorker.ready;
       if(reg) {
         await reg.showNotification(baslik, {
           body: govde,
@@ -1713,17 +1692,20 @@ async function swBildirimGonder(baslik, govde, tag) {
           badge: '/16379.png',
           tag: tag || 'maas-gunu',
           renotify: true,
+          requireInteraction: false,
         });
         return true;
       }
-    } catch(e) {}
+    } catch(e) {
+      console.warn('SW bildirim hatası:', e);
+    }
   }
   // Fallback: normal Notification API
   if('Notification' in window && Notification.permission === 'granted') {
     try {
-      new Notification(baslik, {body: govde, icon: '/16379.png', badge: '/16379.png', tag: tag||'maas-gunu', renotify:true});
+      new Notification(baslik, {body: govde, icon: '/16379.png', tag: tag||'maas-gunu'});
       return true;
-    } catch(e) {}
+    } catch(e) { console.warn('Notification hatası:', e); }
   }
   return false;
 }
@@ -1920,10 +1902,16 @@ async function bildirimIzniAc() {
 
 function bildirimIzniBtnGuncelle() {
   const btn = document.getElementById('bildirimIzniBtn'); if(!btn) return;
+  // TWA'da her zaman aktif göster - bildirimler uygulama tarafından yönetiliyor
+  if('serviceWorker' in navigator) {
+    btn.textContent = '🔔 Bildirim Ayarları';
+    btn.style.opacity = '1';
+    return;
+  }
   if(!('Notification' in window)) { btn.style.display = 'none'; return; }
   if(Notification.permission === 'granted') btn.textContent = '🔔 Bildirim Ayarları ✓';
-  else if(Notification.permission === 'denied') { btn.textContent = '🔕 Bildirimler Engellendi'; btn.style.opacity = '0.5'; }
   else btn.textContent = '🔔 Bildirim Ayarları';
+  btn.style.opacity = '1';
 }
 
 async function bildirimIzniIste() {
