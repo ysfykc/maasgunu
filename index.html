@@ -144,7 +144,7 @@
 .page-body { padding:16px; flex:1; padding-bottom:calc(env(safe-area-inset-bottom) + 40px); }
 
 /* ══ ADMİN PANELİ ══ */
-#adminPanel { display:none; position:fixed; inset:0; z-index:9998; background:var(--bg); overflow-y:auto; padding-bottom:40px; }
+#adminPanel { padding-bottom:40px; }
 .admin-topbar { position:sticky; top:0; background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-bottom:.5px solid var(--brd2); padding:calc(env(safe-area-inset-top) + 12px) 16px 12px; display:flex; align-items:center; gap:12px; z-index:10; }
 .admin-topbar h2 { font-size:17px; font-weight:800; flex:1; }
 .admin-close { font-size:22px; background:none; border:none; cursor:pointer; color:var(--txt2); }
@@ -223,20 +223,21 @@ input[type=number]{-moz-appearance:textfield}
 .sablon-ekle { padding:6px 14px; border-radius:99px; background:var(--green); color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; }
 .sablon-ekle.r { background:var(--red); }
 #login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; overflow: hidden; }
-.login-bg { position:absolute; inset:0; width:100%; height:100%; z-index:-1; background:radial-gradient(ellipse at 50% 30%, #1a5c38 0%, #0a1f14 55%, #060e09 100%); }
-.login-badge { display:none; }
-#login { position:fixed; inset:0; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
-.login-splash { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; width:100%; flex:1; padding-top:env(safe-area-inset-top); }
-.login-logo-wrap { position:relative; margin-bottom:28px; }
-.login-logo-wrap img { width:110px; height:110px; border-radius:28px; box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 0 1.5px rgba(255,255,255,0.12); }
-.login-logo-glow { position:absolute; inset:-20px; border-radius:50px; background:radial-gradient(circle, rgba(42,173,98,0.25) 0%, transparent 70%); z-index:-1; }
-.login-appname { font-family:var(--fs); font-size:42px; color:#fff; letter-spacing:-.5px; line-height:1; margin-bottom:8px; text-shadow:0 2px 20px rgba(0,0,0,0.4); }
-.login-tagline { font-size:11px; color:rgba(255,255,255,0.45); font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:48px; }
-.login-btns { width:100%; padding:0 28px; display:flex; flex-direction:column; gap:12px; margin-bottom:calc(env(safe-area-inset-bottom) + 32px); }
-.login-btn-google { width:100%; padding:16px; border-radius:18px; background:rgba(255,255,255,0.97); color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.35); border:none; cursor:pointer; letter-spacing:-.01em; }
-.login-btn-email { width:100%; padding:16px; border-radius:18px; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.9); font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.18); cursor:pointer; backdrop-filter:blur(12px); }
-.login-btn-kayit { width:100%; padding:12px; border-radius:18px; background:transparent; color:rgba(255,255,255,0.45); font-size:13px; font-weight:500; border:none; cursor:pointer; }
-.login-version { position:absolute; bottom:calc(env(safe-area-inset-bottom) + 8px); font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:.04em; }
+/* LOGIN EKRANI */
+#login { position:fixed; inset:0; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; overflow:hidden; }
+.login-bg { position:absolute; inset:0; z-index:0; }
+.login-bg-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.login-bg-overlay { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.88) 100%); }
+.login-splash { position:relative; z-index:1; width:100%; display:flex; flex-direction:column; align-items:center; padding:0 28px calc(env(safe-area-inset-bottom) + 32px); }
+.login-logo-wrap { display:none; }
+.login-logo-glow { display:none; }
+.login-appname { font-family:var(--fs); font-size:48px; color:#fff; letter-spacing:-.5px; line-height:1; margin-bottom:6px; text-align:center; text-shadow:0 2px 20px rgba(0,0,0,0.4); }
+.login-tagline { font-size:12px; color:rgba(255,255,255,0.55); font-weight:600; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:40px; text-align:center; }
+.login-btns { width:100%; display:flex; flex-direction:column; gap:10px; }
+.login-btn-google { width:100%; padding:16px; border-radius:16px; background:#fff; color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); border:none; cursor:pointer; }
+.login-btn-email { width:100%; padding:16px; border-radius:16px; background:rgba(255,255,255,0.15); color:#fff; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.25); cursor:pointer; backdrop-filter:blur(12px); }
+.login-btn-kayit { width:100%; padding:12px; background:transparent; color:rgba(255,255,255,0.45); font-size:13px; font-weight:500; border:none; cursor:pointer; }
+.login-version { display:none; }
 
 /* ══ HEDEF TASARRUFU ══ */
 .hedef-card { margin:0 16px 12px; background:linear-gradient(135deg,#1a3a8b,#5a3a8b); border-radius:20px; padding:16px; box-shadow:0 8px 24px rgba(26,58,139,.25); }
@@ -539,6 +540,21 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </head>
 <body>
 
+<!-- SPLASH SCREEN -->
+<div id="appSplash" style="
+  position:fixed;inset:0;z-index:99999;overflow:hidden;
+  background:#060e09;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  transition:opacity .5s ease;
+">
+  <img src="16379.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 30%,rgba(0,0,0,0.75) 100%);"></div>
+  <div style="position:relative;z-index:1;text-align:center;padding:0 32px calc(env(safe-area-inset-bottom)+48px);">
+    <div style="font-family:'Instrument Serif',serif;font-size:48px;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:8px;text-shadow:0 2px 24px rgba(0,0,0,0.5);">Maaş Günü</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:1.4px;text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
+  </div>
+</div>
+
 <div id="vLoader"><div id="vLoaderBar"></div></div>
 
 <div id="undoToast"></div>
@@ -609,13 +625,12 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div id="login">
-  <div class="login-bg"></div>
+  <div class="login-bg">
+    <img src="16379.png" class="login-bg-img" alt="bg">
+    <div class="login-bg-overlay"></div>
+  </div>
 
   <div class="login-splash" id="loginPanel">
-    <div class="login-logo-wrap">
-      <div class="login-logo-glow"></div>
-      <img src="16379.png" alt="Maaş Günü">
-    </div>
     <div class="login-appname">Maaş Günü</div>
     <div class="login-tagline">Gelirini Planla • Geleceğini Kur</div>
 
@@ -4194,6 +4209,7 @@ async function init(){
          // Kullanıcı profilini kaydet (admin paneli için)
          profilKaydet(kullanici);
          lsYukle(); navSec(navIdx); render(); await fbYukle(); kurlariGuncelle().then(() => { render(); if(navIdx===1)portfoyRender(); if(navIdx===2)renderBorcum(); }); setSynk('ok');
+         if(window._hideSplash) window._hideSplash();
          // Onboarding kontrolü
          if(!veri.ayarlar?.onboardingDone) { setTimeout(obBaslat, 400); }
          window._fb.onSnapshot(window._fb.doc(db, 'users', user.uid, 'masaygunu2', 'ana'), (snap) => {
@@ -4207,7 +4223,8 @@ async function init(){
          }, (err) => { setSynk('off'); });
       } else { 
          user=null;veri={aylar:{}, portfoy:[], borclar:[], copKutusu:[], ayarlar:{maasGunu:15, portfoyHedef:0}, kurlar:{usd:32.5,eur:35.0,USD:32.5,EUR:35.0}, guncelleme:null}; 
-         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true); 
+         document.getElementById('login').style.display='flex'; uiLoginDurumuAyarla(true);
+         if(window._hideSplash) window._hideSplash();
       }
     });
     return;
@@ -4240,11 +4257,10 @@ const _acikSayfalar = [];
 function sayfaAc(id) {
   Haptic.light();
   const el = document.getElementById(id);
-  if(!el) return;
+  if(!el) { console.warn('sayfaAc: bulunamadı', id); return; }
   el.classList.add('open');
   _acikSayfalar.push(id);
   history.pushState({sayfa: id}, '', window.location.href);
-  // Scroll en üste
   setTimeout(() => { el.scrollTop = 0; }, 50);
 }
 
@@ -4270,8 +4286,16 @@ window.addEventListener('popstate', function(e) {
   // Önce açık sayfa var mı
   if(_acikSayfalar.length > 0) {
     const sonSayfa = _acikSayfalar[_acikSayfalar.length - 1];
-    sayfaKapat(sonSayfa);
-    history.pushState({mg:true}, '', window.location.href);
+    const el = document.getElementById(sonSayfa);
+    if(el) el.classList.remove('open');
+    const idx = _acikSayfalar.lastIndexOf(sonSayfa);
+    if(idx > -1) _acikSayfalar.splice(idx, 1);
+    // Hâlâ açık sayfa varsa state'i koru, yoksa ana state'e dön
+    if(_acikSayfalar.length > 0) {
+      history.pushState({mg:true}, '', window.location.href);
+    } else {
+      history.pushState({mg:true}, '', window.location.href);
+    }
     return;
   }
   // Giriş ekranındaysa dur
@@ -4308,6 +4332,20 @@ window.addEventListener('popstate', function(e) {
 /* ══ SAYFA GEÇİŞ BİTİŞ ══ */
 
 /* ══ BAŞLAT ══ */
+
+document.addEventListener('DOMContentLoaded', function() {
+  const splash = document.getElementById('appSplash');
+  if(!splash) return;
+  const start = Date.now();
+  window._hideSplash = function() {
+    const wait = Math.max(0, 1200 - (Date.now() - start));
+    setTimeout(() => {
+      splash.style.opacity = '0';
+      setTimeout(() => splash.remove(), 500);
+    }, wait);
+  };
+  setTimeout(() => { if(splash.parentNode) window._hideSplash(); }, 4000);
+});
 
 document.addEventListener('DOMContentLoaded',init);
 function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
