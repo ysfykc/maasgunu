@@ -113,6 +113,18 @@
 .tekrar-gecmis-modal .ay-durum.yok { background:var(--bg2); color:var(--txt3); }
 
 
+/* ══ PORTFÖY TİCKER ══ */
+@keyframes tickerScroll {
+  0% { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+.ticker-item { display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:36px;border-right:.5px solid var(--brd);flex-shrink:0; }
+.ticker-item .t-name { color:var(--txt3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em; }
+.ticker-item .t-val { color:var(--txt);font-weight:700;font-size:12px; }
+.ticker-item .t-chg { font-size:10px;font-weight:700; }
+.ticker-item .t-chg.up { color:var(--green); }
+.ticker-item .t-chg.dn { color:var(--red); }
+
 /* ══ SAYFA GEÇİŞ SİSTEMİ ══ */
 .page-screen {
   position:fixed; inset:0; z-index:8000;
@@ -222,22 +234,22 @@ input[type=number]{-moz-appearance:textfield}
 .sablon-meta { font-size:11px; color:var(--txt3); margin-top:2px; }
 .sablon-ekle { padding:6px 14px; border-radius:99px; background:var(--green); color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; }
 .sablon-ekle.r { background:var(--red); }
-#login { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #000; overflow: hidden; }
 /* LOGIN EKRANI */
-#login { position:fixed; inset:0; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; overflow:hidden; }
-.login-bg { position:absolute; inset:0; z-index:0; }
-.login-bg-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.login-bg-overlay { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.88) 100%); }
-.login-splash { position:relative; z-index:1; width:100%; display:flex; flex-direction:column; align-items:center; padding:0 28px calc(env(safe-area-inset-bottom) + 32px); }
-.login-logo-wrap { display:none; }
-.login-logo-glow { display:none; }
-.login-appname { font-family:var(--fs); font-size:48px; color:#fff; letter-spacing:-.5px; line-height:1; margin-bottom:6px; text-align:center; text-shadow:0 2px 20px rgba(0,0,0,0.4); }
-.login-tagline { font-size:12px; color:rgba(255,255,255,0.55); font-weight:600; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:40px; text-align:center; }
-.login-btns { width:100%; display:flex; flex-direction:column; gap:10px; }
-.login-btn-google { width:100%; padding:16px; border-radius:16px; background:#fff; color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); border:none; cursor:pointer; }
-.login-btn-email { width:100%; padding:16px; border-radius:16px; background:rgba(255,255,255,0.15); color:#fff; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.25); cursor:pointer; backdrop-filter:blur(12px); }
-.login-btn-kayit { width:100%; padding:12px; background:transparent; color:rgba(255,255,255,0.45); font-size:13px; font-weight:500; border:none; cursor:pointer; }
-.login-version { display:none; }
+#login { position:fixed; inset:0; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
+.login-bg { position:absolute; inset:0; z-index:0; background:linear-gradient(160deg, #0d2818 0%, #0a1f12 45%, #071510 100%); }
+.login-bg-img { display:none; }
+.login-bg-overlay { display:none; }
+.login-splash { position:relative; z-index:1; width:100%; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.login-logo-wrap { position:relative; margin-bottom:20px; }
+.login-logo-wrap img { width:88px; height:88px; border-radius:22px; box-shadow:0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.07); display:block; }
+.login-logo-glow { position:absolute; inset:-24px; border-radius:50px; background:radial-gradient(circle, rgba(42,173,98,0.15) 0%, transparent 65%); z-index:-1; }
+.login-appname { font-family:var(--fs); font-size:38px; color:#eef2ee; letter-spacing:-.4px; line-height:1; margin-bottom:8px; }
+.login-tagline { font-size:11px; color:rgba(255,255,255,0.3); font-weight:600; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:52px; }
+.login-btns { width:100%; padding:0 28px; display:flex; flex-direction:column; gap:10px; margin-bottom:calc(env(safe-area-inset-bottom) + 28px); }
+.login-btn-google { width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.3); border:none; cursor:pointer; }
+.login-btn-email { width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.85); font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.12); cursor:pointer; }
+.login-btn-kayit { width:100%; padding:12px; background:transparent; color:rgba(255,255,255,0.3); font-size:13px; font-weight:500; border:none; cursor:pointer; }
+.login-version { position:absolute; bottom:calc(env(safe-area-inset-bottom)+8px); font-size:10px; color:rgba(255,255,255,0.15); letter-spacing:.04em; }
 
 /* ══ HEDEF TASARRUFU ══ */
 .hedef-card { margin:0 16px 12px; background:linear-gradient(135deg,#1a3a8b,#5a3a8b); border-radius:20px; padding:16px; box-shadow:0 8px 24px rgba(26,58,139,.25); }
@@ -543,16 +555,16 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <!-- SPLASH SCREEN -->
 <div id="appSplash" style="
   position:fixed;inset:0;z-index:99999;overflow:hidden;
-  background:#060e09;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  background:linear-gradient(160deg,#0d2818 0%,#0a1f12 45%,#071510 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   transition:opacity .5s ease;
 ">
-  <img src="16379.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;">
-  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 30%,rgba(0,0,0,0.75) 100%);"></div>
-  <div style="position:relative;z-index:1;text-align:center;padding:0 32px calc(env(safe-area-inset-bottom)+48px);">
-    <div style="font-family:'Instrument Serif',serif;font-size:48px;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:8px;text-shadow:0 2px 24px rgba(0,0,0,0.5);">Maaş Günü</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:1.4px;text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
+  <div style="position:relative;margin-bottom:20px;">
+    <div style="position:absolute;inset:-24px;border-radius:50px;background:radial-gradient(circle,rgba(42,173,98,0.15) 0%,transparent 65%);"></div>
+    <img src="16379.png" style="width:88px;height:88px;border-radius:22px;box-shadow:0 12px 40px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.07);display:block;position:relative;">
   </div>
+  <div style="font-family:'Instrument Serif',serif;font-size:38px;color:#eef2ee;letter-spacing:-.4px;line-height:1;margin-bottom:8px;">Maaş Günü</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.28);font-weight:600;letter-spacing:1.4px;text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
 </div>
 
 <div id="vLoader"><div id="vLoaderBar"></div></div>
@@ -625,12 +637,14 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 
 <div id="login">
-  <div class="login-bg">
-    <img src="16379.png" class="login-bg-img" alt="bg">
-    <div class="login-bg-overlay"></div>
-  </div>
+  <div class="login-bg"></div>
+  <div class="login-version">Maaş Günü v4.6</div>
 
   <div class="login-splash" id="loginPanel">
+    <div class="login-logo-wrap">
+      <div class="login-logo-glow"></div>
+      <img src="16379.png" alt="Maaş Günü">
+    </div>
     <div class="login-appname">Maaş Günü</div>
     <div class="login-tagline">Gelirini Planla • Geleceğini Kur</div>
 
@@ -813,6 +827,14 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
        🔄 Canlı Fiyatları Çek
     </button>
   </div>
+  <!-- CANLI FİYAT TİCKER -->
+  <div id="portfoyTicker" style="overflow:hidden;background:var(--surf);border-bottom:.5px solid var(--brd);border-top:.5px solid var(--brd);height:36px;display:flex;align-items:center;margin-bottom:4px;">
+    <div id="tickerInner" style="display:flex;white-space:nowrap;animation:tickerScroll 28s linear infinite;align-items:center;">
+      <div id="tickerItems" style="display:flex;"></div>
+      <div id="tickerItems2" style="display:flex;"></div>
+    </div>
+  </div>
+
   <div style="padding: 0 16px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
      <div style="font-size:14px; font-weight:800; color:var(--txt2);">Varlık Listesi</div>
      <div style="display:flex; gap:6px;">
@@ -2796,6 +2818,18 @@ async function kurlariGuncelle() {
            veri.kurlar['22_ayar'] = s('YIA') || (g * 22 / 24);
            veri.kurlar['14_ayar'] = g * 14 / 24;
            veri.kurlar.zaman = new Date().toISOString();
+           
+           // BIST100 ve NASDAQ — Worker üzerinden Yahoo Finance
+           try {
+             const bist = await wFetch('https://query1.finance.yahoo.com/v8/finance/chart/XU100.IS?range=1d&interval=1d', 6000);
+             if(bist) { const bd = JSON.parse(bist); const bv = bd?.chart?.result?.[0]?.meta?.regularMarketPrice; if(bv) veri.kurlar.bist100 = bv; }
+           } catch(e) {}
+           try {
+             const nas = await wFetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EIXIC?range=1d&interval=1d', 6000);
+             if(nas) { const nd = JSON.parse(nas); const nv = nd?.chart?.result?.[0]?.meta?.regularMarketPrice; if(nv) veri.kurlar.nasdaq = nv; }
+           } catch(e) {}
+           
+           if(navIdx === 1) tickerGuncelle();
            await fbKaydet();
            return true;
        }
@@ -3359,6 +3393,38 @@ function grafikRender(v){ grafikKatRender(v); }
 
 /* ══ PORTFÖY FONKSİYONLARI ══ */
 const altinIsimMap = { 'gram-altin':'Gram Altın (24K)', '22-ayar-bilezik':'22 Ayar Gram Altın', 'ceyrek-altin':'Çeyrek Altın', 'yarim-altin':'Yarım Altın', 'tam-altin':'Tam Altın', 'cumhuriyet-altini':'Cumhuriyet Altını', 'ata-altin':'Ata Altın', 'gremse-altin':'Gremse Altın' };
+/* ══ PORTFÖY TİCKER ══ */
+function tickerGuncelle() {
+  const k = veri.kurlar || {};
+  const usd = parseFloat(k.usd || k.USD || 0);
+  const eur = parseFloat(k.eur || k.EUR || 0);
+  const gram = parseFloat(k.gram_altin || 0);
+
+  const items = [
+    { ad:'BIST 100', val: k.bist100 ? Number(k.bist100).toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—', birim:'', chg: null },
+    { ad:'NASDAQ', val: k.nasdaq ? Number(k.nasdaq).toLocaleString('en-US',{maximumFractionDigits:0}) : '—', birim:'', chg: null },
+    { ad:'USD/TRY', val: usd > 0 ? usd.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', birim:'₺', chg: null },
+    { ad:'EUR/TRY', val: eur > 0 ? eur.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', birim:'₺', chg: null },
+    { ad:'ALTIN', val: gram > 0 ? gram.toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—', birim:'₺', chg: null },
+  ];
+
+  const html = items.map(i => `
+    <div class="ticker-item">
+      <span class="t-name">${i.ad}</span>
+      <span class="t-val">${i.birim}${i.val}</span>
+    </div>`).join('');
+
+  const el1 = document.getElementById('tickerItems');
+  const el2 = document.getElementById('tickerItems2');
+  if(el1) el1.innerHTML = html;
+  if(el2) el2.innerHTML = html;
+
+  // Animasyon süresini içerik uzunluğuna göre ayarla
+  const inner = document.getElementById('tickerInner');
+  if(inner) inner.style.animationDuration = (items.length * 5) + 's';
+}
+/* ══ PORTFÖY TİCKER BİTİŞ ══ */
+
 /* ══ PORTFÖY GEÇMİŞİ ══ */
 function portfoyGecmisKaydet(toplamDeger) {
   if(!toplamDeger || toplamDeger <= 0) return;
@@ -3502,6 +3568,7 @@ async function varlikKaydet() {
 }
 
 function portfoyRender() {
+   tickerGuncelle();
    const el = document.getElementById('portfoyIcerik');
    if(!veri.portfoy || veri.portfoy.length === 0) {
      el.innerHTML = `<div class="empty-sec"><div class="empty-ico">💼</div><div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px;">Portföy boş</div><div style="font-size:13px;color:var(--txt3);">+ Ekle butonuyla ilk varlığını ekle</div></div>`;
