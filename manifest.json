@@ -4,20 +4,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "fullscreen",
-  "background_color": "#0a1a0e",
-  "theme_color": "#0a1a0e",
-  "icons": [
-    {
-      "src": "16379.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "16379.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
+  "background_color": "#0a1f12",
+  "theme_color": "#0a1f12",
+  "icons": [...]
 }
