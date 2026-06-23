@@ -293,6 +293,7 @@ input[type=number]{-moz-appearance:textfield}
 main{ padding-top:calc(var(--top) + 46px + env(safe-area-inset-top)); padding-bottom:calc(var(--nav) + 120px + env(safe-area-inset-bottom)); }
 .page{display:none}
 .page.on{display:block;animation:fadeUp .25s ease}
+#pageAyarlar.on{overflow-y:auto;-webkit-overflow-scrolling:touch;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* STABİL NAV CSS */
@@ -756,7 +757,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 
 <!-- AYARLAR SAYFASI (NAV SEKMESİ) -->
-<div class="page" id="pageAyarlar" style="overflow-y:auto;height:100%;position:fixed;inset:0;z-index:1;">
+<div class="page" id="pageAyarlar">
 <div style="height:calc(env(safe-area-inset-top) + 60px);"></div>
 <div style="padding:0 16px 100px;">
 
@@ -2820,6 +2821,7 @@ async function sifremiUnuttum() {
   }
 }
 
+function cikisYap() { cikisOnayAc(); }
 function cikisOnayAc() { document.getElementById('exitModal').style.display = 'flex'; }
 function cikisOnayKapat() { document.getElementById('exitModal').style.display = 'none'; }
 async function gercekCikisYap() { await window._fb.signOut(auth); window.location.reload(); }
@@ -4355,10 +4357,17 @@ function ayarlarSayfasiDoldur() {
   const th=document.getElementById('ayarTasarrufHedef2'); if(th) th.value=veri.ayarlar?.tasarrufHedef||'';
   const ph=document.getElementById('ayarHedef2'); if(ph) ph.value=getPortfoyHedefi()||'';
   const tt=document.getElementById('ayarTasarrufTarih2'); if(tt) tt.value=veri.ayarlar?.tasarrufTarih||'';
+  // Admin butonu - mevcut admin kontrolünü kullan
   const ab2=document.getElementById('adminBtn2');
-  if(ab2&&user) import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({getDoc,doc})=>{
-    getDoc(doc(db,'admins',user.uid)).then(snap=>{if(snap.exists()&&ab2)ab2.style.display='flex';});
-  }).catch(()=>{});
+  if(ab2) {
+    try {
+      if(db && user) {
+        window._fb?.getDoc(window._fb?.doc(db,'admins',user.uid))
+          .then(snap=>{ if(snap?.exists()) ab2.style.display='flex'; })
+          .catch(()=>{});
+      }
+    } catch(e) {}
+  }
 }
 
 async function ayarlarKaydet2() {
