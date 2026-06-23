@@ -1681,10 +1681,20 @@ async function swKaydet() {
 }
 
 async function swBildirimGonder(baslik, govde, tag) {
-  // Önce mevcut SW kaydını bul
   if('serviceWorker' in navigator) {
     try {
       const reg = await navigator.serviceWorker.ready;
+      if(reg && reg.active) {
+        // SW'ye mesaj gönder — en güvenilir yöntem TWA'da
+        reg.active.postMessage({
+          type: 'SHOW_NOTIFICATION',
+          title: baslik,
+          body: govde,
+          tag: tag || 'maas-gunu'
+        });
+        return true;
+      }
+      // Fallback: doğrudan showNotification
       if(reg) {
         await reg.showNotification(baslik, {
           body: govde,
@@ -1692,20 +1702,17 @@ async function swBildirimGonder(baslik, govde, tag) {
           badge: '/16379.png',
           tag: tag || 'maas-gunu',
           renotify: true,
-          requireInteraction: false,
         });
         return true;
       }
-    } catch(e) {
-      console.warn('SW bildirim hatası:', e);
-    }
+    } catch(e) { console.warn('SW bildirim hatası:', e); }
   }
   // Fallback: normal Notification API
   if('Notification' in window && Notification.permission === 'granted') {
     try {
       new Notification(baslik, {body: govde, icon: '/16379.png', tag: tag||'maas-gunu'});
       return true;
-    } catch(e) { console.warn('Notification hatası:', e); }
+    } catch(e) {}
   }
   return false;
 }
