@@ -1681,38 +1681,39 @@ async function swKaydet() {
 }
 
 async function swBildirimGonder(baslik, govde, tag) {
-  if('serviceWorker' in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      if(reg && reg.active) {
-        // SW'ye mesaj gönder — en güvenilir yöntem TWA'da
-        reg.active.postMessage({
-          type: 'SHOW_NOTIFICATION',
-          title: baslik,
-          body: govde,
-          tag: tag || 'maas-gunu'
-        });
-        return true;
-      }
-      // Fallback: doğrudan showNotification
+  try {
+    if('serviceWorker' in navigator) {
+      const reg = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((_,rej)=>setTimeout(()=>rej('timeout'),3000))
+      ]);
       if(reg) {
-        await reg.showNotification(baslik, {
-          body: govde,
-          icon: '/16379.png',
-          badge: '/16379.png',
-          tag: tag || 'maas-gunu',
-          renotify: true,
-        });
-        return true;
+        // Yöntem 1: doğrudan showNotification
+        try {
+          await reg.showNotification(baslik, {
+            body: govde, icon:'/16379.png', badge:'/16379.png',
+            tag: tag||'maas-gunu', renotify:true,
+          });
+          return true;
+        } catch(e1) {
+          console.warn('showNotification hatası:', e1);
+          // Yöntem 2: postMessage
+          if(reg.active) {
+            reg.active.postMessage({type:'SHOW_NOTIFICATION',title:baslik,body:govde,tag:tag||'maas-gunu'});
+            return true;
+          }
+        }
       }
-    } catch(e) { console.warn('SW bildirim hatası:', e); }
-  }
-  // Fallback: normal Notification API
-  if('Notification' in window && Notification.permission === 'granted') {
-    try {
-      new Notification(baslik, {body: govde, icon: '/16379.png', tag: tag||'maas-gunu'});
-      return true;
-    } catch(e) {}
+    }
+  } catch(e) { console.warn('SW hazır değil:', e); }
+  // Son çare: Notification API + izin iste
+  if('Notification' in window) {
+    if(Notification.permission !== 'granted') {
+      await Notification.requestPermission();
+    }
+    if(Notification.permission === 'granted') {
+      try { new Notification(baslik, {body:govde, icon:'/16379.png', tag:tag||'maas-gunu'}); return true; } catch(e) {}
+    }
   }
   return false;
 }
