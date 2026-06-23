@@ -152,6 +152,8 @@
   font-size:22px; cursor:pointer; color:var(--blue);
   flex-shrink:0; font-weight:400;
 }
+#pageAyarlar.page-screen { z-index:500; }
+#pageAyarlar.page-screen.open { transform:translateX(0); }
 .page-topbar-title { font-size:17px; font-weight:800; color:var(--txt); flex:1; }
 .page-body { padding:16px; flex:1; padding-bottom:calc(env(safe-area-inset-bottom) + 40px); }
 
@@ -293,7 +295,7 @@ input[type=number]{-moz-appearance:textfield}
 main{ padding-top:calc(var(--top) + 46px + env(safe-area-inset-top)); padding-bottom:calc(var(--nav) + 120px + env(safe-area-inset-bottom)); }
 .page{display:none}
 .page.on{display:block;animation:fadeUp .25s ease}
-#pageAyarlar.on{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* STABİL NAV CSS */
@@ -757,8 +759,11 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 
 <!-- AYARLAR SAYFASI (NAV SEKMESİ) -->
-<div class="page" id="pageAyarlar">
-<div style="padding:0 16px 100px;">
+<div class="page-screen" id="pageAyarlar">
+<div class="page-topbar">
+  <div class="page-topbar-title">⚙️ Ayarlar</div>
+</div>
+<div class="page-body">
 
   <!-- Profil Kartı -->
   <div style="background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:20px;margin-bottom:20px;box-shadow:var(--sh);display:flex;align-items:center;gap:14px;">
@@ -3125,8 +3130,12 @@ function navSec(i){
   document.getElementById('pageAy').className='page'+(i===0?' on':''); 
   document.getElementById('pagePortfoy').className='page'+(i===1?' on':'');
   document.getElementById('pageBorcum').className='page'+(i===2?' on':'');
+  // pageAyarlar - page-screen sistemi kullan
   const pAy = document.getElementById('pageAyarlar');
-  if(pAy) pAy.className='page'+(i===3?' on':'');
+  if(pAy) {
+    if(i===3) { pAy.classList.add('open'); if(!_acikSayfalar.includes('pageAyarlar')) _acikSayfalar.push('pageAyarlar'); }
+    else { pAy.classList.remove('open'); const idx=_acikSayfalar.indexOf('pageAyarlar'); if(idx>-1) _acikSayfalar.splice(idx,1); }
+  }
   
   const qaw=document.getElementById('fabContainer'); 
   if(qaw) { if(i === 0) { qaw.classList.remove('hide-fab'); } else { qaw.classList.add('hide-fab'); qaw.classList.remove('open'); } }
@@ -4526,19 +4535,15 @@ function backButtonBaslat() {
 }
 
 window.addEventListener('popstate', function(e) {
-  // Önce açık sayfa var mı
-  if(_acikSayfalar.length > 0) {
-    const sonSayfa = _acikSayfalar[_acikSayfalar.length - 1];
+  // Önce açık sayfa var mı (pageAyarlar hariç — o nav sekmesi)
+  const sayfalarHaric = _acikSayfalar.filter(s => s !== 'pageAyarlar');
+  if(sayfalarHaric.length > 0) {
+    const sonSayfa = sayfalarHaric[sayfalarHaric.length - 1];
     const el = document.getElementById(sonSayfa);
     if(el) el.classList.remove('open');
     const idx = _acikSayfalar.lastIndexOf(sonSayfa);
     if(idx > -1) _acikSayfalar.splice(idx, 1);
-    // Hâlâ açık sayfa varsa state'i koru, yoksa ana state'e dön
-    if(_acikSayfalar.length > 0) {
-      history.pushState({mg:true}, '', window.location.href);
-    } else {
-      history.pushState({mg:true}, '', window.location.href);
-    }
+    history.pushState({mg:true}, '', window.location.href);
     return;
   }
   // Giriş ekranındaysa dur
