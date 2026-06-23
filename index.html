@@ -552,21 +552,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
-<div id="appSplash" style="
-  position:fixed;inset:0;z-index:99999;overflow:hidden;
-  background:linear-gradient(160deg,#0d2818 0%,#0a1f12 45%,#071510 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity .5s ease;
-">
-  <div style="position:relative;margin-bottom:20px;">
-    <div style="position:absolute;inset:-24px;border-radius:50px;background:radial-gradient(circle,rgba(42,173,98,0.15) 0%,transparent 65%);"></div>
-    <img src="16379.png" style="width:88px;height:88px;border-radius:22px;box-shadow:0 12px 40px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.07);display:block;position:relative;">
-  </div>
-  <div style="font-family:'Instrument Serif',serif;font-size:38px;color:#eef2ee;letter-spacing:-.4px;line-height:1;margin-bottom:8px;">Maaş Günü</div>
-  <div style="font-size:10px;color:rgba(255,255,255,0.28);font-weight:600;letter-spacing:1.4px;text-transform:uppercase;">Gelirini Planla • Geleceğini Kur</div>
-</div>
-
 <div id="vLoader"><div id="vLoaderBar"></div></div>
 
 <div id="undoToast"></div>
@@ -1781,44 +1766,50 @@ function bildirimToggle(tip) {
 
 function bildirimPanelAc() {
   Haptic.light();
-  document.getElementById('mAyarlar').classList.remove('on');
-
-  // İzin durumu
   const durumEl = document.getElementById('bildirimIzinDurum');
-  if(!('Notification' in window)) {
-    durumEl.style.background = 'var(--red-bg)'; durumEl.style.color = 'var(--red)';
-    durumEl.textContent = '❌ Tarayıcın bildirim desteklemiyor';
-  } else if(Notification.permission === 'granted') {
-    durumEl.style.background = 'var(--green-bg)'; durumEl.style.color = 'var(--green)';
-    durumEl.textContent = '✅ Bildirimler aktif';
-  } else if(Notification.permission === 'denied') {
-    durumEl.style.background = 'var(--red-bg)'; durumEl.style.color = 'var(--red)';
-    durumEl.textContent = '🔕 Bildirimler engellendi — Tarayıcı ayarlarından izin ver';
-  } else {
-    durumEl.style.background = 'var(--amber-bg)'; durumEl.style.color = 'var(--amber)';
-    durumEl.textContent = '⚠️ Bildirim izni verilmemiş — İzin Ver\'e bas';
+  if(durumEl) {
+    // TWA'da SW kaydını kontrol et
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration('/').then(reg => {
+        if(reg) {
+          durumEl.style.background = 'var(--green-bg)'; durumEl.style.color = 'var(--green)';
+          durumEl.textContent = '✅ Bildirimler aktif (Uygulama tarafından yönetiliyor)';
+        } else {
+          durumEl.style.background = 'var(--amber-bg)'; durumEl.style.color = 'var(--amber)';
+          durumEl.textContent = '⚠️ Bildirim servisi yükleniyor — İzin Ver butonuna bas';
+        }
+      }).catch(() => {
+        durumEl.style.background = 'var(--green-bg)'; durumEl.style.color = 'var(--green)';
+        durumEl.textContent = '✅ Bildirimler aktif';
+      });
+    } else {
+      durumEl.style.background = 'var(--amber-bg)'; durumEl.style.color = 'var(--amber)';
+      durumEl.textContent = '⚠️ Bildirim servisi hazır değil';
+    }
   }
 
   // Toggle durumları
   const prefs = bildirimPrefsYukle();
-  document.getElementById('togFatura').classList.toggle('on', prefs.fatura);
-  document.getElementById('togBorc').classList.toggle('on', prefs.borc);
-  document.getElementById('togMaas').classList.toggle('on', prefs.maas);
+  const togF = document.getElementById('togFatura');
+  const togB = document.getElementById('togBorc');
+  const togM = document.getElementById('togMaas');
+  if(togF) togF.classList.toggle('on', !!prefs.fatura);
+  if(togB) togB.classList.toggle('on', !!prefs.borc);
+  if(togM) togM.classList.toggle('on', !!prefs.maas);
 
   // Son gönderilen
   const gecmisEl = document.getElementById('bildirimGecmis');
-  const sonlar = [
-    {key: BILDIRIM_KEY, ad: 'Fatura'},
-    {key: BORC_BILDIRIM_KEY, ad: 'Borç'},
-    {key: 'mg_maas_bildirim_son', ad: 'Maaş'},
-  ];
-  gecmisEl.innerHTML = sonlar.map(s => {
-    const tarih = localStorage.getItem(s.key);
-    return `<div style="display:flex;justify-content:space-between;padding:4px 0;">
-      <span>${s.ad}</span>
-      <span style="color:var(--txt3);">${tarih ? tarih : 'Henüz gönderilmedi'}</span>
-    </div>`;
-  }).join('');
+  if(gecmisEl) {
+    const sonlar = [
+      {key: BILDIRIM_KEY, ad: 'Fatura'},
+      {key: BORC_BILDIRIM_KEY, ad: 'Borç'},
+      {key: 'mg_maas_bildirim_son', ad: 'Maaş'},
+    ];
+    gecmisEl.innerHTML = sonlar.map(s => {
+      const tarih = localStorage.getItem(s.key);
+      return '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>' + s.ad + '</span><span style="color:var(--txt3);">' + (tarih || 'Henüz gönderilmedi') + '</span></div>';
+    }).join('');
+  }
 
   sayfaAc('mBildirimSayfa');
 }
@@ -1885,19 +1876,43 @@ async function borcHatirlaticiGonder() {
 }
 
 async function bildirimIzniAc() {
-  if(!('Notification' in window)) { toast('❌ Tarayıcın bildirim desteklemiyor'); return; }
-  if(Notification.permission === 'denied') { 
-    toast('❌ Bildirimler engellendi. Telefon Ayarları → Uygulamalar → Maaş Günü → Bildirimler yolunu dene.'); 
+  if(!('Notification' in window) && !('serviceWorker' in navigator)) { 
+    toast('❌ Cihazın bildirim desteklemiyor'); 
     return; 
   }
-  const izinOk = await bildirimIzniVeSwKur();
-  if(izinOk) {
+  
+  // SW'yi önce kaydet
+  const reg = await swKaydet();
+  
+  // İzin iste
+  let izin = 'granted';
+  if('Notification' in window && Notification.permission !== 'granted') {
+    if(Notification.permission === 'denied') {
+      toast('❌ Bildirimler engellendi. Telefon Ayarları → Uygulamalar → Maaş Günü → Bildirimler yolunu dene.');
+      return;
+    }
+    izin = await Notification.requestPermission();
+  }
+  
+  if(izin === 'granted' || reg) {
     toast('✅ Bildirimler açıldı!');
-    // SW üzerinden test bildirimi gönder
-    const basarili = await swBildirimGonder('Maaş Günü 🔔', 'Bildirimler aktif! Fatura ve borç hatırlatıcıları çalışacak.', 'test');
-    if(!basarili) toast('⚠️ Test bildirimi gönderilemedi — Lütfen telefon bildirim ayarlarını kontrol et');
-    const btn = document.getElementById('bildirimIzniBtn');
-    if(btn) btn.textContent = '🔔 Bildirim Ayarları ✓';
+    // Test bildirimi gönder
+    if(reg) {
+      try {
+        await reg.showNotification('Maaş Günü 🔔', {
+          body: 'Bildirimler aktif! Fatura ve borç hatırlatıcıları çalışacak.',
+          icon: '/16379.png',
+          badge: '/16379.png',
+          tag: 'test-bildirim',
+        });
+      } catch(e) {
+        // Fallback
+        if('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Maaş Günü 🔔', {body: 'Bildirimler aktif!', icon: '/16379.png'});
+        }
+      }
+    }
+    bildirimPanelAc();
   } else {
     toast('❌ Bildirim izni verilmedi');
   }
@@ -4399,20 +4414,6 @@ window.addEventListener('popstate', function(e) {
 /* ══ SAYFA GEÇİŞ BİTİŞ ══ */
 
 /* ══ BAŞLAT ══ */
-
-document.addEventListener('DOMContentLoaded', function() {
-  const splash = document.getElementById('appSplash');
-  if(!splash) return;
-  const start = Date.now();
-  window._hideSplash = function() {
-    const wait = Math.max(0, 1200 - (Date.now() - start));
-    setTimeout(() => {
-      splash.style.opacity = '0';
-      setTimeout(() => splash.remove(), 500);
-    }, wait);
-  };
-  setTimeout(() => { if(splash.parentNode) window._hideSplash(); }, 4000);
-});
 
 document.addEventListener('DOMContentLoaded',init);
 function uiLoginDurumuAyarla(acik){ document.body.classList.toggle('login-open', !!acik); document.body.classList.toggle('app-ready', !acik); const q=document.getElementById('fabContainer'); if(q) { q.style.display = acik ? 'none' : (navIdx === 0 ? 'flex' : 'none'); } }
