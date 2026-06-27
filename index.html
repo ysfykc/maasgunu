@@ -117,6 +117,70 @@
 .tekrar-gecmis-modal .ay-durum.yok { background:var(--bg2); color:var(--txt3); }
 
 
+/* ══ DASHBOARD PANELİ ══ */
+.dash-panel { margin:0 16px 10px; display:flex; flex-direction:column; gap:8px; }
+
+.dash-row { display:flex; gap:8px; }
+.dash-pace { flex:1; background:linear-gradient(135deg,#1c3fa0,#5c1fa0); border-radius:18px; padding:14px 16px; display:flex; align-items:center; gap:12px; box-shadow:0 8px 24px rgba(28,63,160,.25); position:relative; overflow:hidden; }
+.dash-pace::after { content:''; position:absolute; right:-16px; top:-16px; width:72px; height:72px; background:rgba(255,255,255,.07); border-radius:50%; }
+.dash-pace-ico { font-size:22px; z-index:1; }
+.dash-pace-body { z-index:1; }
+.dash-pace-lbl { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.6); margin-bottom:2px; }
+.dash-pace-val { font-family:var(--fs); font-size:24px; font-weight:500; color:#fff; line-height:1; letter-spacing:-.3px; }
+.dash-pace-sub { font-size:10px; color:rgba(255,255,255,.65); font-weight:600; margin-top:2px; }
+.dash-fatura-btn { width:100%; height:100%; min-height:76px; padding:12px 14px; border-radius:18px; background:var(--amber-bg); color:var(--amber); font-size:12px; font-weight:700; border:1px solid rgba(184,96,16,.18); cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; gap:3px; -webkit-tap-highlight-color:transparent; box-shadow:0 2px 8px rgba(184,96,16,.1); }
+.dash-fatura-ico { font-size:18px; }
+.dash-fatura-txt { font-size:11px; font-weight:700; line-height:1.3; }
+.dash-fatura-arr { font-size:14px; align-self:flex-end; margin-top:auto; }
+
+.dash-ozet { background:var(--surf); border:.5px solid var(--brd); border-radius:20px; padding:16px; display:flex; gap:0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+.dash-ozet-sol, .dash-ozet-sag { flex:1; display:flex; flex-direction:column; gap:6px; }
+.dash-ozet-sol { padding-right:16px; }
+.dash-ozet-sag { padding-left:16px; }
+.dash-ozet-ayrac { width:1px; background:var(--brd); flex-shrink:0; }
+.dash-ozet-lbl { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--txt3); }
+.dash-ozet-val { font-size:24px; font-weight:900; letter-spacing:-.04em; line-height:1; }
+.dash-prg-wrap { height:6px; background:var(--bg2); border-radius:99px; overflow:hidden; }
+.dash-prg-bar { height:100%; border-radius:99px; transition:width .6s cubic-bezier(.4,0,.2,1); }
+.dash-prg-bar.ok { background:linear-gradient(90deg,var(--green),var(--green2)); }
+.dash-prg-bar.warn { background:linear-gradient(90deg,var(--amber),#e8c040); }
+.dash-prg-bar.danger { background:linear-gradient(90deg,var(--red),var(--red2)); }
+.dash-prg-bar.p { background:linear-gradient(90deg,var(--purple),#9a70d4); }
+.dash-prg-bar.g { background:linear-gradient(90deg,var(--green),var(--green2)); }
+.dash-ozet-sub { display:flex; justify-content:space-between; align-items:center; font-size:10px; font-weight:600; color:var(--txt2); }
+
+.dash-compare { background:var(--surf); border:.5px solid var(--brd); border-radius:16px; padding:12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 6px rgba(0,0,0,.04); }
+.dash-compare-ico { font-size:20px; flex-shrink:0; }
+.dash-compare-txt { font-size:13px; font-weight:700; color:var(--txt); }
+.dash-compare-sub { font-size:11px; color:var(--txt2); font-weight:500; margin-top:1px; }
+
+.dash-ai { background:var(--surf); border:.5px solid var(--brd); border-radius:18px; padding:14px; display:flex; gap:12px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+.dash-ai-ico { width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,var(--blue),var(--purple)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; box-shadow:0 4px 12px rgba(90,58,139,.2); }
+.dash-ai-body { flex:1; min-width:0; }
+.dash-ai-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.dash-ai-ttl { font-size:12px; font-weight:800; color:var(--txt); }
+.dash-ai-tag { font-size:9px; color:var(--blue); background:var(--blue-bg); padding:2px 8px; border-radius:99px; font-weight:700; }
+.dash-ai-txt { font-size:12px; line-height:1.55; color:var(--txt2); }
+.dash-ai-actions { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.dash-ai-btn { padding:6px 12px; border-radius:99px; background:var(--bg2); color:var(--txt2); font-size:11px; font-weight:700; border:none; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.dash-ai-btn:active { opacity:.7; }
+
+.dash-hedef { background:linear-gradient(135deg,#1a3a8b,#5a3a8b); border-radius:18px; padding:16px; box-shadow:0 8px 24px rgba(26,58,139,.2); }
+.dash-hedef-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.dash-hedef-ttl { font-size:12px; font-weight:800; color:rgba(255,255,255,.8); text-transform:uppercase; letter-spacing:.06em; }
+.dash-hedef-edit { background:rgba(255,255,255,.15); border:none; color:#fff; padding:5px 12px; border-radius:99px; font-size:11px; font-weight:700; cursor:pointer; }
+.dash-hedef-val { font-family:var(--fs); font-size:26px; color:#fff; letter-spacing:-.5px; margin-bottom:4px; }
+.dash-hedef-bot { display:flex; justify-content:space-between; font-size:11px; color:rgba(255,255,255,.7); font-weight:600; margin-top:8px; }
+
+.dash-bl-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.dash-bl-ttl { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--txt3); }
+
+.dash-actions { display:flex; gap:8px; }
+.dash-action-btn { flex:1; background:var(--surf); border:.5px solid var(--brd); border-radius:16px; padding:12px 4px; display:flex; flex-direction:column; align-items:center; gap:5px; font-size:10px; font-weight:800; color:var(--txt2); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .1s; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.dash-action-btn:active { transform:scale(0.93); background:var(--bg2); }
+.dash-action-btn span:first-child { font-size:20px; }
+
+
 /* ══ PORTFÖY TİCKER ══ */
 @keyframes tickerScroll {
   0% { transform:translateX(0); }
@@ -880,90 +944,122 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 </div>
 
-<div class="pace-card" id="paceCard">
-  <div class="pace-ico">⏱️</div>
-  <div class="pace-info">
-    <div class="pace-ttl">Günlük Limitin</div>
-    <div class="pace-val" id="paceVal">₺0</div>
-    <div class="pace-sub" id="paceSub">Maaşa X gün var</div>
+<!-- ═══ DASHBOARD PANELİ ═══ -->
+<div class="dash-panel" id="dashPanel">
+
+  <!-- ÜSTTE: Pace + Fatura yan yana -->
+  <div class="dash-row">
+    <div class="dash-pace" id="paceCard" style="display:none;">
+      <div class="dash-pace-ico">⏱️</div>
+      <div class="dash-pace-body">
+        <div class="dash-pace-lbl">Günlük Limit</div>
+        <div class="dash-pace-val" id="paceVal">₺0</div>
+        <div class="dash-pace-sub" id="paceSub">—</div>
+      </div>
+    </div>
+    <div id="faturaUyari" style="display:none; flex:1;">
+      <button onclick="faturaModalAc()" class="dash-fatura-btn">
+        <span class="dash-fatura-ico">🔔</span>
+        <span id="faturaUyariTxt" class="dash-fatura-txt">Yaklaşan ödemeler</span>
+        <span class="dash-fatura-arr">›</span>
+      </button>
+    </div>
   </div>
-</div>
 
-<div class="ai-chip" id="aiInsight" style="display:none">
-<div class="ai-chip-ico">🤖</div>
-<div class="ai-chip-body">
-<div class="ai-chip-title">
-<span>Akıllı Öneri</span>
-<span class="ai-chip-tag" id="aiInsightTag">Canlı</span>
-</div>
-<div class="ai-chip-text" id="aiInsightText"></div>
-<div class="ai-chip-actions">
-<button class="ai-mini-btn" onclick="aiOneriYenile()">Başka öneri</button>
-<button class="ai-mini-btn" onclick="navSec(0); setTimeout(()=>tabSec(3),100); window.scrollTo({top:999,behavior:'smooth'})">Grafiğe bak</button>
-</div>
-</div>
-</div>
-
-<!-- HEDEF TASARRUFU KARTI -->
-<div id="hedefCard" style="display:none;" class="hedef-card">
-  <div class="hedef-card-top">
-    <div class="hedef-card-ttl">🎯 Tasarruf Hedefin</div>
-    <button class="hedef-card-edit" onclick="hedefModalAc()">Düzenle</button>
+  <!-- ORTA: Özet kart — Harcama + Birikim yan yana -->
+  <div class="dash-ozet" id="dashOzet">
+    <div class="dash-ozet-sol">
+      <div class="dash-ozet-lbl">Harcama</div>
+      <div class="dash-ozet-val" id="dashOzetPct" style="color:var(--red)">%0</div>
+      <div class="dash-prg-wrap"><div class="dash-prg-bar ok" id="prgBar" style="width:0%"></div></div>
+      <div class="dash-ozet-sub">
+        <span id="prgOde">₺0 ödendi</span>
+        <span id="prgKal" style="color:var(--txt3)">₺0 kaldı</span>
+      </div>
+    </div>
+    <div class="dash-ozet-ayrac"></div>
+    <div class="dash-ozet-sag" id="kavanozWrap">
+      <div class="dash-ozet-lbl">Birikim</div>
+      <div class="dash-ozet-val" style="color:var(--purple)" id="kYatirim">₺0</div>
+      <div class="dash-prg-wrap"><div class="dash-prg-bar p" id="kBar" style="width:0%"></div></div>
+      <div class="dash-ozet-sub">
+        <span style="color:var(--txt3)">%20 hedef</span>
+        <button onclick="sayfaAc('mAiAsistan')" style="background:none;border:none;font-size:10px;font-weight:700;color:var(--purple);cursor:pointer;padding:0;">AI Analiz ›</button>
+      </div>
+    </div>
   </div>
-  <div class="hedef-card-val" id="hedefVal">₺0 / ₺0</div>
-  <div class="hedef-card-sub" id="hedefSub">Hedefe ulaşmak için devam et</div>
-  <div class="hedef-prg-wrap"><div class="hedef-prg" id="hedefPrg" style="width:0%"></div></div>
-  <div class="hedef-card-bot">
-    <span id="hedefPct">%0 tamamlandı</span>
-    <span id="hedefKalan"></span>
+
+  <!-- KARŞILAŞTIRMA -->
+  <div id="compareBar" style="display:none;" class="dash-compare">
+    <div class="dash-compare-ico" id="compareIco">📊</div>
+    <div style="flex:1;min-width:0;">
+      <div class="dash-compare-txt" id="compareTxt">Geçen aya göre</div>
+      <div class="dash-compare-sub" id="compareSub"></div>
+    </div>
   </div>
-</div>
 
-<!-- FATURA HATIRLATICI BUTONU (topbar yakını) -->
-<div id="faturaUyari" style="display:none; margin:0 16px 10px;">
-  <button onclick="faturaModalAc()" style="width:100%; padding:12px 16px; border-radius:16px; background:var(--amber-bg); color:var(--amber); font-size:13px; font-weight:700; border:1.5px solid rgba(184,96,16,.2); cursor:pointer; display:flex; align-items:center; gap:8px;">
-    <span style="font-size:18px;">🔔</span>
-    <span id="faturaUyariTxt">Yaklaşan ödemeler var</span>
-    <span style="margin-left:auto;">→</span>
-  </button>
-</div>
-
-<div id="compareBar" style="display:none;" class="compare-bar">
-  <div class="compare-ico" id="compareIco">📊</div>
-  <div class="compare-body">
-    <div class="compare-txt" id="compareTxt">Geçen aya göre</div>
-    <div class="compare-sub" id="compareSub"></div>
+  <!-- AKİLLİ ÖNERİ -->
+  <div class="dash-ai" id="aiInsight" style="display:none">
+    <div class="dash-ai-ico">🤖</div>
+    <div class="dash-ai-body">
+      <div class="dash-ai-top">
+        <span class="dash-ai-ttl">Akıllı Öneri</span>
+        <span class="dash-ai-tag" id="aiInsightTag">Canlı</span>
+      </div>
+      <div class="dash-ai-txt" id="aiInsightText"></div>
+      <div class="dash-ai-actions">
+        <button class="dash-ai-btn" onclick="aiOneriYenile()">↺ Başka öneri</button>
+        <button class="dash-ai-btn" onclick="navSec(0);setTimeout(()=>tabSec(3),100);window.scrollTo({top:999,behavior:'smooth'})">📊 Grafik</button>
+        <button class="dash-ai-btn" onclick="sayfaAc('mAiAsistan')" style="color:var(--blue);">AI Asistan ›</button>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- BÜTÇE LİMİTLERİ KARTI -->
-<div id="butceLimitKart" style="display:none;">
-  <div class="butce-ttl">
-    <span>📊 Bütçe Limitleri</span>
-    <button onclick="butceLimitModalAc()" style="background:none;border:none;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;">Düzenle</button>
+  <!-- HEDEF -->
+  <div id="hedefCard" style="display:none;" class="dash-hedef">
+    <div class="dash-hedef-top">
+      <span class="dash-hedef-ttl">🎯 Tasarruf Hedefi</span>
+      <button class="dash-hedef-edit" onclick="hedefModalAc()">Düzenle</button>
+    </div>
+    <div class="dash-hedef-val" id="hedefVal">₺0 / ₺0</div>
+    <div class="dash-prg-wrap" style="margin:8px 0;"><div class="dash-prg-bar g" id="hedefPrg" style="width:0%"></div></div>
+    <div class="dash-hedef-bot">
+      <span id="hedefPct">%0 tamamlandı</span>
+      <span id="hedefKalan" style="color:var(--txt3);font-size:11px;"></span>
+    </div>
   </div>
-  <div id="butceLimitIcerik"></div>
-</div>
 
-<div style="margin:0 16px 10px; display:flex; gap:8px;">
-  <button onclick="sablonModalAc()" style="flex:1; padding:10px 14px; border-radius:14px; background:var(--blue-bg); color:var(--blue); font-size:12px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">📋 Şablonlardan Ekle</button>
-</div>
+  <!-- BÜTÇE LİMİTLERİ -->
+  <div id="butceLimitKart" style="display:none;">
+    <div class="dash-bl-hdr">
+      <span class="dash-bl-ttl">📊 Bütçe Limitleri</span>
+      <button onclick="butceLimitModalAc()" style="background:none;border:none;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;">Düzenle</button>
+    </div>
+    <div id="butceLimitIcerik"></div>
+  </div>
 
-<div class="prg-sec">
-<div class="prg-top">
-  <span class="prg-lbl">Harcama Oranı</span>
-  <button onclick="dekontOlustur()" style="font-size:10px; font-weight:800; background:var(--blue-bg); color:var(--blue); padding:4px 10px; border-radius:999px; border:none; display:flex; align-items:center; gap:4px; cursor:pointer; transition:.15s;"><span style="font-size:12px;">📸</span> Özeti Paylaş</button>
-  <span class="prg-pct" id="prgPct">%0</span>
-</div>
-<div class="prg-bar-wrap"><div class="prg-bar ok" id="prgBar" style="width:0%"></div></div>
-<div class="prg-bot"><span id="prgOde">₺0 ödendi</span><span id="prgKal">₺0 kaldı</span></div>
+  <!-- ALT KISIM: Hızlı Eylemler -->
+  <div class="dash-actions">
+    <button onclick="sablonModalAc()" class="dash-action-btn">
+      <span>📋</span><span>Şablonlar</span>
+    </button>
+    <button onclick="dekontOlustur()" class="dash-action-btn">
+      <span>📸</span><span>Paylaş</span>
+    </button>
+    <button onclick="navSec(0);setTimeout(()=>tabSec(3),100)" class="dash-action-btn">
+      <span>📊</span><span>Grafik</span>
+    </button>
+    <button onclick="sayfaAc('mAiAsistan')" class="dash-action-btn" style="color:var(--green);">
+      <span>🤖</span><span>AI Analiz</span>
+    </button>
+  </div>
 
-<div class="kavanoz-wrap" id="kavanozWrap">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><span style="font-size:12px; font-weight:700; color:var(--purple);">🍯 Birikim Kavanozu</span><span id="kYatirim" style="font-size:12px; font-weight:700;">₺0 / ₺0</span></div>
-  <div class="prg-bar-wrap" style="height:6px; margin-bottom:0;"><div class="prg-bar p" id="kBar" style="width:0%"></div></div>
-  <div style="font-size:10px; color:var(--txt3); margin-top:6px;">Sistem Hedefi: Toplam Gelirin %20'si</div>
 </div>
-</div>
+<!-- ═══ DASHBOARD PANELİ BİTİŞ ═══ -->
+
+<!-- Hidden eski PRG elementleri ID uyumu için -->
+<span id="prgPct" style="display:none"></span>
+
 
 <div class="tabs">
 <button class="tbtn on" onclick="tabSec(0)">📋 Tümü</button>
@@ -3387,7 +3483,7 @@ function paceHesapla(h) {
   const hedefTarih = new Date(hedefY, hedefM, hGun); const farkMs = hedefTarih - bugun;
   const gunLeft = Math.max(1, Math.ceil(farkMs / (1000 * 60 * 60 * 24)));
   const dailyLimit = h.kalan > 0 ? (h.kalan / gunLeft) : 0;
-  document.getElementById('paceVal').textContent = fTL(dailyLimit); document.getElementById('paceSub').textContent = `Maaşa ${gunLeft} gün var`; pCard.style.display = 'flex';
+  document.getElementById('paceVal').textContent = fTL(dailyLimit); document.getElementById('paceSub').textContent = `${gunLeft} gün var`; pCard.style.display = 'flex';
 }
 
 function aiOnerileriUret(h){
