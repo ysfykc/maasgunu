@@ -473,10 +473,13 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 /* BİLEŞENLER: MAAŞ GÜNÜ ANA EKRAN */
 .hero{margin:16px 16px 10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.hcard{border-radius:20px;padding:16px 10px 14px;text-align:center;position:relative;overflow:hidden;transition:transform .12s cubic-bezier(.34,1.56,.64,1);min-height:90px;}
+.hcard{border-radius:20px;padding:16px 10px 14px;text-align:center;position:relative;overflow:hidden;transition:transform .12s cubic-bezier(.34,1.56,.64,1);min-height:92px;}
+.hcard::before{content:'';position:absolute;right:-12px;top:-12px;width:50px;height:50px;border-radius:50%;opacity:.25;}
 .hcard:active{transform:scale(.96);transition:transform .1s cubic-bezier(.34,1.56,.64,1)}
 .hcard.gelir{ background:linear-gradient(145deg,#d4f0e0 0%,#edf9f2 100%); border:1.5px solid rgba(26,122,66,.25)!important; box-shadow:0 6px 20px rgba(26,122,66,.15); }
+.hcard.gelir::before{background:var(--green);}
 .hcard.gider{ background:linear-gradient(145deg,#f5d4d4 0%,#fdf0f0 100%); border:1.5px solid rgba(191,48,48,.25)!important; box-shadow:0 6px 20px rgba(191,48,48,.12); }
+.hcard.gider::before{background:var(--red);}
 [data-theme=dark] .hcard.gelir{ background:linear-gradient(145deg,rgba(50,215,75,.2) 0%,rgba(10,25,14,1) 100%); border:1.5px solid rgba(50,215,75,.3)!important; box-shadow:0 6px 20px rgba(50,215,75,.1); }
 [data-theme=dark] .hcard.gider{ background:linear-gradient(145deg,rgba(255,69,58,.2) 0%,rgba(25,10,10,1) 100%); border:1.5px solid rgba(255,69,58,.3)!important; box-shadow:0 6px 20px rgba(255,69,58,.1); }
 .hcard.kalan-pos{background:linear-gradient(150deg,#0f6633 0%,#1a9950 50%,#22c563 100%);box-shadow:0 8px 32px rgba(15,102,51,.4),0 2px 8px rgba(15,102,51,.25)}
@@ -521,7 +524,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .tbtn{flex:1;padding:10px 4px;border-radius:14px;font-size:12px;font-weight:700;color:var(--txt3);text-align:center;transition:transform .1s,background .15s;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .tbtn:active{transform:scale(0.95)}
 .tbtn.on{background:var(--surf);color:var(--txt);box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.sec{padding:0 16px 8px}
+.sec{padding:0 16px 12px}
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:14px}
 .sec-ttl{font-size:11px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.09em}
 .sec-total{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--bg2)}
@@ -530,31 +533,68 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .empty-sec{ text-align:center; padding:24px 16px; color:var(--txt3); font-size:12.5px; line-height:1.6; background:var(--ios-surface-strong); border-radius:22px; box-shadow:var(--ios-shadow-soft); margin-bottom:10px; }
 .empty-ico{font-size:32px;opacity:.4;margin-bottom:8px}
 
-.kalem-wrap{position:relative;margin-bottom:8px;border-radius:18px;overflow:hidden;transition:opacity .2s,border .15s}
-.kalem-wrap.dragging{opacity:0.35;border:2px dashed var(--blue)!important}
-.kalem-wrap.drag-over{border-top:3px solid var(--blue)}
-.kalem-drag-handle{width:22px;display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:14px;cursor:grab;flex-shrink:0;padding-right:2px;user-select:none}
+.kalem-wrap{position:relative;margin-bottom:8px;border-radius:18px;overflow:hidden;transition:opacity .2s}
+.kalem-wrap.dragging{opacity:0.3}
+.kalem-wrap.drag-over{margin-top:4px}
+.kalem-drag-handle{width:18px;display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:12px;cursor:grab;flex-shrink:0;opacity:.4;user-select:none}
 .kalem-bg{position:absolute;inset:0;z-index:0;background:var(--bg2);opacity:0;transition:opacity .25s ease}
-.kalem-bg-l, .kalem-bg-r{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;opacity:0}
-.kalem-bg-l{left:24px;color:var(--green)}
-.kalem-bg-r{right:24px;color:var(--red)}
-.kalem{ position:relative; z-index:1; background:var(--surf); border:.5px solid var(--brd); border-radius:16px; display:flex; align-items:center; padding:14px 15px; gap:12px; box-shadow:0 1px 6px rgba(0,0,0,.06); transition:transform .12s cubic-bezier(.34,1.56,.64,1); will-change:transform; }
-.kalem:active{transform:scale(0.97);box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.kalem-check{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--brd2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border .15s;}
-.kalem-check.on{background:var(--green);border-color:var(--green)}
-.kalem-check.on::after{content:'✓';font-size:13px;color:#fff;font-weight:800}
+.kalem-bg-l,.kalem-bg-r{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;opacity:0}
+.kalem-bg-l{left:20px;color:var(--green)}
+.kalem-bg-r{right:20px;color:var(--red)}
 
-.kalem-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px;}
-.kalem-ad{font-size:15px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;letter-spacing:-.015em;}
-.kalem-ad.done{text-decoration:line-through;color:var(--txt3)}
-.kalem-meta{display:flex;align-items:center;gap:6px;margin-top:0;flex-wrap:wrap;line-height:1;}
-.kalem-not{font-size:12px;color:var(--txt3);font-weight:500;}
-.badge{font-size:9px;font-weight:800;padding:4px 6px;border-radius:6px;text-transform:uppercase;letter-spacing:.04em;}
+/* ANA KART */
+.kalem{
+  position:relative;z-index:1;
+  background:var(--surf);
+  border:.5px solid var(--brd);
+  border-radius:18px;
+  display:flex;align-items:center;
+  padding:13px 14px;gap:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+  transition:transform .12s cubic-bezier(.34,1.56,.64,1),opacity .2s;
+  will-change:transform;
+  -webkit-tap-highlight-color:transparent;
+}
+.kalem:active{transform:scale(0.975);}
+.kalem.odendi-kalem{opacity:.65;}
 
-.kalem-tutar{font-size:16px;font-weight:800;flex-shrink:0;letter-spacing:-.02em}
-.kalem-tutar.g{color:var(--green)} .kalem-tutar.r{color:var(--red)}
-.sec .kalem-wrap:has(.kalem-tutar.g) .kalem { border-left:3px solid var(--green); }
-.sec .kalem-wrap:has(.kalem-tutar.r) .kalem { border-left:3px solid var(--red); }
+/* İKON KUTU */
+.kalem-ikon{
+  width:42px;height:42px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;flex-shrink:0;
+  transition:transform .15s;
+}
+.kalem-ikon.tip-gelir{background:linear-gradient(135deg,#d4f0e0,#edfaf4);}
+.kalem-ikon.tip-gider{background:linear-gradient(135deg,#fde8e8,#fff0f0);}
+[data-theme=dark] .kalem-ikon.tip-gelir{background:rgba(50,215,75,.12);}
+[data-theme=dark] .kalem-ikon.tip-gider{background:rgba(255,69,58,.12);}
+
+/* CHECK BUTONU */
+.kalem-check{
+  width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--brd2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  cursor:pointer;
+}
+.kalem-check.on{background:var(--green);border-color:var(--green);transform:scale(1.1);}
+.kalem-check.on::after{content:'✓';font-size:12px;color:#fff;font-weight:900;}
+
+.kalem-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+.kalem-ad{font-size:15px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;letter-spacing:-.02em;}
+.kalem-ad.done{text-decoration:line-through;opacity:.45;}
+.kalem-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.kalem-not{font-size:11px;color:var(--txt3);font-weight:500;}
+.badge{font-size:9px;font-weight:800;padding:3px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;}
+
+.kalem-sag{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.kalem-tutar{font-size:17px;font-weight:900;letter-spacing:-.03em;}
+.kalem-tutar.g{color:var(--green);}
+.kalem-tutar.r{color:var(--red);}
+.kalem-durum{font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;}
+.kalem-durum.odendi{background:var(--green-bg);color:var(--green);}
+.kalem-durum.bekliyor{background:var(--bg2);color:var(--txt3);}
 
 /* PORTFÖY & BORCUM KARTLARI */
 .portfoy-card { margin-bottom: 8px; background: var(--surf); border:.5px solid var(--brd); border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,.06); position: relative; overflow: hidden; cursor:pointer; transition:transform .12s; -webkit-tap-highlight-color:transparent; }
@@ -3293,25 +3333,47 @@ function icerikRender(){
     return; 
   }
   let html=''; const gG=tabIdx===0||tabIdx===1; const gD=tabIdx===0||tabIdx===2;
-  if(gG){ const top=v.gelirler.reduce((s,k)=>s+k.tutar,0); const aktifTop=v.gelirler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0); html+=`<div class="sec" id="sec-gelir"><div class="sec-hdr"><span class="sec-ttl">🟢 Gelirler</span><span class="sec-total g">${fTL(aktifTop)} / ${fTL(top)}</span></div>`; html+=v.gelirler.length?v.gelirler.map((k,i)=>kalemHtml(k,'gelir',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🟢</div>Henüz gelir eklenmedi</div>'; html+='</div>'; }
-  if(gD){ const top=v.giderler.reduce((s,k)=>s+k.tutar,0); const aktifTop=v.giderler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0); html+=`<div class="sec" id="sec-gider"><div class="sec-hdr"><span class="sec-ttl">🔴 Giderler</span><span class="sec-total r">${fTL(aktifTop)} / ${fTL(top)}</span></div>`; html+=v.giderler.length?v.giderler.map((k,i)=>kalemHtml(k,'gider',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🔴</div>Henüz gider eklenmedi</div>'; html+='</div>'; }
+  if(gG){ const top=v.gelirler.reduce((s,k)=>s+k.tutar,0); const aktifTop=v.gelirler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0); html+=`<div class="sec" id="sec-gelir"><div class="sec-hdr"><span class="sec-ttl" style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;"></span>GELİRLER</span><span class="sec-total g" style="font-size:13px;font-weight:800;">${fTL(aktifTop)} / ${fTL(top)}</span></div>`; html+=v.gelirler.length?v.gelirler.map((k,i)=>kalemHtml(k,'gelir',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🟢</div>Henüz gelir eklenmedi</div>'; html+='</div>'; }
+  if(gD){ const top=v.giderler.reduce((s,k)=>s+k.tutar,0); const aktifTop=v.giderler.filter(k=>k.odendi).reduce((s,k)=>s+k.tutar,0); html+=`<div class="sec" id="sec-gider"><div class="sec-hdr"><span class="sec-ttl" style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0;"></span>GİDERLER</span><span class="sec-total r" style="font-size:13px;font-weight:800;">${fTL(aktifTop)} / ${fTL(top)}</span></div>`; html+=v.giderler.length?v.giderler.map((k,i)=>kalemHtml(k,'gider',i)).join(''):'<div class="empty-sec"><div class="empty-ico">🔴</div>Henüz gider eklenmedi</div>'; html+='</div>'; }
   el.innerHTML=html; swipelariBagla();
 }
 
+const _KALEM_IKONLARI = {"Market": "🛒", "Yiyecek": "🍔", "Restoran": "🍽️", "Kafe": "☕", "Ulaşım": "🚗", "Yakıt": "⛽", "Taksi": "🚕", "Kira": "🏠", "Aidat": "🏢", "Fatura": "💡", "Sağlık": "💊", "Sigorta": "🛡️", "Eğitim": "📚", "Giyim": "👗", "Eğlence": "🎬", "Spor": "🏋️", "Maaş": "💼", "Gelir": "💰", "Kira Geliri": "🏠", "Yatırım": "📈", "BES": "🛡️", "Tasarruf": "🪙", "Kredi": "💳", "Aidat ": "🏢"};
+function _kalemIkon(k, tip) {
+  const kat = k.kategori || k.ad || '';
+  for(const [anahtar, ikon] of Object.entries(_KALEM_IKONLARI)) {
+    if(kat.toLowerCase().includes(anahtar.toLowerCase()) || k.ad.toLowerCase().includes(anahtar.toLowerCase())) return ikon;
+  }
+  if(k.yatirim) return '📈';
+  if(k.tekrar) return tip === 'gelir' ? '💰' : '📋';
+  return tip === 'gelir' ? '💵' : '💸';
+}
+
 function kalemHtml(k,tip,idx){
-  const renk=tip==='gelir'?'g':'r'; const badges=[]; const tekrarYazi = tip === 'gelir' ? 'Sabit Gelir' : 'Sabit Gider';
-  if(k.tekrar)badges.push(`<span class="badge tekrar">${tekrarYazi}</span>`); if(k.yatirim)badges.push('<span class="badge yatirim">Yatırım</span>');
-  const gecmisBadge = k.tekrar ? `<button onclick="event.stopPropagation();tekrarGecmisAc('${tip}','${escHtml(k.ad)}','${k.kaynakId||k.id}')" style="background:none;border:none;color:var(--txt3);font-size:10px;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:99px;background:var(--bg2);margin-left:4px;">📋 Geçmiş</button>` : '';
-  return`<div class="kalem-wrap" id="kw-${k.id}" data-id="${k.id}" data-tip="${tip}" data-idx="${idx}">
-    <div class="kalem-bg"><div class="kalem-bg-l"><span>✓ İşaretle</span></div><div class="kalem-bg-r"><span>Sil 🗑</span></div></div>
-    <div class="kalem" id="k-${k.id}" onclick="kalemDuzenleAc('${tip}','${k.id}')">
+  const renk=tip==='gelir'?'g':'r';
+  const ikon = _kalemIkon(k, tip);
+  const badges=[];
+  const tekrarYazi = tip==='gelir'?'Sabit Gelir':'Sabit Gider';
+  if(k.tekrar) badges.push(`<span class="badge tekrar" style="background:var(--blue-bg);color:var(--blue);">${tekrarYazi}</span>`);
+  if(k.yatirim) badges.push('<span class="badge yatirim" style="background:var(--purple-bg);color:var(--purple);">Yatırım</span>');
+  const gecmisBadge = k.tekrar ? `<button onclick="event.stopPropagation();tekrarGecmisAc('${tip}','${escHtml(k.ad)}','${k.kaynakId||k.id}')" style="background:var(--bg2);border:none;color:var(--txt3);font-size:10px;font-weight:700;cursor:pointer;padding:2px 8px;border-radius:99px;">📋 Geçmiş</button>` : '';
+  const tarihYazi = k.not ? (k.tekrar ? `Her ayın ${escHtml(k.not)}. günü` : `Ayın ${escHtml(k.not)}. günü`) : '';
+  const meta = [k.kategori?`<span class="kalem-not">${escHtml(k.kategori)}</span>`:'', tarihYazi?`<span class="kalem-not">${tarihYazi}</span>`:'', ...badges, gecmisBadge].filter(Boolean).join('');
+
+  return `<div class="kalem-wrap" id="kw-${k.id}" data-id="${k.id}" data-tip="${tip}" data-idx="${idx}">
+    <div class="kalem-bg"><div class="kalem-bg-l">✓ Tamamlandı</div><div class="kalem-bg-r">Sil 🗑</div></div>
+    <div class="kalem${k.odendi?' odendi-kalem':''}" id="k-${k.id}" onclick="kalemDuzenleAc('${tip}','${k.id}')">
       <div class="kalem-drag-handle" data-drag="${k.id}" data-tip="${tip}" ontouchstart="dragTouchBasla(event,this)" onclick="event.stopPropagation()">⠿</div>
-      <div class="kalem-check ${k.odendi?'on':''}" onclick="event.stopPropagation();toggleOdendi('${tip}','${k.id}')"></div>
+      <div class="kalem-ikon tip-${tip}">${ikon}</div>
       <div class="kalem-info">
-        <div class="kalem-ad ${k.odendi?'done':''}">${escHtml(k.ad)}</div>
-        <div class="kalem-meta">${k.kategori?`<span class="kalem-not">${escHtml(k.kategori)}</span>`:''} ${k.not?(k.tekrar?`<span class="kalem-not">📅 Her ayın ${escHtml(k.not)}. günü</span>`:`<span class="kalem-not">📅 Ayın ${escHtml(k.not)}. günü</span>`):''} ${badges.join('')}${gecmisBadge}</div>
+        <div class="kalem-ad${k.odendi?' done':''}">${escHtml(k.ad)}</div>
+        ${meta ? `<div class="kalem-meta">${meta}</div>` : ''}
       </div>
-      <div class="kalem-tutar ${renk}">${fTL(k.tutar)}</div>
+      <div class="kalem-sag">
+        <div class="kalem-tutar ${renk}">${fTL(k.tutar)}</div>
+        <div class="kalem-durum ${k.odendi?'odendi':'bekliyor'}">${k.odendi?'✓ Ödendi':'Bekliyor'}</div>
+      </div>
+      <div class="kalem-check ${k.odendi?'on':''}" onclick="event.stopPropagation();toggleOdendi('${tip}','${k.id}')"></div>
     </div>
   </div>`;
 }
