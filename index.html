@@ -47,6 +47,8 @@
   --ios-shadow-soft:0 8px 24px rgba(15,23,42,.07);
   --ios-blur:blur(18px);
   --ios-ring:rgba(255,255,255,.55);
+  --surf-solid:rgba(255,255,255,0.98);
+  --prim:var(--green); --prim-bg:var(--green-bg);
 }
 [data-theme=dark] {
   --bg:#0a0a0a; --bg2:#141414; --bg3:#1e1e1e;
@@ -71,6 +73,8 @@
   --ios-shadow:0 16px 42px rgba(0,0,0,.5);
   --ios-shadow-soft:0 8px 24px rgba(0,0,0,.3);
   --ios-ring:rgba(255,255,255,.08);
+  --surf-solid:rgba(28,28,30,0.98);
+  --prim:var(--green); --prim-bg:var(--green-bg);
 }
 
 /* ══ BÜTÇE LİMİTLERİ ══ */
@@ -212,7 +216,7 @@ body.app-ready:not(.login-open) .ai-fab { display:flex; }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{font-size:15px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
-body{font-family:var(--fd);background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%);color:var(--txt);min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;overflow-y:auto}
+body{font-family:var(--fd);background:var(--bg);color:var(--txt);min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;-webkit-tap-highlight-color:transparent;}
 
 [data-theme=dark] body { background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%); }
 
@@ -255,22 +259,114 @@ input[type=number]{-moz-appearance:textfield}
 .sablon-meta { font-size:11px; color:var(--txt3); margin-top:2px; }
 .sablon-ekle { padding:6px 14px; border-radius:99px; background:var(--green); color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; }
 .sablon-ekle.r { background:var(--red); }
-/* LOGIN EKRANI */
-#login { position:fixed; inset:0; z-index:9000; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
-.login-bg { position:absolute; inset:0; z-index:0; background:linear-gradient(160deg, #0d2818 0%, #0a1f12 45%, #071510 100%); }
-.login-bg-img { display:none; }
-.login-bg-overlay { display:none; }
-.login-splash { position:relative; z-index:1; width:100%; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.login-logo-wrap { position:relative; margin-bottom:20px; }
-.login-logo-wrap img { width:88px; height:88px; border-radius:22px; box-shadow:0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.07); display:block; }
-.login-logo-glow { position:absolute; inset:-24px; border-radius:50px; background:radial-gradient(circle, rgba(42,173,98,0.15) 0%, transparent 65%); z-index:-1; }
-.login-appname { font-family:var(--fs); font-size:38px; color:#eef2ee; letter-spacing:-.4px; line-height:1; margin-bottom:8px; }
-.login-tagline { font-size:11px; color:rgba(255,255,255,0.3); font-weight:600; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:52px; }
-.login-btns { width:100%; padding:0 28px; display:flex; flex-direction:column; gap:10px; margin-bottom:calc(env(safe-area-inset-bottom) + 28px); }
-.login-btn-google { width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.3); border:none; cursor:pointer; }
-.login-btn-email { width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.85); font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px; border:1px solid rgba(255,255,255,0.12); cursor:pointer; }
-.login-btn-kayit { width:100%; padding:12px; background:transparent; color:rgba(255,255,255,0.3); font-size:13px; font-weight:500; border:none; cursor:pointer; }
-.login-version { position:absolute; bottom:calc(env(safe-area-inset-bottom)+8px); font-size:10px; color:rgba(255,255,255,0.15); letter-spacing:.04em; }
+/* ══ LOGIN EKRANI ══ */
+#login {
+  position:fixed; inset:0; z-index:9000;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  background:#040d08;
+}
+.login-bg {
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26,122,66,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 20% 100%, rgba(10,60,30,0.4) 0%, transparent 60%),
+    linear-gradient(180deg, #040d08 0%, #071510 100%);
+}
+.login-bg::after {
+  content:'';
+  position:absolute; inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232aad62' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.login-top {
+  position:relative; z-index:1;
+  flex:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding-top:env(safe-area-inset-top);
+}
+.login-logo-wrap {
+  position:relative; margin-bottom:24px;
+}
+.login-logo-glow {
+  position:absolute; inset:-30px; border-radius:60px;
+  background:radial-gradient(circle, rgba(42,173,98,0.22) 0%, transparent 70%);
+  z-index:-1;
+  animation:loginGlow 3s ease-in-out infinite alternate;
+}
+@keyframes loginGlow {
+  from{opacity:.6;transform:scale(.95);}
+  to{opacity:1;transform:scale(1.05);}
+}
+.login-logo-wrap img {
+  width:92px; height:92px; border-radius:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08), 0 0 0 4px rgba(42,173,98,.15);
+  display:block;
+}
+.login-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(42,173,98,.15); border:1px solid rgba(42,173,98,.3);
+  color:rgba(42,173,98,.9); font-size:10px; font-weight:700;
+  padding:4px 10px; border-radius:99px; margin-bottom:20px;
+  letter-spacing:.04em; text-transform:uppercase;
+}
+.login-appname {
+  font-family:var(--fs); font-size:42px; color:#ffffff;
+  letter-spacing:-.5px; line-height:1; margin-bottom:8px;
+  text-shadow:0 2px 30px rgba(0,0,0,.4);
+}
+.login-tagline {
+  font-size:13px; color:rgba(255,255,255,.38);
+  font-weight:500; letter-spacing:.3px; margin-bottom:0;
+}
+.login-stats {
+  display:flex; gap:20px; margin-top:28px;
+}
+.login-stat {
+  text-align:center;
+}
+.login-stat-val { font-size:18px; font-weight:800; color:rgba(255,255,255,.9); }
+.login-stat-lbl { font-size:10px; color:rgba(255,255,255,.35); font-weight:600; margin-top:2px; }
+.login-divider { width:1px; background:rgba(255,255,255,.1); }
+.login-bottom {
+  position:relative; z-index:1;
+  padding:0 24px calc(env(safe-area-inset-bottom) + 24px);
+}
+.login-btns {
+  display:flex; flex-direction:column; gap:10px;
+}
+.login-btn-google {
+  width:100%; padding:16px;
+  border-radius:18px;
+  background:#ffffff;
+  color:#1a1814; font-size:15px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  box-shadow:0 8px 40px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2);
+  border:none; cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.login-btn-google:active { transform:scale(0.97); box-shadow:0 4px 20px rgba(0,0,0,.3); }
+.login-btn-email {
+  width:100%; padding:15px;
+  border-radius:18px;
+  background:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.9); font-size:15px; font-weight:600;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  border:1px solid rgba(255,255,255,.15);
+  cursor:pointer;
+  transition:transform .12s, background .12s;
+  -webkit-tap-highlight-color:transparent;
+  backdrop-filter:blur(10px);
+}
+.login-btn-email:active { transform:scale(0.97); background:rgba(255,255,255,.15); }
+.login-btn-kayit {
+  width:100%; padding:10px; background:transparent;
+  color:rgba(255,255,255,.3); font-size:13px; font-weight:500;
+  border:none; cursor:pointer;
+}
+.login-version {
+  display:none;
+}
 
 /* ══ HEDEF TASARRUFU ══ */
 .hedef-card { margin:0 16px 12px; background:linear-gradient(135deg,#1a3a8b,#5a3a8b); border-radius:20px; padding:16px; box-shadow:0 8px 24px rgba(26,58,139,.25); }
@@ -300,7 +396,8 @@ input[type=number]{-moz-appearance:textfield}
 .logo{font-family:var(--fd);font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:-.02em}
 .logo-ico{width:32px;height:32px;border-radius:12px;object-fit:cover;box-shadow:0 10px 22px rgba(26,122,66,.22)}
 .tbr{display:flex;align-items:center;gap:8px}
-.ibtn{width:34px;height:34px;border-radius:13px;background:var(--ios-surface-strong);box-shadow:var(--ios-shadow-soft);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt2)}
+.ibtn{width:34px;height:34px;border-radius:13px;background:var(--ios-surface-strong);box-shadow:var(--ios-shadow-soft);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt2);transition:transform .1s,opacity .1s;-webkit-tap-highlight-color:transparent;cursor:pointer;}
+.ibtn:active{transform:scale(0.85);opacity:.7;}
 #avatar{display:none;width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid var(--brd2)}
 
 /* STABİL AY_BAR CSS */
@@ -312,14 +409,15 @@ input[type=number]{-moz-appearance:textfield}
 
 /* STABİL MAIN PAD CSS */
 main{ padding-top:calc(var(--top) + 46px + env(safe-area-inset-top)); padding-bottom:calc(var(--nav) + 120px + env(safe-area-inset-bottom)); }
-.page{display:none}
-.page.on{display:block;animation:fadeUp .25s ease}
+.page{display:none;will-change:opacity}
+.page.on{display:block;animation:fadeUp .22s cubic-bezier(.25,.46,.45,.94)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* STABİL NAV CSS */
 .nav{ position:fixed; bottom:0; left:0; right:0; height:calc(72px + env(safe-area-inset-bottom)); padding-bottom:calc(12px + env(safe-area-inset-bottom)); background:var(--ios-surface); backdrop-filter:var(--ios-blur); -webkit-backdrop-filter:var(--ios-blur); border-top:.5px solid rgba(0,0,0,.06); display:flex; align-items:center; justify-content:space-around; z-index:200; }
 [data-theme=dark] .nav {border-color:rgba(255,255,255,.08)}
-.nitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px;border-radius:18px;color:var(--txt3);font-size:10px;font-weight:800;transition:.15s;cursor:pointer}
+.nitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px;border-radius:18px;color:var(--txt3);font-size:10px;font-weight:800;transition:transform .1s,color .15s;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.nitem:active{transform:scale(0.88)}
 .nitem.on{background:var(--bg2);color:var(--green)}
 .nico{font-size:21px;line-height:1}
 
@@ -327,7 +425,7 @@ main{ padding-top:calc(var(--top) + 46px + env(safe-area-inset-top)); padding-bo
 .fab-container { position: fixed; bottom: calc(86px + env(safe-area-inset-bottom)); right: 20px; z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 14px; pointer-events: none; }
 .fab-actions { display: flex; flex-direction: column; gap: 14px; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.9); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .fab-container.open .fab-actions { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-.main-fab { width: 58px; height: 58px; border-radius: 29px; background: var(--txt); color: var(--bg); font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 28px rgba(0,0,0,0.25); border: none; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; pointer-events: auto; }
+.main-fab { width: 58px; height: 58px; border-radius: 29px; background: var(--txt); color: var(--bg); font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 28px rgba(0,0,0,0.25); border: none; transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color:transparent; }
 [data-theme=dark] .main-fab { background: #f2f2f7; color: #1c1c1e; }
 .fab-container.open .main-fab { transform: rotate(45deg); }
 .action-btn { width: 52px; height: 52px; border-radius: 20px; border: none; color: white; font-size: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: transform 0.15s ease; cursor: pointer; }
@@ -376,7 +474,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 /* BİLEŞENLER: MAAŞ GÜNÜ ANA EKRAN */
 .hero{margin:16px 16px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .hcard{border:none!important;border-radius:22px;padding:14px 12px;text-align:center;position:relative;overflow:hidden;transition:.3s;min-height:86px;box-shadow:var(--ios-shadow-soft);backdrop-filter:var(--ios-blur);-webkit-backdrop-filter:var(--ios-blur);}
-.hcard:active{transform:scale(.98)}
+.hcard:active{transform:scale(.96);transition:transform .1s cubic-bezier(.34,1.56,.64,1)}
 .hcard.gelir{ background: linear-gradient(90deg, rgba(42,173,98,.24) 0%, rgba(42,173,98,.10) 38%, rgba(255,255,255,.92) 100%); }
 .hcard.gider{ background: linear-gradient(90deg, rgba(224,80,80,.24) 0%, rgba(224,80,80,.10) 38%, rgba(255,255,255,.92) 100%); }
 [data-theme=dark] .hcard.gelir{ background: linear-gradient(90deg, rgba(50,215,75,.20) 0%, rgba(50,215,75,.08) 38%, rgba(28,28,30,.94) 100%); }
@@ -437,7 +535,8 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .kalem-bg-l, .kalem-bg-r{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;opacity:0}
 .kalem-bg-l{left:24px;color:var(--green)}
 .kalem-bg-r{right:24px;color:var(--red)}
-.kalem{ position:relative; z-index:1; background:var(--ios-surface-strong); border:none; border-radius:20px; display:flex; align-items:center; padding:14px; gap:12px; box-shadow:var(--ios-shadow-soft); transition:transform .16s ease; }
+.kalem{ position:relative; z-index:1; background:var(--surf-solid); border:.5px solid var(--brd); border-radius:20px; display:flex; align-items:center; padding:14px; gap:12px; box-shadow:0 2px 12px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04); transition:transform .12s cubic-bezier(.34,1.56,.64,1),box-shadow .12s; will-change:transform; }
+.kalem:active{transform:scale(0.97);box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .kalem-check{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--brd2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .kalem-check.on{background:var(--green);border-color:var(--green)}
 .kalem-check.on::after{content:'✓';font-size:13px;color:#fff;font-weight:800}
@@ -644,16 +743,34 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <div id="login">
   <div class="login-bg"></div>
-  <div class="login-version">Maaş Günü v4.6</div>
 
-  <div class="login-splash" id="loginPanel">
+  <div class="login-top" id="loginPanel">
     <div class="login-logo-wrap">
       <div class="login-logo-glow"></div>
       <img src="16379.png" alt="Maaş Günü">
     </div>
+    <div class="login-badge">✦ Kişisel Finans</div>
     <div class="login-appname">Maaş Günü</div>
-    <div class="login-tagline">Gelirini Planla • Geleceğini Kur</div>
+    <div class="login-tagline">Gelirini planla, geleceğini kur</div>
+    <div class="login-stats">
+      <div class="login-stat">
+        <div class="login-stat-val">%100</div>
+        <div class="login-stat-lbl">Gizli</div>
+      </div>
+      <div class="login-divider"></div>
+      <div class="login-stat">
+        <div class="login-stat-val">Ücretsiz</div>
+        <div class="login-stat-lbl">Kullanım</div>
+      </div>
+      <div class="login-divider"></div>
+      <div class="login-stat">
+        <div class="login-stat-val">Anlık</div>
+        <div class="login-stat-lbl">Senkron</div>
+      </div>
+    </div>
+  </div>
 
+  <div class="login-bottom">
     <div class="login-btns">
       <button id="loginBtn" class="login-btn-google" onclick="girisYap()">
         <svg height="20" viewBox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
@@ -668,22 +785,20 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
     </div>
   </div>
 
-  <div class="login-version">Maaş Günü v4.6</div>
-
-  <div id="emailPanel" style="display:none; flex:1; flex-direction:column; width:100%; padding:0 32px;">
-    <button onclick="emailPanelKapat()" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.15); border:none; color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px);">← Geri</button>
-    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; margin-bottom:10vh;">
-      <div id="emailPanelTtl" style="font-family:var(--fs); font-size:30px; color:#fff; letter-spacing:-.5px; text-align:center; margin-bottom:8px;">Giriş Yap</div>
-      <div id="emailHata" style="display:none; background:rgba(255,80,80,0.2); border:1px solid rgba(255,80,80,0.4); color:#ffb3b3; padding:10px 14px; border-radius:12px; font-size:13px; text-align:center;"></div>
+  <div id="emailPanel" style="display:none; flex:1; flex-direction:column; width:100%; padding:0 32px; position:relative; z-index:1;">
+    <button onclick="emailPanelKapat()" style="align-self:flex-start; margin-top:20px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.15); color:#fff; padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px);">← Geri</button>
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:14px; margin-bottom:10vh;">
+      <div id="emailPanelTtl" style="font-family:var(--fs); font-size:32px; color:#fff; letter-spacing:-.5px; text-align:center; margin-bottom:8px;">Giriş Yap</div>
+      <div id="emailHata" style="display:none; background:rgba(255,80,80,0.15); border:1px solid rgba(255,80,80,0.3); color:#ffb3b3; padding:10px 14px; border-radius:12px; font-size:13px; text-align:center;"></div>
       <div id="emailAdSoyadRow" style="display:none;">
-        <input id="eAdSoyad" type="text" placeholder="Ad Soyad" autocomplete="name" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
+        <input id="eAdSoyad" type="text" placeholder="Ad Soyad" autocomplete="name" style="width:100%;box-sizing:border-box; padding:15px; border-radius:16px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:15px; outline:none; font-family:inherit;" />
       </div>
-      <input id="eEmail" type="email" placeholder="E-posta adresi" autocomplete="email" inputmode="email" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
-      <input id="eSifre" type="password" placeholder="Şifre" autocomplete="current-password" style="width:100%; padding:15px; border-radius:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:14px; outline:none; font-family:inherit;" />
-      <button id="emailGirisBtn" onclick="emailIslem()" style="width:100%; padding:15px; border-radius:16px; background:rgba(255,255,255,0.95); color:#1a1814; font-size:14px; font-weight:700; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.3);">Giriş Yap</button>
-      <button id="sifremiUnuttumBtn" onclick="sifremiUnuttum()" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer; padding:4px;">Şifremi unuttum</button>
+      <input id="eEmail" type="email" placeholder="E-posta adresi" autocomplete="email" inputmode="email" style="width:100%;box-sizing:border-box; padding:15px; border-radius:16px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:15px; outline:none; font-family:inherit;" />
+      <input id="eSifre" type="password" placeholder="Şifre" autocomplete="current-password" style="width:100%;box-sizing:border-box; padding:15px; border-radius:16px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:15px; outline:none; font-family:inherit;" />
+      <button id="emailGirisBtn" onclick="emailIslem()" style="width:100%; padding:16px; border-radius:18px; background:#ffffff; color:#1a1814; font-size:15px; font-weight:700; border:none; cursor:pointer; box-shadow:0 8px 32px rgba(0,0,0,0.35);">Giriş Yap</button>
+      <button id="sifremiUnuttumBtn" onclick="sifremiUnuttum()" style="background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:13px; cursor:pointer; padding:4px;">Şifremi unuttum</button>
       <div id="emailAltLink" style="text-align:center;">
-        <button onclick="emailPanelAc('kayit')" id="kayitGecBtn" style="background:transparent; border:none; color:rgba(255,255,255,0.6); font-size:13px; font-weight:600; cursor:pointer;">Hesabın yok mu? Kayıt ol →</button>
+        <button onclick="emailPanelAc('kayit')" id="kayitGecBtn" style="background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:13px; font-weight:600; cursor:pointer;">Hesabın yok mu? Kayıt ol →</button>
       </div>
     </div>
   </div>
