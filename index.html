@@ -9,8 +9,8 @@
 <title>Maaş Günü</title>
 
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="16379.png">
-<link rel="apple-touch-icon" href="16379.png">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -941,7 +941,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <div class="login-top" id="loginPanel">
     <div class="login-logo-wrap">
       <div class="login-logo-glow"></div>
-      <img src="16379.png" alt="Maaş Günü">
+      <img src="icons/icon-512.png" alt="Maaş Günü">
     </div>
     <div class="login-badge">✦ Kişisel Finans</div>
     <div class="login-appname">Maaş Günü</div>
@@ -1000,7 +1000,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <header class="topbar">
 <div class="logo">
-  <img class="logo-ico" src="16379.png" alt="Logo">
+  <img class="logo-ico" src="icons/icon-512.png" alt="Logo">
   Maaş Günü
 </div>
 <div class="tbr">
@@ -1480,7 +1480,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div class="page-topbar">
   <button class="page-topbar-back" onclick="sayfaKapat('mCopSayfa')">‹</button>
   <div class="page-topbar-title">Çöp Kutusu</div>
-  <button onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:999px; border:none;">Tümünü Sil</button>
+  <button id="copBosaltBtn" onclick="copuBosalt()" style="font-size:11px; background:var(--red-bg); color:var(--red); font-weight:800; padding:6px 12px; border-radius:999px; border:none;">Tümünü Sil</button>
 </div>
 <div class="page-body">
 <div style="font-size:12px; color:var(--txt2); margin-bottom:16px;">Silinen gelirler, giderler, varlıklar ve borçlar burada toplanır. Geri yükleyebilirsiniz.</div>
@@ -2172,7 +2172,7 @@ async function swBildirimGonder(baslik, govde, tag) {
         // Yöntem 1: doğrudan showNotification
         try {
           await reg.showNotification(baslik, {
-            body: govde, icon:'/16379.png', badge:'/16379.png',
+            body: govde, icon:'/icons/icon-192.png', badge:'/icons/icon-192-maskable.png',
             tag: tag||'maas-gunu', renotify:true,
           });
           return true;
@@ -2193,7 +2193,7 @@ async function swBildirimGonder(baslik, govde, tag) {
       await Notification.requestPermission();
     }
     if(Notification.permission === 'granted') {
-      try { new Notification(baslik, {body:govde, icon:'/16379.png', tag:tag||'maas-gunu'}); return true; } catch(e) {}
+      try { new Notification(baslik, {body:govde, icon:'/icons/icon-192.png', tag:tag||'maas-gunu'}); return true; } catch(e) {}
     }
   }
   return false;
@@ -2337,7 +2337,7 @@ async function borcHatirlaticiGonder() {
   localStorage.setItem(BORC_BILDIRIM_KEY, bugunStr);
 
   if(mesajlar.length === 1) {
-    bildirimGonder('Maaş Günü — Borç Hatırlatıcı', mesajlar[0], 'https://ysfykc.github.io/16379.png');
+    bildirimGonder('Maaş Günü — Borç Hatırlatıcı', mesajlar[0], 'https://ysfykc.github.io/icons/icon-192.png');
   } else {
     bildirimGonder(
       `Maaş Günü — ${mesajlar.length} borç hatırlatıcı`,
@@ -2372,14 +2372,14 @@ async function bildirimIzniAc() {
       try {
         await reg.showNotification('Maaş Günü 🔔', {
           body: 'Bildirimler aktif! Fatura ve borç hatırlatıcıları çalışacak.',
-          icon: '/16379.png',
-          badge: '/16379.png',
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-192-maskable.png',
           tag: 'test-bildirim',
         });
       } catch(e) {
         // Fallback
         if('Notification' in window && Notification.permission === 'granted') {
-          new Notification('Maaş Günü 🔔', {body: 'Bildirimler aktif!', icon: '/16379.png'});
+          new Notification('Maaş Günü 🔔', {body: 'Bildirimler aktif!', icon: '/icons/icon-192.png'});
         }
       }
     }
@@ -3403,7 +3403,7 @@ async function dekontOlustur() {
 
     <!-- Header -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;position:relative;">
-      <img src="16379.png" crossorigin="anonymous" style="width:42px;height:42px;border-radius:12px;box-shadow:0 6px 16px rgba(42,173,98,.3);">
+      <img src="icons/icon-512.png" crossorigin="anonymous" style="width:42px;height:42px;border-radius:12px;box-shadow:0 6px 16px rgba(42,173,98,.3);">
       <div>
         <div style="font-size:18px;font-weight:800;color:#f2f2f7;letter-spacing:-.02em;">Maaş Günü</div>
         <div style="font-size:11px;color:rgba(255,255,255,.45);font-weight:500;">${ayIsmi}</div>
@@ -3761,14 +3761,28 @@ async function duzenleKaydet(){
   const ad=document.getElementById('dAd').value.trim(); const tutar=parseFloat(document.getElementById('dTutar').value)||0; if(!ad||!tutar)return;
   const v=ayVerisi(aktifAy); const liste=duzenlenenTip==='gelir'?v.gelirler:v.giderler; const k=liste.find(x=>x.id===duzenlenenId);
   if(k){
-    const eskiTekrar = k.tekrar;
-    k.ad=ad;k.tutar=tutar;k.kategori=document.getElementById('dKat').value.trim();k.not=document.getElementById('dNot').value.trim();k.tekrar=dTekrarAcik;
-    // Tekrar kapatıldıysa silinenler listesine ekle ki ileriki aylarda çıkmasın
+    const eskiTekrar = k.tekrar; const eskiAd = k.ad; const eskiKaynakId = k.kaynakId || k.id;
+    const yeniKat = document.getElementById('dKat').value.trim(); const yeniNot = document.getElementById('dNot').value.trim();
+    k.ad=ad;k.tutar=tutar;k.kategori=yeniKat;k.not=yeniNot;k.tekrar=dTekrarAcik;
+    // Tekrar kapatıldıysa silinenler listesine ekle ki ileriki aylarda çıkmasın,
+    // ve zaten oluşmuş gelecek ay kayıtlarını da (henüz ödenmemişse) temizle
     if(eskiTekrar && !dTekrarAcik) {
       const v2=ayVerisi(aktifAy);
-      const silinenRef={kaynakId:k.kaynakId||k.id,ad:k.ad};
+      const silinenRef={kaynakId:eskiKaynakId,ad:eskiAd};
       if(duzenlenenTip==='gelir'){if(!v2.silinenGelirler)v2.silinenGelirler=[];v2.silinenGelirler.push(silinenRef);}
       else{if(!v2.silinenGiderler)v2.silinenGiderler=[];v2.silinenGiderler.push(silinenRef);}
+      Object.keys(veri.aylar).filter(ay=>ay>aktifAy).forEach(ay=>{
+        const av=veri.aylar[ay]; const l=duzenlenenTip==='gelir'?av.gelirler:av.giderler; if(!l)return;
+        const kalanlar=l.filter(x=>!(x.tekrar && !x.odendi && (x.kaynakId===eskiKaynakId || x.ad===eskiAd)));
+        if(duzenlenenTip==='gelir') av.gelirler=kalanlar; else av.giderler=kalanlar;
+      });
+    }
+    // Tekrar açık kalmaya devam ediyorsa, zaten oluşmuş gelecek aylardaki (henüz ödenmemiş) kopyalara da yeni tutar/ad/kategori yansısın
+    else if(dTekrarAcik) {
+      Object.keys(veri.aylar).filter(ay=>ay>aktifAy).forEach(ay=>{
+        const av=veri.aylar[ay]; const l=duzenlenenTip==='gelir'?av.gelirler:av.giderler; if(!l)return;
+        l.forEach(x=>{ if(x.tekrar && !x.odendi && (x.kaynakId===eskiKaynakId || x.ad===eskiAd)) { x.ad=ad; x.tutar=tutar; x.kategori=yeniKat; x.not=yeniNot; } });
+      });
     }
   }
   document.getElementById('mDuzenle').classList.remove('on'); render();await fbKaydet(); Haptic.success(); toast('✅ Güncellendi');
@@ -3921,13 +3935,27 @@ function tickerGuncelle() {
   const usd = parseFloat(k.usd || k.USD || 0);
   const eur = parseFloat(k.eur || k.EUR || 0);
   const gram = parseFloat(k.gram_altin || 0);
+  const ceyrek = parseFloat(k.ceyrek || 0);
+  const yarim = parseFloat(k.yarim || 0);
+  const tam = parseFloat(k.tam || 0);
+  const ata = parseFloat(k.ata || 0);
+  const cumhuriyet = parseFloat(k.cumhuriyet || 0);
+  const gremse = parseFloat(k.gremse || 0);
+
+  const fmt = (v) => v > 0 ? v.toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—';
 
   const items = [
     { ad:'BIST 100', val: k.bist100 ? Number(k.bist100).toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—', birim:'', chg: null },
     { ad:'NASDAQ', val: k.nasdaq ? Number(k.nasdaq).toLocaleString('en-US',{maximumFractionDigits:0}) : '—', birim:'', chg: null },
     { ad:'USD/TRY', val: usd > 0 ? usd.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', birim:'₺', chg: null },
     { ad:'EUR/TRY', val: eur > 0 ? eur.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', birim:'₺', chg: null },
-    { ad:'ALTIN', val: gram > 0 ? gram.toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—', birim:'₺', chg: null },
+    { ad:'GRAM ALTIN', val: fmt(gram), birim:'₺', chg: null },
+    { ad:'ÇEYREK ALTIN', val: fmt(ceyrek), birim:'₺', chg: null },
+    { ad:'YARIM ALTIN', val: fmt(yarim), birim:'₺', chg: null },
+    { ad:'TAM ALTIN', val: fmt(tam), birim:'₺', chg: null },
+    { ad:'ATA ALTIN', val: fmt(ata), birim:'₺', chg: null },
+    { ad:'CUMHURİYET ALTINI', val: fmt(cumhuriyet), birim:'₺', chg: null },
+    { ad:'GREMSE ALTIN', val: fmt(gremse), birim:'₺', chg: null },
   ];
 
   const html = items.map(i => `
