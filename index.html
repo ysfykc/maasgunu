@@ -576,7 +576,7 @@ main{ padding-top:calc(var(--top) + 46px + env(safe-area-inset-top)); padding-bo
 .main-fab { width: 58px; height: 58px; border-radius: 29px; background: var(--txt); color: var(--bg); font-size: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 28px rgba(0,0,0,0.25); border: none; transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color:transparent; }
 [data-theme=dark] .main-fab { background: #f2f2f7; color: #1c1c1e; }
 .fab-container.open .main-fab { transform: rotate(45deg); }
-.action-btn { width: 52px; height: 52px; border-radius: 20px; border: none; color: white; font-size: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: transform 0.15s ease; cursor: pointer; }
+.action-btn { width: 52px; height: 52px; border-radius: 20px; border: none; color: white; font-size: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.35); transition: transform 0.15s ease; cursor: pointer; }
 .action-btn:active { transform: scale(0.92); }
 .action-btn.gelir-btn { background: linear-gradient(145deg, rgba(42,173,98,0.92), rgba(42,173,98,0.74)); }
 .action-btn.gider-btn { background: linear-gradient(145deg, rgba(224,80,80,0.92), rgba(224,80,80,0.74)); }
@@ -656,7 +656,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .ai-chip-text{ font-size:12px; line-height:1.55; color:var(--txt2); }
 .ai-chip-actions{ display:flex; gap:6px; margin-top:8px; }
 .ai-mini-btn{ padding:8px 10px; border-radius:999px; background:var(--bg2); color:var(--txt2); font-size:10.5px; font-weight:700; transition:.15s; cursor:pointer; border:none; }
-.prg-sec{ margin:0 16px 10px; background:var(--surf); border:.5px solid var(--brd); border-radius:20px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,.06); transition:all .25s ease; }
+.prg-sec{ margin:0 16px 10px; background:var(--surf); border:.5px solid var(--brd); border-radius:20px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,.06); transition:background .2s,box-shadow .2s; }
 .prg-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .prg-lbl{font-size:12px;font-weight:600;color:var(--txt2)}
 .prg-pct{font-size:12px;font-weight:700}
@@ -804,7 +804,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 .odm-d{font-size:10.5px;color:var(--txt3)}
 .odm-r{font-size:13px;font-weight:800;color:var(--green)}
 
-.mini-chart{ margin:0 16px 10px; background:var(--ios-surface-strong)!important; backdrop-filter:var(--ios-blur); border:.5px solid var(--ios-ring)!important; border-radius:22px!important; padding:14px; box-shadow:var(--ios-shadow-soft); transition:all .25s ease; }
+.mini-chart{ margin:0 16px 10px; background:var(--surf); border:.5px solid var(--brd); border-radius:22px; padding:14px; box-shadow:var(--ios-shadow-soft); }
 .mini-chart-ttl{font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:12px}
 
 .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
@@ -2141,13 +2141,6 @@ function tarihFmt(ym) {
   return `${AYLAR[parseInt(m)-1]} ${y}`;
 }
 
-function hedefModalAc() {
-  Haptic.light();
-  document.getElementById('ayarTasarrufHedef').value = veri.ayarlar?.tasarrufHedef || '';
-  document.getElementById('ayarTasarrufTarih').value = veri.ayarlar?.tasarrufTarih || '';
-  document.getElementById('mAyarlar').classList.add('on');
-}
-
 /* ══ FATURA HATIRLATICI ══ */
 /* ══ BİLDİRİM SİSTEMİ ══ */
 /* ══ SERVICE WORKER & PUSH BİLDİRİMLER ══ */
@@ -2741,15 +2734,7 @@ function adminKontrolEt() {
   });
 }
 
-async function adminAc() {
-  Haptic.light();
-  sayfaAc('adminPanel');
-  await adminVerileriYukle();
-}
 
-function adminKapat() {
-  sayfaKapat('adminPanel');
-}
 
 async function profilKaydet(kullanici) {
   if(!db || !kullanici) return;
@@ -3926,7 +3911,6 @@ function grafikTrendRender(v) {
   });
 }
 
-function grafikRender(v){ grafikKatRender(v); }
 
 
 /* ══ PORTFÖY FONKSİYONLARI ══ */
@@ -4486,7 +4470,6 @@ function borcAnaliz(){
   return{toplam,altin,doviz,tl,acik};
 }
 
-function akilliBorcOneriYenile(){ akilliBorcIndex++; akilliBorcOneriRender(); }
 function akilliBorcOneriRender() {
   const box=document.getElementById('smartBox'); if(!box)return;
   const a=borcAnaliz(); const oneriler=[];
@@ -4921,10 +4904,6 @@ function sayfaKapat(id) {
   if(idx > -1) _acikSayfalar.splice(idx, 1);
 }
 
-function tumSayfalariKapat() {
-  document.querySelectorAll('.page-screen').forEach(el => el.classList.remove('open'));
-  _acikSayfalar.length = 0;
-}
 
 
 /* ══ AI FİNANSAL ASİSTAN ══ */
