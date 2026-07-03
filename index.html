@@ -9,8 +9,8 @@
 <title>Maaş Günü</title>
 
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="16379.png">
-<link rel="apple-touch-icon" href="16379.png">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -941,7 +941,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <div class="login-top" id="loginPanel">
     <div class="login-logo-wrap">
       <div class="login-logo-glow"></div>
-      <img src="16379.png" alt="Maaş Günü">
+      <img src="icons/icon-512.png" alt="Maaş Günü">
     </div>
     <div class="login-badge">✦ Kişisel Finans</div>
     <div class="login-appname">Maaş Günü</div>
@@ -1000,7 +1000,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 
 <header class="topbar">
 <div class="logo">
-  <img class="logo-ico" src="16379.png" alt="Logo">
+  <img class="logo-ico" src="icons/icon-512.png" alt="Logo">
   Maaş Günü
 </div>
 <div class="tbr">
@@ -2172,7 +2172,7 @@ async function swBildirimGonder(baslik, govde, tag) {
         // Yöntem 1: doğrudan showNotification
         try {
           await reg.showNotification(baslik, {
-            body: govde, icon:'/16379.png', badge:'/16379.png',
+            body: govde, icon:'/icons/icon-192.png', badge:'/icons/icon-192-maskable.png',
             tag: tag||'maas-gunu', renotify:true,
           });
           return true;
@@ -2193,7 +2193,7 @@ async function swBildirimGonder(baslik, govde, tag) {
       await Notification.requestPermission();
     }
     if(Notification.permission === 'granted') {
-      try { new Notification(baslik, {body:govde, icon:'/16379.png', tag:tag||'maas-gunu'}); return true; } catch(e) {}
+      try { new Notification(baslik, {body:govde, icon:'/icons/icon-192.png', tag:tag||'maas-gunu'}); return true; } catch(e) {}
     }
   }
   return false;
@@ -2337,7 +2337,7 @@ async function borcHatirlaticiGonder() {
   localStorage.setItem(BORC_BILDIRIM_KEY, bugunStr);
 
   if(mesajlar.length === 1) {
-    bildirimGonder('Maaş Günü — Borç Hatırlatıcı', mesajlar[0], 'https://ysfykc.github.io/16379.png');
+    bildirimGonder('Maaş Günü — Borç Hatırlatıcı', mesajlar[0], 'https://ysfykc.github.io/icons/icon-192.png');
   } else {
     bildirimGonder(
       `Maaş Günü — ${mesajlar.length} borç hatırlatıcı`,
@@ -2372,14 +2372,14 @@ async function bildirimIzniAc() {
       try {
         await reg.showNotification('Maaş Günü 🔔', {
           body: 'Bildirimler aktif! Fatura ve borç hatırlatıcıları çalışacak.',
-          icon: '/16379.png',
-          badge: '/16379.png',
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-192-maskable.png',
           tag: 'test-bildirim',
         });
       } catch(e) {
         // Fallback
         if('Notification' in window && Notification.permission === 'granted') {
-          new Notification('Maaş Günü 🔔', {body: 'Bildirimler aktif!', icon: '/16379.png'});
+          new Notification('Maaş Günü 🔔', {body: 'Bildirimler aktif!', icon: '/icons/icon-192.png'});
         }
       }
     }
@@ -3403,7 +3403,7 @@ async function dekontOlustur() {
 
     <!-- Header -->
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;position:relative;">
-      <img src="16379.png" crossorigin="anonymous" style="width:42px;height:42px;border-radius:12px;box-shadow:0 6px 16px rgba(42,173,98,.3);">
+      <img src="icons/icon-512.png" crossorigin="anonymous" style="width:42px;height:42px;border-radius:12px;box-shadow:0 6px 16px rgba(42,173,98,.3);">
       <div>
         <div style="font-size:18px;font-weight:800;color:#f2f2f7;letter-spacing:-.02em;">Maaş Günü</div>
         <div style="font-size:11px;color:rgba(255,255,255,.45);font-weight:500;">${ayIsmi}</div>
