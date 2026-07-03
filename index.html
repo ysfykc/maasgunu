@@ -1196,6 +1196,7 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
   <div style="padding: 0 16px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
      <div style="font-size:14px; font-weight:800; color:var(--txt2);">Varlık Listesi</div>
      <div style="display:flex; gap:6px;">
+        <button class="sbtn" style="width:auto; padding:8px 12px; margin:0; border-radius:99px; font-size:12px; background:var(--bg2); color:var(--txt);" onclick="sayfaAc('mCevirici');ceviriciAc()" title="Çevirici">🔁</button>
         <button class="sbtn" style="width:auto; padding:8px 12px; margin:0; border-radius:99px; font-size:12px; background:var(--bg2); color:var(--txt);" onclick="pGecmisToggle()" title="Geçmiş">📈</button>
         <button class="sbtn" style="width:auto; padding:8px 12px; margin:0; border-radius:99px; font-size:12px; background:var(--bg2); color:var(--txt);" onclick="togglePChart()">📊</button>
         <button class="sbtn a" style="width:auto; padding:8px 16px; margin:0; border-radius:99px; font-size:12px;" onclick="modalVarlikAc()">+ Ekle</button>
@@ -1487,6 +1488,36 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 <div id="copListesi" style="margin-bottom:16px;"></div>
 </div>
 </div>
+
+<div class="page-screen" id="mCevirici">
+<div class="page-topbar">
+  <button class="page-topbar-back" onclick="sayfaKapat('mCevirici')">‹</button>
+  <div class="page-topbar-title">Çevirici</div>
+  <div style="width:34px;"></div>
+</div>
+<div class="page-body">
+  <div class="tabs" style="margin-bottom:16px;">
+    <button class="tbtn on" id="cevTabDoviz" onclick="ceviriciTabSec('doviz')">Döviz</button>
+    <button class="tbtn" id="cevTabAltin" onclick="ceviriciTabSec('altin')">Altın</button>
+  </div>
+  <div id="ceviriciListesi" style="display:flex;flex-direction:column;margin-bottom:20px;border-radius:14px;overflow:hidden;background:var(--surf);"></div>
+  <div class="hcard" style="text-align:center;padding:20px 16px;">
+     <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;min-width:0;">
+           <div style="font-size:11px;color:var(--txt3);font-weight:800;margin-bottom:8px;letter-spacing:.5px;" id="cevSolLbl">USD</div>
+           <input id="cevSolInput" type="number" inputmode="decimal" value="1" oninput="ceviriciHesapla('sol')" style="width:100%;background:var(--bg2);border:none;border-radius:12px;padding:14px 8px;font-size:19px;font-weight:800;color:var(--txt);text-align:center;font-family:var(--fd);">
+        </div>
+        <button onclick="ceviriciYonDegistir()" style="width:38px;height:38px;border-radius:50%;background:var(--blue-bg);color:var(--blue);border:none;font-size:16px;flex-shrink:0;">🔁</button>
+        <div style="flex:1;min-width:0;">
+           <div style="font-size:11px;color:var(--txt3);font-weight:800;margin-bottom:8px;letter-spacing:.5px;" id="cevSagLbl">TRY</div>
+           <input id="cevSagInput" type="number" inputmode="decimal" value="0" oninput="ceviriciHesapla('sag')" style="width:100%;background:var(--bg2);border:none;border-radius:12px;padding:14px 8px;font-size:19px;font-weight:800;color:var(--txt);text-align:center;font-family:var(--fd);">
+        </div>
+     </div>
+     <div id="cevGuncellemeZamani" style="margin-top:12px;font-size:10.5px;color:var(--txt3);"></div>
+  </div>
+</div>
+</div>
+
 
 <div class="page-screen" id="mAyarlar">
 <div class="page-topbar">
@@ -3292,6 +3323,7 @@ async function kurlariGuncelle() {
        if(g > 0) {
            veri.kurlar.usd = s('USD'); veri.kurlar.USD = s('USD');
            veri.kurlar.eur = s('EUR'); veri.kurlar.EUR = s('EUR');
+           veri.kurlar.gbp = s('GBP') || 0; veri.kurlar.GBP = veri.kurlar.gbp;
            veri.kurlar.gram_altin = g;
            veri.kurlar.ceyrek = s('CEYREKALTIN') || (g * 1.605);
            veri.kurlar.yarim = s('YARIMALTIN') || (g * 3.21);
@@ -3935,27 +3967,13 @@ function tickerGuncelle() {
   const usd = parseFloat(k.usd || k.USD || 0);
   const eur = parseFloat(k.eur || k.EUR || 0);
   const gram = parseFloat(k.gram_altin || 0);
-  const ceyrek = parseFloat(k.ceyrek || 0);
-  const yarim = parseFloat(k.yarim || 0);
-  const tam = parseFloat(k.tam || 0);
-  const ata = parseFloat(k.ata || 0);
-  const cumhuriyet = parseFloat(k.cumhuriyet || 0);
-  const gremse = parseFloat(k.gremse || 0);
-
-  const fmt = (v) => v > 0 ? v.toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—';
 
   const items = [
     { ad:'BIST 100', val: k.bist100 ? Number(k.bist100).toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—', birim:'', chg: null },
     { ad:'NASDAQ', val: k.nasdaq ? Number(k.nasdaq).toLocaleString('en-US',{maximumFractionDigits:0}) : '—', birim:'', chg: null },
     { ad:'USD/TRY', val: usd > 0 ? usd.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', birim:'₺', chg: null },
     { ad:'EUR/TRY', val: eur > 0 ? eur.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', birim:'₺', chg: null },
-    { ad:'GRAM ALTIN', val: fmt(gram), birim:'₺', chg: null },
-    { ad:'ÇEYREK ALTIN', val: fmt(ceyrek), birim:'₺', chg: null },
-    { ad:'YARIM ALTIN', val: fmt(yarim), birim:'₺', chg: null },
-    { ad:'TAM ALTIN', val: fmt(tam), birim:'₺', chg: null },
-    { ad:'ATA ALTIN', val: fmt(ata), birim:'₺', chg: null },
-    { ad:'CUMHURİYET ALTINI', val: fmt(cumhuriyet), birim:'₺', chg: null },
-    { ad:'GREMSE ALTIN', val: fmt(gremse), birim:'₺', chg: null },
+    { ad:'GRAM ALTIN', val: gram > 0 ? gram.toLocaleString('tr-TR',{maximumFractionDigits:0}) : '—', birim:'₺', chg: null },
   ];
 
   const html = items.map(i => `
@@ -3974,6 +3992,121 @@ function tickerGuncelle() {
   if(inner) inner.style.animationDuration = (items.length * 5) + 's';
 }
 /* ══ PORTFÖY TİCKER BİTİŞ ══ */
+
+/* ══ ÇEVİRİCİ ══ */
+const CEVIRICI_DOVIZLER = [
+  {key:'usd', ad:'USD', alt:'Amerikan Doları', bayrak:'🇺🇸'},
+  {key:'eur', ad:'EUR', alt:'Avrupa Eurosu', bayrak:'🇪🇺'},
+  {key:'gbp', ad:'GBP', alt:'İngiliz Sterlini', bayrak:'🇬🇧'},
+];
+const CEVIRICI_ALTINLAR = [
+  {key:'gram', ad:'Gram Altın', alt:'24 Ayar', bayrak:'📊'},
+  {key:'22_ayar', ad:'22 Ayar', alt:'Gram Altın', bayrak:'⚖️'},
+  {key:'14_ayar', ad:'14 Ayar', alt:'Gram Altın', bayrak:'⚖️'},
+  {key:'ceyrek', ad:'Çeyrek Altın', alt:'', bayrak:'¼'},
+  {key:'yarim', ad:'Yarım Altın', alt:'', bayrak:'½'},
+  {key:'tam', ad:'Tam Altın', alt:'', bayrak:'1'},
+  {key:'ata', ad:'Ata Altın', alt:'', bayrak:'🏛'},
+  {key:'cumhuriyet', ad:'Cumhuriyet Altını', alt:'', bayrak:'🪙'},
+  {key:'gremse', ad:'Gremse Altın', alt:'', bayrak:'⚖️'},
+];
+
+let ceviriciTip = 'doviz';
+let ceviriciSecim = 'usd';
+
+function ceviriciKurGetir(key){
+  const k = veri.kurlar || {};
+  const map = {
+    usd: parseFloat(k.usd || k.USD || 0),
+    eur: parseFloat(k.eur || k.EUR || 0),
+    gbp: parseFloat(k.gbp || k.GBP || 0),
+    gram: parseFloat(k.gram_altin || 0),
+    '22_ayar': parseFloat(k['22_ayar'] || (parseFloat(k.gram_altin||0) * 22/24)),
+    '14_ayar': parseFloat(k['14_ayar'] || (parseFloat(k.gram_altin||0) * 14/24)),
+    ceyrek: parseFloat(k.ceyrek || 0),
+    yarim: parseFloat(k.yarim || 0),
+    tam: parseFloat(k.tam || 0),
+    ata: parseFloat(k.ata || 0),
+    cumhuriyet: parseFloat(k.cumhuriyet || 0),
+    gremse: parseFloat(k.gremse || 0),
+  };
+  return map[key] || 0;
+}
+
+function ceviriciAc(){
+  ceviriciTip = 'doviz'; ceviriciSecim = 'usd';
+  document.getElementById('cevTabDoviz').classList.add('on');
+  document.getElementById('cevTabAltin').classList.remove('on');
+  document.getElementById('cevSolInput').value = 1;
+  ceviriciListesiRender();
+  ceviriciHesapla('sol');
+}
+
+function ceviriciTabSec(tip){
+  ceviriciTip = tip;
+  document.getElementById('cevTabDoviz').classList.toggle('on', tip==='doviz');
+  document.getElementById('cevTabAltin').classList.toggle('on', tip==='altin');
+  ceviriciSecim = (tip==='doviz') ? 'usd' : 'gram';
+  ceviriciListesiRender();
+  ceviriciHesapla('sol');
+}
+
+function ceviriciListesiRender(){
+  const liste = ceviriciTip === 'doviz' ? CEVIRICI_DOVIZLER : CEVIRICI_ALTINLAR;
+  const el = document.getElementById('ceviriciListesi');
+  el.innerHTML = liste.map((it,i) => `
+    <div onclick="ceviriciSecItemYap('${it.key}')" id="cevRow_${it.key}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;${it.key===ceviriciSecim?'background:var(--bg2);':''}${i>0?'border-top:.5px solid var(--brd);':''}">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--txt);">${it.ad}</div>
+        <div style="font-size:11.5px;color:var(--txt3);margin-top:1px;">${it.alt}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:var(--txt3);font-weight:700;">TRY</div>
+        <div style="font-size:11.5px;color:var(--txt3);">Türk Lirası</div>
+      </div>
+    </div>`).join('');
+}
+
+function ceviriciSecItemYap(key){
+  ceviriciSecim = key;
+  ceviriciListesiRender();
+  ceviriciHesapla('sol');
+}
+
+function ceviriciYonDegistir(){
+  const solInp = document.getElementById('cevSolInput');
+  const sagInp = document.getElementById('cevSagInput');
+  const tmp = solInp.value; solInp.value = sagInp.value; sagInp.value = tmp;
+  ceviriciHesapla('sol');
+}
+
+function ceviriciSecimBilgi(){
+  const liste = ceviriciTip === 'doviz' ? CEVIRICI_DOVIZLER : CEVIRICI_ALTINLAR;
+  return liste.find(x => x.key === ceviriciSecim) || liste[0];
+}
+
+function ceviriciHesapla(kaynak){
+  const bilgi = ceviriciSecimBilgi();
+  const kur = ceviriciKurGetir(ceviriciSecim);
+  document.getElementById('cevSolLbl').textContent = bilgi.ad;
+  document.getElementById('cevSagLbl').textContent = 'TRY';
+  const solInp = document.getElementById('cevSolInput');
+  const sagInp = document.getElementById('cevSagInput');
+  if(kaynak === 'sag'){
+    const sagDeger = parseFloat(sagInp.value) || 0;
+    solInp.value = kur > 0 ? +(sagDeger / kur).toFixed(4) : 0;
+  } else {
+    const solDeger = parseFloat(solInp.value) || 0;
+    sagInp.value = kur > 0 ? +(solDeger * kur).toFixed(2) : 0;
+  }
+  const zamanEl = document.getElementById('cevGuncellemeZamani');
+  if(zamanEl){
+    zamanEl.textContent = kur > 0
+      ? `1 ${bilgi.ad} ≈ ${kur.toLocaleString('tr-TR',{maximumFractionDigits:2})} ₺`
+      : 'Kur bilgisi için Portföy sayfasında "Canlı Fiyatları Çek" yapın';
+  }
+}
+/* ══ ÇEVİRİCİ BİTİŞ ══ */
 
 /* ══ PORTFÖY GEÇMİŞİ ══ */
 function portfoyGecmisKaydet(toplamDeger) {
