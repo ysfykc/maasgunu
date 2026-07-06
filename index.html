@@ -1591,6 +1591,18 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
 </div>
 <div class="page-body">
 
+  <!-- UYGULAMA KAPALIYKEN BİLDİRİM (FCM) -->
+  <div style="background:linear-gradient(135deg,var(--green-bg),var(--surf));border:1px solid var(--green-brd,rgba(26,122,66,.2));border-radius:16px;padding:16px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <span style="font-size:24px;">🔔</span>
+      <div>
+        <div style="font-size:14px;font-weight:800;color:var(--txt);">Uygulama Kapalıyken Bildirim</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:1px;">Maaş günü, fatura ve borç hatırlatıcıları</div>
+      </div>
+    </div>
+    <div id="fcmDurum" style="margin-top:10px;"></div>
+  </div>
+
   <div id="bildirimIzinDurum" style="padding:10px 14px;border-radius:12px;margin-bottom:16px;font-size:13px;font-weight:600;"></div>
 
   <div style="background:var(--surf);border:1px solid var(--brd);border-radius:16px;overflow:hidden;margin-bottom:12px;">
@@ -2187,6 +2199,100 @@ function tarihFmt(ym) {
 const VAPID_PUBLIC = 'BEl62iUYgUivxIkv69yViEuiBIa40HI80NM9a9NHw0CZO1UFkr5h3HlhY1_kgEW5T2KD-D9dpYzJuLJlX7hjk';
 // Not: Bu demo VAPID key'dir. Gerçek kullanım için kendi key'ini üretmen gerekir.
 
+/* ══ FCM PUSH BİLDİRİM (UYGULAMA KAPALIYKEN) ══ */
+// Aynı Firebase projesi (maasgunu-bd353) Teknohane ile paylaşılıyor.
+const FCM_VAPID_KEY = 'BPt5vY5P3Dr9DG2zHOQwhQKnH6V5UruqGisQRTlGWxkNaAYtYKAEG9xiTHn78yGq1DlrsnWFSazOquL_9krdtjY';
+const PUSH_API = 'https://teknohane-push.yusuf-aykac.workers.dev/';
+let _fcmMessaging = null;
+let _pushAutoSyncDone = false;
+
+// Hedef kullanıcının FCM token'ını bulup Worker üzerinden push gönderir
+async function fcmPushGonder(toUid, baslik, govde, url) {
+  try {
+    if(!db || !window._fb) return;
+    const snap = await window._fb.getDoc(window._fb.doc(db, 'users', toUid, 'fcm', 'token'));
+    const token = snap.exists() ? snap.data()?.fcmToken : null;
+    if(!token) return;
+    await fetch(PUSH_API, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ token, title: baslik, body: govde, url: url || 'https://ysfykc.github.io/' })
+    });
+  } catch(e) { /* sessizce geç */ }
+}
+
+// Kullanıcı "Bildirimleri Aç" butonuna basınca: izin ister, FCM token alır, Firestore'a kaydeder
+async function fcmKur(sessiz) {
+  if(!user) { if(!sessiz) toast('Önce giriş yapmalısın'); return; }
+  if(typeof Notification === 'undefined' || !('serviceWorker' in navigator)) {
+    if(!sessiz) toast('Bu cihaz bildirimleri desteklemiyor'); return;
+  }
+  if(!sessiz) toast('⏳ Bildirimler ayarlanıyor...');
+  const zamanAsimli = (promise, ms, etiket) => Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error(`"${etiket}" ${ms/1000}sn'de yanıt vermedi`)), ms))
+  ]);
+  try {
+    let izin = Notification.permission;
+    if(izin === 'default') izin = await zamanAsimli(Notification.requestPermission(), 15000, 'İzin');
+    if(izin !== 'granted') {
+      if(!sessiz) {
+        if(izin === 'denied') toast('❌ Bildirim engellenmiş. Telefon ayarlarından açmalısın');
+        else toast('Bildirim izni verilmedi');
+      }
+      fcmDurumGuncelle(); return;
+    }
+    // Firebase Messaging modülünü yükle
+    const { getMessaging, getToken } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js');
+    const swReg = await zamanAsimli(
+      navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/firebase-cloud-messaging-push-scope' }),
+      15000, 'Service Worker'
+    );
+    if(!_fcmMessaging) _fcmMessaging = getMessaging(window._fbApp);
+    const token = await zamanAsimli(
+      getToken(_fcmMessaging, { vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: swReg }),
+      15000, 'Token alma'
+    );
+    if(!token) { if(!sessiz) toast('Token alınamadı, tekrar dene'); return; }
+    // Firestore'a kaydet
+    await window._fb.setDoc(window._fb.doc(db, 'users', user.uid, 'fcm', 'token'), {
+      fcmToken: token,
+      guncelleme: new Date().toISOString(),
+      platform: navigator.userAgent
+    });
+    if(!veri.ayarlar) veri.ayarlar = {};
+    veri.ayarlar.fcmToken = token;
+    veri.ayarlar.pushAcik = true;
+    lsKaydet();
+    fcmDurumGuncelle();
+    if(!sessiz) toast('🔔 Bildirimler açıldı! Uygulama kapalıyken de bildirim alacaksın');
+  } catch(e) {
+    console.error('FCM kurulum hatası:', e);
+    if(!sessiz) toast('Bildirimler açılamadı: ' + e.message);
+  }
+}
+
+// Bildirim durumu göstergesini günceller
+function fcmDurumGuncelle() {
+  const el = document.getElementById('fcmDurum');
+  if(!el) return;
+  const izin = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+  let metin, renk, btn = '';
+  if(izin === 'unsupported') {
+    metin = 'Bu cihazda desteklenmiyor'; renk = 'var(--txt3)';
+  } else if(izin === 'granted' && veri.ayarlar?.pushAcik) {
+    metin = '✓ Açık — Uygulama kapalıyken bildirim alırsın'; renk = 'var(--green)';
+    btn = `<button class="s-inp" style="margin-top:10px;background:var(--bg2);color:var(--txt2);font-weight:700;cursor:pointer;" onclick="fcmKur(false)">🔄 Bildirimleri Yenile</button>`;
+    if(!_pushAutoSyncDone) { _pushAutoSyncDone = true; setTimeout(() => fcmKur(true), 500); }
+  } else if(izin === 'denied') {
+    metin = '❌ Engellenmiş (telefon ayarlarından açmalısın)'; renk = 'var(--red)';
+  } else {
+    metin = 'Kapalı'; renk = 'var(--txt3)';
+    btn = `<button class="btn btn-g" style="margin-top:12px;" onclick="fcmKur(false)">🔔 Uygulama Kapalıyken Bildirim Al</button>`;
+  }
+  el.innerHTML = `<div style="font-size:13px;color:${renk};font-weight:700;">${metin}</div>${btn}`;
+}
+
 async function swKaydet() {
   if(!('serviceWorker' in navigator)) return null;
   try {
@@ -2259,12 +2365,15 @@ async function bildirimIzniVeSwKur() {
 const BILDIRIM_PREFS_KEY = 'mg_bildirim_prefs';
 
 function bildirimPrefsYukle() {
+  if(veri.bildirimPrefs) return veri.bildirimPrefs;
   try { return JSON.parse(localStorage.getItem(BILDIRIM_PREFS_KEY) || '{"fatura":true,"borc":true,"maas":true}'); }
   catch(e) { return {fatura:true, borc:true, maas:true}; }
 }
 
 function bildirimPrefKaydet(prefs) {
   localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(prefs));
+  veri.bildirimPrefs = prefs;
+  fbKaydet();
 }
 
 function bildirimToggle(tip) {
@@ -2323,6 +2432,7 @@ function bildirimPanelAc() {
   }
 
   sayfaAc('mBildirimSayfa');
+  fcmDurumGuncelle();
 }
 
 function maasBildirimiGonder() {
@@ -3113,6 +3223,7 @@ async function fbBaslat(){
   const{getFirestore,doc,setDoc,getDoc,onSnapshot}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
   const{getAuth,signInWithPopup,signInWithRedirect,getRedirectResult,GoogleAuthProvider,onAuthStateChanged,signOut,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updateProfile}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
   const app=initializeApp(CFG); db=getFirestore(app);auth=getAuth(app);
+  window._fbApp=app;
   window._fb={doc,setDoc,getDoc,onSnapshot,signInWithPopup,signInWithRedirect,getRedirectResult,GoogleAuthProvider,onAuthStateChanged,signOut,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,updateProfile};
   return new Promise(res=>onAuthStateChanged(auth,u=>{user=u;res(u);}));
 }
