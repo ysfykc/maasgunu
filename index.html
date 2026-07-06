@@ -2376,19 +2376,20 @@ function bildirimPrefsYukle() {
 async function bildirimPrefKaydet(prefs) {
   localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(prefs));
   veri.bildirimPrefs = prefs; // eski sürümlerle uyum için tutuluyor, artık kaynak değil
-  if(user) {
-    try {
-      await window._fb.setDoc(window._fb.doc(db, 'users', user.uid, 'ayarlar', 'bildirimler'), prefs, {merge:true});
-    } catch(e) { console.warn('Bildirim tercihleri Firestore\'a kaydedilemedi:', e); }
-  }
+  if(!user) { toast('⚠️ Kaydedilmedi: giriş yapılmamış görünüyor'); return; }
+  try {
+    await window._fb.setDoc(window._fb.doc(db, 'users', user.uid, 'ayarlar', 'bildirimler'), prefs, {merge:true});
+    toast('☁️ Firestore\'a yazıldı: ' + JSON.stringify(prefs));
+  } catch(e) { toast('❌ Firestore yazma hatası: ' + e.message); }
 }
 
 async function bildirimPrefsFirestoreYukle() {
-  if(!user) return null;
+  if(!user) { toast('⚠️ Okunmadı: giriş yapılmamış'); return null; }
   try {
     const snap = await window._fb.getDoc(window._fb.doc(db, 'users', user.uid, 'ayarlar', 'bildirimler'));
-    if(snap.exists()) return snap.data();
-  } catch(e) { console.warn('Bildirim tercihleri okunamadı:', e); }
+    if(snap.exists()) { const d = snap.data(); toast('☁️ Firestore\'dan okundu: ' + JSON.stringify(d)); return d; }
+    toast('ℹ️ Firestore\'da henüz kayıt yok');
+  } catch(e) { toast('❌ Firestore okuma hatası: ' + e.message); }
   return null;
 }
 
@@ -2436,6 +2437,7 @@ function bildirimPanelAc() {
   // Firestore'daki gerçek tercihi de kontrol et (cihazlar arası tutarlılık için)
   bildirimPrefsFirestoreYukle().then(uzak => {
     if(!uzak) return;
+    toast('🔁 Ekran Firestore değeriyle güncellendi');
     localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(uzak));
     veri.bildirimPrefs = uzak;
     const tF = document.getElementById('togFatura'), tB = document.getElementById('togBorc'), tM = document.getElementById('togMaas');
