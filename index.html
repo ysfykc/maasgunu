@@ -2365,23 +2365,39 @@ async function bildirimIzniVeSwKur() {
 const BILDIRIM_PREFS_KEY = 'mg_bildirim_prefs';
 
 function bildirimPrefsYukle() {
-  if(veri.bildirimPrefs) return veri.bildirimPrefs;
   try { return JSON.parse(localStorage.getItem(BILDIRIM_PREFS_KEY) || '{"fatura":true,"borc":true,"maas":true}'); }
   catch(e) { return {fatura:true, borc:true, maas:true}; }
 }
 
-function bildirimPrefKaydet(prefs) {
+// Bildirim tercihlerini KENDİ küçük Firestore dokümanına yazar.
+// Büyük 'veri' bloğundan bilerek ayrıldı: o blok tamamen yeniden yazılıp
+// tamamen yeniden okunduğu (fbKaydet/fbYukle/onSnapshot) için, uygulama
+// kapatılırken yarım kalan bir senkron bu tercihleri eski haline döndürebiliyordu.
+async function bildirimPrefKaydet(prefs) {
   localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(prefs));
-  veri.bildirimPrefs = prefs;
-  fbKaydet();
+  veri.bildirimPrefs = prefs; // eski sürümlerle uyum için tutuluyor, artık kaynak değil
+  if(user) {
+    try {
+      await window._fb.setDoc(window._fb.doc(db, 'users', user.uid, 'ayarlar', 'bildirimler'), prefs, {merge:true});
+    } catch(e) { console.warn('Bildirim tercihleri Firestore\'a kaydedilemedi:', e); }
+  }
+}
+
+async function bildirimPrefsFirestoreYukle() {
+  if(!user) return null;
+  try {
+    const snap = await window._fb.getDoc(window._fb.doc(db, 'users', user.uid, 'ayarlar', 'bildirimler'));
+    if(snap.exists()) return snap.data();
+  } catch(e) { console.warn('Bildirim tercihleri okunamadı:', e); }
+  return null;
 }
 
 function bildirimToggle(tip) {
   const prefs = bildirimPrefsYukle();
   prefs[tip] = !prefs[tip];
-  bildirimPrefKaydet(prefs);
   document.getElementById(`tog${tip.charAt(0).toUpperCase()+tip.slice(1)}`).classList.toggle('on', prefs[tip]);
   toast(prefs[tip] ? `✅ ${tip} bildirimi açıldı` : `🔕 ${tip} bildirimi kapatıldı`);
+  bildirimPrefKaydet(prefs);
 }
 
 function bildirimPanelAc() {
@@ -2416,6 +2432,17 @@ function bildirimPanelAc() {
   if(togF) togF.classList.toggle('on', !!prefs.fatura);
   if(togB) togB.classList.toggle('on', !!prefs.borc);
   if(togM) togM.classList.toggle('on', !!prefs.maas);
+
+  // Firestore'daki gerçek tercihi de kontrol et (cihazlar arası tutarlılık için)
+  bildirimPrefsFirestoreYukle().then(uzak => {
+    if(!uzak) return;
+    localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(uzak));
+    veri.bildirimPrefs = uzak;
+    const tF = document.getElementById('togFatura'), tB = document.getElementById('togBorc'), tM = document.getElementById('togMaas');
+    if(tF) tF.classList.toggle('on', !!uzak.fatura);
+    if(tB) tB.classList.toggle('on', !!uzak.borc);
+    if(tM) tM.classList.toggle('on', !!uzak.maas);
+  });
 
   // Son gönderilen
   const gecmisEl = document.getElementById('bildirimGecmis');
