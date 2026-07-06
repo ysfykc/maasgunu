@@ -1634,12 +1634,6 @@ body.app-ready:not(.login-open) .fab-container { display: flex; }
     <div id="bildirimGecmis" style="font-size:12px;color:var(--txt2);"></div>
   </div>
 
-  <div style="background:var(--surf);border:1px solid var(--brd);border-radius:16px;padding:14px 16px;margin-bottom:16px;">
-    <div style="font-size:12px;font-weight:700;color:var(--txt3);margin-bottom:8px;">🔧 Teşhis Kaydı (geçici)</div>
-    <div id="bildirimDebugKutu" style="font-size:11px;color:var(--txt2);white-space:pre-wrap;line-height:1.6;"></div>
-    <button class="s-inp" style="margin-top:8px;font-size:11px;" onclick="localStorage.removeItem(BILDIRIM_DEBUG_KEY); document.getElementById('bildirimDebugKutu').textContent='';">Logu Temizle</button>
-  </div>
-
   <button class="sbtn" onclick="bildirimIzniAc()" style="margin-bottom:8px;">🔔 İzin Ver / Test Bildirimi</button>
 </div>
 </div>
@@ -2369,18 +2363,6 @@ async function bildirimIzniVeSwKur() {
 
 /* ══ BİLDİRİM YÖNETİM PANELİ ══ */
 const BILDIRIM_PREFS_KEY = 'mg_bildirim_prefs';
-const BILDIRIM_DEBUG_KEY = 'mg_bildirim_debug_log';
-
-// Kalıcı log: toast'lar üst üste binip kayboluyor, bu yüzden her olayı
-// localStorage'a da yazıyoruz — kapatıp açtıktan sonra bile ekranda görülebilsin.
-function bildirimDebugLog(msg) {
-  try {
-    const log = JSON.parse(localStorage.getItem(BILDIRIM_DEBUG_KEY) || '[]');
-    log.push(new Date().toLocaleTimeString('tr-TR') + ' — ' + msg);
-    while(log.length > 25) log.shift();
-    localStorage.setItem(BILDIRIM_DEBUG_KEY, JSON.stringify(log));
-  } catch(e) {}
-}
 
 function bildirimPrefsYukle() {
   try { return JSON.parse(localStorage.getItem(BILDIRIM_PREFS_KEY) || '{"fatura":true,"borc":true,"maas":true}'); }
@@ -2394,21 +2376,20 @@ function bildirimPrefsYukle() {
 async function bildirimPrefKaydet(prefs) {
   localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(prefs));
   veri.bildirimPrefs = prefs; // eski sürümlerle uyum için tutuluyor, artık kaynak değil
-  bildirimDebugLog('localStorage yazıldı: ' + JSON.stringify(prefs));
-  if(!user) { bildirimDebugLog('YAZILAMADI: user null (giriş yok)'); return; }
+  if(!user) { toast('⚠️ Kaydedilmedi: giriş yapılmamış görünüyor'); return; }
   try {
     await window._fb.setDoc(window._fb.doc(db, 'users', user.uid, 'ayarlar', 'bildirimler'), prefs, {merge:true});
-    bildirimDebugLog('Firestore YAZMA başarılı: ' + JSON.stringify(prefs));
-  } catch(e) { bildirimDebugLog('Firestore YAZMA HATASI: ' + e.message); }
+    toast('☁️ Firestore\'a yazıldı: ' + JSON.stringify(prefs));
+  } catch(e) { toast('❌ Firestore yazma hatası: ' + e.message); }
 }
 
 async function bildirimPrefsFirestoreYukle() {
-  if(!user) { bildirimDebugLog('OKUMA yapılmadı: user null'); return null; }
+  if(!user) { toast('⚠️ Okunmadı: giriş yapılmamış'); return null; }
   try {
     const snap = await window._fb.getDoc(window._fb.doc(db, 'users', user.uid, 'ayarlar', 'bildirimler'));
-    if(snap.exists()) { const d = snap.data(); bildirimDebugLog('Firestore OKUNDU: ' + JSON.stringify(d)); return d; }
-    bildirimDebugLog('Firestore OKUNDU: kayıt yok (henüz hiç yazılmamış)');
-  } catch(e) { bildirimDebugLog('Firestore OKUMA HATASI: ' + e.message); }
+    if(snap.exists()) { const d = snap.data(); toast('☁️ Firestore\'dan okundu: ' + JSON.stringify(d)); return d; }
+    toast('ℹ️ Firestore\'da henüz kayıt yok');
+  } catch(e) { toast('❌ Firestore okuma hatası: ' + e.message); }
   return null;
 }
 
@@ -2420,17 +2401,8 @@ function bildirimToggle(tip) {
   bildirimPrefKaydet(prefs);
 }
 
-
 function bildirimPanelAc() {
   Haptic.light();
-  bildirimDebugLog('--- Panel açıldı ---');
-  const debugKutu = document.getElementById('bildirimDebugKutu');
-  if(debugKutu) {
-    try {
-      const log = JSON.parse(localStorage.getItem(BILDIRIM_DEBUG_KEY) || '[]');
-      debugKutu.textContent = log.length ? log.join('\n') : '(henüz kayıt yok)';
-    } catch(e) { debugKutu.textContent = 'log okunamadı: ' + e.message; }
-  }
   const durumEl = document.getElementById('bildirimIzinDurum');
   if(durumEl) {
     // TWA'da SW kaydını kontrol et
@@ -2464,11 +2436,8 @@ function bildirimPanelAc() {
 
   // Firestore'daki gerçek tercihi de kontrol et (cihazlar arası tutarlılık için)
   bildirimPrefsFirestoreYukle().then(uzak => {
-    const dk = document.getElementById('bildirimDebugKutu');
-    if(dk) { try { const log = JSON.parse(localStorage.getItem(BILDIRIM_DEBUG_KEY) || '[]'); dk.textContent = log.join('\n'); } catch(e){} }
     if(!uzak) return;
-    bildirimDebugLog('EKRAN Firestore değeriyle GÜNCELLENDİ (üzerine yazıldı): ' + JSON.stringify(uzak));
-    if(dk) { try { const log = JSON.parse(localStorage.getItem(BILDIRIM_DEBUG_KEY) || '[]'); dk.textContent = log.join('\n'); } catch(e){} }
+    toast('🔁 Ekran Firestore değeriyle güncellendi');
     localStorage.setItem(BILDIRIM_PREFS_KEY, JSON.stringify(uzak));
     veri.bildirimPrefs = uzak;
     const tF = document.getElementById('togFatura'), tB = document.getElementById('togBorc'), tM = document.getElementById('togMaas');
